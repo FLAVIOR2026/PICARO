@@ -1,0 +1,38 @@
+{
+  "name": "PICARO — Gestão de Equipas por Turnos",
+  "short_name": "PICARO",
+  "description": "O Pica Ponto inteligente — gestão de escalas, ponto e equipas para lares, IPSS e instituições de saúde.",
+  "start_url": "./picaro.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0C332E",
+  "theme_color": "#0C332E",
+  "lang": "pt-PT",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
