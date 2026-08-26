@@ -973,6 +973,21 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
 }
 </style>
 
+
+<style id="pica-roster-complete-styles">
+.roster-state-chip{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 9px;border-radius:8px;font-size:11px;font-weight:700;text-align:center;line-height:1.15}
+.roster-state-chip.off{background:#f0f2f4;color:#687481;border:1px solid #e0e5e8}
+.roster-state-chip.vacation{background:#fff4df;color:#946218;border:1px solid #f3dfb5}
+.roster-note-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#fff;margin-left:5px;vertical-align:middle}
+.coverage-alert{border:1px solid #f0d7a5;background:#fff8eb;color:#7f5712;border-radius:10px;padding:10px 13px;font-size:12px;line-height:1.5;margin-bottom:7px}
+.coverage-ok{border:1px solid #d6eadf;background:#eff9f3;color:#32734e;border-radius:10px;padding:10px 13px;font-size:12px}
+@media(max-width:768px){
+  .roster-table{min-width:900px!important}
+  #page-escalas .toolbar{gap:10px;align-items:flex-start;flex-wrap:wrap}
+  #escala-copy-btn{width:auto;min-height:42px}
+}
+</style>
+
 </head>
 <body>
 
@@ -1016,7 +1031,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           <label>Palavra-passe</label>
           <input type="password" id="password-input" placeholder="••••••••" autocomplete="current-password" required>
           <div style="display:flex; justify-content:flex-end; margin-top:8px;">
-            <button type="button" id="forgot-password-btn" class="policy-link" style="font-size:12px;">Esqueci-me da palavra-passe</button>
+            <button type="button" id="forgot-password-btn" class="policy-link dark-on-light" style="font-size:13px; font-weight:700; padding:8px 0; min-height:38px;">Esqueci-me da palavra-passe</button>
           </div>
         </div>
         <button type="submit" class="btn-primary" id="login-submit-btn">Entrar</button>
@@ -1834,6 +1849,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
             <button class="action-btn" id="escala-next-btn" title="Semana seguinte">→</button>
           </div>
         </div>
+        <div id="escala-coverage-alerts" style="margin-bottom:12px;"></div>
         <div class="panel">
           <div class="panel-body" style="padding-top:16px; overflow-x:auto;">
             <table class="roster-table">
@@ -2489,6 +2505,11 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
       <label>Trocar com colega (mesmo dia)</label>
       <select class="select-input" id="rm-swap-target"></select>
     </div>
+    <div class="field">
+      <label>Notas do dia</label>
+      <textarea id="rm-notes" rows="3" placeholder="Opcional — observações sobre este turno/folga"></textarea>
+    </div>
+    <div id="rm-availability-warning" class="hint-chip" hidden></div>
   </div>
   <div class="drawer-foot">
     <button class="btn-secondary" id="roster-modal-cancel-btn">Cancelar</button>
@@ -2777,7 +2798,8 @@ let editingTeamName = null;
 let editingShiftId = null;
 
 /* ---- Escalas (roster) ---- */
-let rosterEntries = []; // {employeeId, date:'YYYY-MM-DD', shiftId}
+let rosterEntries = []; // {employeeId, date, shiftId, isDayOff, notes, teamId}
+let rosterApprovedVacations = [];
 let rosterModalContext = null;
 const dowNames = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
 const monthsPt = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -4674,9 +4696,31 @@ let supaTeamNameToId = {};
 async function loadSupaTeamMap(institutionId){
   supaTeamNameToId = {};
   try {
-    const { data, error } = await supabaseClient.from('teams').select('id,name').eq('institution_id', institutionId);
-    if(!error && data) data.forEach(t=> supaTeamNameToId[t.name] = t.id);
-  } catch(err){ console.warn('Não foi possível carregar as equipas da base de dados.', err); }
+    const { data, error } = await supabaseClient
+      .from('teams')
+      .select('id,name,description,color,min_staff_required')
+      .eq('institution_id', institutionId)
+      .is('deleted_at', null)
+      .order('name');
+
+    if(error) throw error;
+
+    teams = (data || []).map(t=>({
+      id:t.id,
+      _supa:true,
+      name:t.name,
+      description:t.description || '',
+      color:t.color || '#6366f1',
+      minStaff:Number(t.min_staff_required || 0),
+      scheduled:0,
+      present:0
+    }));
+
+    data?.forEach(t=>{ supaTeamNameToId[t.name] = t.id; });
+    populateTeamSelects();
+  } catch(err){
+    console.warn('Não foi possível carregar as equipas da base de dados.', err);
+  }
 }
 function mapSupaStatusToLocal(s){ return s==='on_leave' ? 'ferias' : (s==='active' ? 'ativo' : 'suspenso'); }
 function mapLocalStatusToSupa(s){ return s==='ferias' ? 'on_leave' : (s==='ativo' ? 'active' : 'inactive'); }
@@ -4698,6 +4742,7 @@ async function loadEmployeesFromSupabase(institutionId){
     const m = notes.match(/Horário:\s*([^\n]+)/);
     return {
       id: row.id,
+      profileId: row.profile_id || null,
       _supa: true,
       name: row.full_name,
       team: row.teams ? row.teams.name : '—',
@@ -5162,43 +5207,113 @@ function renderEscalaHeader(){
   document.getElementById('escala-header-row').innerHTML = html;
 }
 
+function renderRosterCoverageWarnings(dates){
+  const el = document.getElementById('escala-coverage-alerts');
+  if(!el) return;
+
+  const warnings = [];
+  for(const team of teams){
+    const minStaff = Number(team.minStaff || 0);
+    if(minStaff <= 0) continue;
+
+    for(const d of dates){
+      const ds = dateStr(d);
+      const teamEmployees = employees.filter(e=>e.team===team.name && e.status!=='suspenso');
+      const scheduled = teamEmployees.filter(e=>{
+        if(employeeOnApprovedVacation(e.id, ds)) return false;
+        const r = getRosterEntry(e.id, ds);
+        return r && !r.isDayOff && !!r.shiftId;
+      }).length;
+
+      if(scheduled < minStaff){
+        warnings.push(`⚠ ${team.name} · ${pad2(d.getDate())}/${pad2(d.getMonth()+1)}: ${scheduled} escalado(s), mínimo ${minStaff}.`);
+      }
+    }
+  }
+
+  if(!warnings.length){
+    el.innerHTML = teams.some(t=>Number(t.minStaff||0)>0)
+      ? `<div class="coverage-ok">✓ Cobertura mínima das equipas assegurada nesta semana.</div>`
+      : '';
+    return;
+  }
+
+  el.innerHTML = warnings.slice(0,12).map(w=>`<div class="coverage-alert">${w}</div>`).join('') +
+    (warnings.length>12 ? `<div class="coverage-alert">+ ${warnings.length-12} outros avisos de cobertura.</div>` : '');
+}
+
 async function renderEscalas(){
   renderEscalaHeader();
+
   if(currentInstitutionId){
     skeletonRosterGrid('escala-table-body', 7, Math.min(employees.length||5, 6));
     await loadRosterForWeek(currentInstitutionId, currentWeekStart);
   }
-  const sourceNote = currentInstitutionId ? ' · sistema ☁' : '';
-  document.getElementById('escala-week-sub').textContent = `Semana de ${weekRangeLabel()}${sourceNote}`;
+
+  document.getElementById('escala-week-sub').textContent = `Semana de ${weekRangeLabel()}`;
+
   const teamFilter = document.getElementById('escala-filter-team').value;
   const dates = getWeekDates(currentWeekStart);
   const todayStr = dateStr(new Date());
   const list = employees.filter(e => !teamFilter || e.team===teamFilter);
 
+  renderRosterCoverageWarnings(dates);
+
+  if(!list.length){
+    document.getElementById('escala-table-body').innerHTML =
+      `<tr><td colspan="8" style="padding:28px;text-align:center;color:var(--ink-faint);">Ainda não existem colaboradores para apresentar.</td></tr>`;
+    return;
+  }
+
   document.getElementById('escala-table-body').innerHTML = list.map(emp=>{
     const cells = dates.map(d=>{
       const ds = dateStr(d);
       const todayCls = ds===todayStr ? ' roster-col-today' : '';
+
       if(emp.status === 'suspenso'){
         return `<td class="${todayCls.trim()}"><span class="roster-off">—</span></td>`;
       }
-      if(emp.status === 'ferias'){
-        return `<td class="${todayCls.trim()}"><span class="status-tag atraso" style="opacity:.85;">Férias</span></td>`;
+
+      if(employeeOnApprovedVacation(emp.id, ds)){
+        return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}">
+          <span class="roster-state-chip vacation" title="Férias aprovadas">Férias</span>
+        </td>`;
       }
+
       const entry = getRosterEntry(emp.id, ds);
-      if(entry){
-        const s = shifts.find(x=>x.id==entry.shiftId);
-        if(!s) return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}"><span class="roster-off">—</span></td>`;
-        return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}"><button class="roster-chip" draggable="true" style="background:${s.color};" onclick="openRosterModal('${emp.id}', '${ds}')">${s.name}<span class="rt">${s.start}–${s.end}</span></button></td>`;
+
+      if(entry?.isDayOff){
+        return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}">
+          <button class="roster-state-chip off" onclick="openRosterModal('${emp.id}','${ds}')" title="${entry.notes ? analyticsEsc(entry.notes) : 'Folga'}">
+            Folga${entry.notes ? '<span class="roster-note-dot" style="background:#7d8790"></span>' : ''}
+          </button>
+        </td>`;
       }
-      return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}"><button class="roster-empty-btn" onclick="openRosterModal('${emp.id}', '${ds}')" title="Atribuir turno">+</button></td>`;
+
+      if(entry?.shiftId){
+        const s = shifts.find(x=>String(x.id)===String(entry.shiftId));
+        if(s){
+          return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}">
+            <button class="roster-chip" draggable="true" style="background:${s.color};" onclick="openRosterModal('${emp.id}','${ds}')" title="${entry.notes ? analyticsEsc(entry.notes) : ''}">
+              ${s.name}<span class="rt">${s.start}–${s.end}${entry.notes ? ' · nota' : ''}</span>
+            </button>
+          </td>`;
+        }
+      }
+
+      return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}">
+        <button class="roster-empty-btn" onclick="openRosterModal('${emp.id}','${ds}')" title="Atribuir turno ou folga">+</button>
+      </td>`;
     }).join('');
-    return `
-    <tr>
+
+    return `<tr>
       <td>
         <div class="emp-cell">
           ${avatarHTML(emp)}
-          <div class="emp-name-wrap"><div class="n">${emp.name}</div><div class="t">${emp.team}</div></div>
+          <div class="emp-name-wrap">
+            <div class="n">${emp.name}</div>
+            <div class="t">${emp.team}</div>
+          </div>
         </div>
       </td>
       ${cells}
@@ -5224,30 +5339,58 @@ function flashRosterCells(cellKeys){
 }
 
 function openRosterModal(empId, ds){
-  const emp = employees.find(e=>e.id==empId);
-  if(!emp || emp.status !== 'ativo'){ return; }
+  const emp = employees.find(e=>String(e.id)===String(empId));
+  if(!emp || emp.status === 'suspenso') return;
+
   rosterModalContext = {employeeId: empId, date: ds};
   const entry = getRosterEntry(empId, ds);
+  const onVacation = currentInstitutionId && employeeOnApprovedVacation(empId, ds);
   const dObj = new Date(ds+'T00:00:00');
-  document.getElementById('roster-modal-title').textContent = `${emp.name} · ${pad2(dObj.getDate())}/${pad2(dObj.getMonth()+1)}`;
+
+  document.getElementById('roster-modal-title').textContent =
+    `${emp.name} · ${pad2(dObj.getDate())}/${pad2(dObj.getMonth()+1)}`;
 
   const shiftSel = document.getElementById('rm-shift');
-  shiftSel.innerHTML = `<option value="">Folga (sem turno)</option>` + shifts.map(s=>`<option value="${s.id}">${s.name} (${s.start}–${s.end})</option>`).join('');
-  shiftSel.value = entry ? entry.shiftId : '';
+  shiftSel.innerHTML =
+    `<option value="__OFF__">Folga</option>` +
+    shifts.map(s=>`<option value="${s.id}">${s.name} (${s.start}–${s.end})</option>`).join('');
+
+  shiftSel.value = entry
+    ? (entry.isDayOff ? '__OFF__' : (entry.shiftId || '__OFF__'))
+    : '__OFF__';
+
+  document.getElementById('rm-notes').value = entry?.notes || '';
+
+  const warning = document.getElementById('rm-availability-warning');
+  warning.hidden = !onVacation;
+  warning.textContent = onVacation
+    ? '⚠ Este colaborador tem férias aprovadas neste dia. Não é possível atribuir um turno.'
+    : '';
+
+  shiftSel.disabled = !!onVacation;
+  document.getElementById('roster-modal-save-btn').disabled = !!onVacation;
 
   const swapWrap = document.getElementById('rm-swap-wrap');
   const swapSel = document.getElementById('rm-swap-target');
-  const others = employees.filter(e=>e.id!=empId && e.status==='ativo' && getRosterEntry(e.id, ds));
-  if(entry && others.length){
+  const others = employees.filter(e=>
+    String(e.id)!==String(empId) &&
+    e.status==='ativo' &&
+    !employeeOnApprovedVacation(e.id, ds) &&
+    getRosterEntry(e.id, ds) &&
+    !getRosterEntry(e.id, ds)?.isDayOff
+  );
+
+  if(entry && !entry.isDayOff && others.length && !onVacation){
     swapWrap.hidden = false;
     swapSel.innerHTML = `<option value="">— não trocar —</option>` + others.map(e=>{
       const oe = getRosterEntry(e.id, ds);
-      const os = shifts.find(x=>x.id==oe.shiftId);
+      const os = shifts.find(x=>String(x.id)===String(oe.shiftId));
       return `<option value="${e.id}">${e.name} · ${os?os.name:'—'}</option>`;
     }).join('');
     swapSel.value = '';
   } else {
     swapWrap.hidden = true;
+    swapSel.value = '';
   }
 
   document.getElementById('roster-modal').classList.add('open');
@@ -5260,76 +5403,143 @@ function closeRosterModal(){
 }
 
 /* ---- Ligação ao serviço de dados (roster_entries) ---- */
+async function loadApprovedVacationsForWeek(institutionId, weekStart){
+  const dates = getWeekDates(weekStart);
+  const from = dateStr(dates[0]), to = dateStr(dates[6]);
+
+  const { data, error } = await supabaseClient
+    .from('vacation_requests')
+    .select('employee_id,start_date,end_date,status')
+    .eq('institution_id', institutionId)
+    .eq('status', 'approved')
+    .lte('start_date', to)
+    .gte('end_date', from);
+
+  if(error){
+    console.warn('Não foi possível carregar férias aprovadas:', error);
+    rosterApprovedVacations = [];
+    return;
+  }
+  rosterApprovedVacations = data || [];
+}
+
+function employeeOnApprovedVacation(employeeId, ds){
+  return rosterApprovedVacations.some(v=>
+    String(v.employee_id)===String(employeeId) &&
+    v.start_date <= ds &&
+    v.end_date >= ds
+  );
+}
+
 async function loadRosterForWeek(institutionId, weekStart){
   const dates = getWeekDates(weekStart);
   const from = dateStr(dates[0]), to = dateStr(dates[6]);
-  const { data, error } = await supabaseClient
-    .from('roster_entries')
-    .select('id, employee_id, shift_type_id, work_date')
-    .eq('institution_id', institutionId)
-    .gte('work_date', from)
-    .lte('work_date', to);
+
+  const [{data, error}, _vac] = await Promise.all([
+    supabaseClient
+      .from('roster_entries')
+      .select('id,employee_id,team_id,shift_type_id,work_date,status,is_day_off,notes')
+      .eq('institution_id', institutionId)
+      .gte('work_date', from)
+      .lte('work_date', to),
+    loadApprovedVacationsForWeek(institutionId, weekStart)
+  ]);
+
   if(error){
     console.warn('Erro a carregar a escala da base de dados:', error);
-    showToast('Não foi possível carregar a escala da base de dados.', true);
+    showToast('Não foi possível carregar a escala.', true);
     return;
   }
+
   rosterEntries = (data||[]).map(row=>({
-    employeeId: row.employee_id, date: row.work_date, shiftId: row.shift_type_id,
+    id:row.id,
+    employeeId:row.employee_id,
+    teamId:row.team_id,
+    date:row.work_date,
+    shiftId:row.shift_type_id,
+    isDayOff:!!row.is_day_off,
+    notes:row.notes || '',
+    status:row.status || 'scheduled'
   }));
 }
-async function supaUpsertRoster(employeeId, ds, shiftTypeId){
-  if(shiftTypeId == null){
-    const { error } = await supabaseClient.from('roster_entries').delete()
-      .eq('institution_id', currentInstitutionId).eq('employee_id', employeeId).eq('work_date', ds);
-    if(error) throw error;
-  } else {
-    const { error } = await supabaseClient.from('roster_entries').upsert({
-      institution_id: currentInstitutionId, employee_id: employeeId, shift_type_id: shiftTypeId, work_date: ds, status:'scheduled',
-    }, { onConflict: 'employee_id,work_date' });
-    if(error) throw error;
-  }
+async function supaUpsertRoster(employeeId, ds, shiftTypeId, options={}){
+  const emp = employees.find(e=>String(e.id)===String(employeeId));
+  const teamId = emp ? (supaTeamNameToId[emp.team] || null) : null;
+  const isDayOff = options.isDayOff ?? (shiftTypeId == null);
+  const notes = options.notes ?? '';
+
+  const { error } = await supabaseClient.from('roster_entries').upsert({
+    institution_id: currentInstitutionId,
+    employee_id: employeeId,
+    team_id: teamId,
+    shift_type_id: isDayOff ? null : shiftTypeId,
+    work_date: ds,
+    status:'scheduled',
+    is_day_off:isDayOff,
+    notes:notes || null
+  }, { onConflict: 'employee_id,work_date' });
+
+  if(error) throw error;
 }
 
 async function saveRosterModal(){
   if(!rosterModalContext) return;
   const {employeeId, date} = rosterModalContext;
+
+  if(employeeOnApprovedVacation(employeeId, date)){
+    showToast('Este colaborador tem férias aprovadas neste dia.', true);
+    return;
+  }
+
   const swapTarget = document.getElementById('rm-swap-target').value;
+  const notes = document.getElementById('rm-notes').value.trim();
 
   if(currentInstitutionId){
     try {
       if(swapTarget){
-        const aShiftId = (getRosterEntry(employeeId, date)||{}).shiftId ?? null;
-        const bShiftId = (getRosterEntry(swapTarget, date)||{}).shiftId ?? null;
-        await supaUpsertRoster(employeeId, date, bShiftId);
-        await supaUpsertRoster(swapTarget, date, aShiftId);
-        showToast('Turno trocado — só este dia foi alterado (sistema).');
+        const a = getRosterEntry(employeeId, date);
+        const b = getRosterEntry(swapTarget, date);
+
+        await supaUpsertRoster(employeeId, date, b?.shiftId || null, {
+          isDayOff:!!b?.isDayOff,
+          notes:a?.notes || ''
+        });
+        await supaUpsertRoster(swapTarget, date, a?.shiftId || null, {
+          isDayOff:!!a?.isDayOff,
+          notes:b?.notes || ''
+        });
+
+        showToast('Turnos trocados com sucesso.');
       } else {
         const val = document.getElementById('rm-shift').value;
-        await supaUpsertRoster(employeeId, date, val || null);
-        showToast('Escala atualizada no sistema.');
+        const isDayOff = val === '__OFF__';
+
+        await supaUpsertRoster(employeeId, date, isDayOff ? null : val, {
+          isDayOff,
+          notes
+        });
+
+        showToast(isDayOff ? 'Folga registada.' : 'Escala atualizada.');
       }
+
       closeRosterModal();
       await renderEscalas();
-      flashRosterCells(swapTarget ? [{employeeId, date}, {employeeId: swapTarget, date}] : [{employeeId, date}]);
+      flashRosterCells(
+        swapTarget
+          ? [{employeeId,date},{employeeId:swapTarget,date}]
+          : [{employeeId,date}]
+      );
     } catch(err){
       console.error(err);
-      showToast('Erro ao gravar escala no sistema: ' + (err.message||'tente novamente.'), true);
+      showToast('Erro ao gravar escala: ' + (err.message||'tente novamente.'), true);
     }
     return;
   }
 
-  if(swapTarget){
-    swapRosterEntries(employeeId, parseInt(swapTarget), date);
-    showToast('Turno trocado entre colaboradores — só este dia foi alterado.');
-  } else {
-    const val = document.getElementById('rm-shift').value;
-    setRosterEntry(employeeId, date, val ? parseInt(val) : null);
-    showToast('Escala atualizada.');
-  }
+  const val = document.getElementById('rm-shift').value;
+  setRosterEntry(employeeId, date, val==='__OFF__' ? null : val);
   closeRosterModal();
   renderEscalas();
-  flashRosterCells(swapTarget ? [{employeeId, date}, {employeeId: swapTarget, date}] : [{employeeId, date}]);
 }
 
 document.getElementById('roster-modal-close-btn').addEventListener('click', closeRosterModal);
@@ -5339,25 +5549,37 @@ document.getElementById('roster-modal-save-btn').addEventListener('click', saveR
 
 /* ---------------- ESCALAS: ARRASTAR PARA TROCAR TURNOS ---------------- */
 async function performRosterSwap(empA, empB, ds){
+  if(employeeOnApprovedVacation(empA, ds) || employeeOnApprovedVacation(empB, ds)){
+    showToast('Não é possível trocar turnos com colaboradores de férias.', true);
+    return;
+  }
+
   if(currentInstitutionId){
     try {
-      const aShiftId = (getRosterEntry(empA, ds)||{}).shiftId ?? null;
-      const bShiftId = (getRosterEntry(empB, ds)||{}).shiftId ?? null;
-      await supaUpsertRoster(empA, ds, bShiftId);
-      await supaUpsertRoster(empB, ds, aShiftId);
-      showToast('Turnos trocados — só este dia foi alterado (sistema).');
+      const a = getRosterEntry(empA, ds);
+      const b = getRosterEntry(empB, ds);
+
+      await supaUpsertRoster(empA, ds, b?.shiftId || null, {
+        isDayOff:!!b?.isDayOff,
+        notes:a?.notes || ''
+      });
+      await supaUpsertRoster(empB, ds, a?.shiftId || null, {
+        isDayOff:!!a?.isDayOff,
+        notes:b?.notes || ''
+      });
+
+      showToast('Turnos trocados com sucesso.');
       await renderEscalas();
-      flashRosterCells([{employeeId:empA, date:ds}, {employeeId:empB, date:ds}]);
+      flashRosterCells([{employeeId:empA,date:ds},{employeeId:empB,date:ds}]);
     } catch(err){
       console.error(err);
-      showToast('Erro ao trocar turnos no sistema: ' + (err.message||'tente novamente.'), true);
+      showToast('Erro ao trocar turnos: ' + (err.message||'tente novamente.'), true);
     }
     return;
   }
+
   swapRosterEntries(empA, empB, ds);
   renderEscalas();
-  flashRosterCells([{employeeId:empA, date:ds}, {employeeId:empB, date:ds}]);
-  showToast('Turnos trocados — só este dia foi alterado.');
 }
 
 let rosterDragSource = null;
@@ -5424,7 +5646,12 @@ document.getElementById('escala-copy-btn').addEventListener('click', async ()=>{
       for(const emp of employees){
         for(let i=0;i<curDates.length;i++){
           const prevEntry = prevWeekEntries.find(r=>r.employeeId==emp.id && r.date===dateStr(prevDates[i]));
-          await supaUpsertRoster(emp.id, dateStr(curDates[i]), prevEntry ? prevEntry.shiftId : null);
+          await supaUpsertRoster(
+            emp.id,
+            dateStr(curDates[i]),
+            prevEntry?.shiftId || null,
+            { isDayOff: prevEntry ? !!prevEntry.isDayOff : true, notes: prevEntry?.notes || '' }
+          );
         }
       }
       await renderEscalas();
@@ -5960,11 +6187,44 @@ function genPassword(){
   return p;
 }
 
-function renderUsers(){
+async function renderUsers(){
+  if(currentInstitutionId && supabaseClient){
+    try{
+      const ids = employees.map(e=>e.profileId).filter(Boolean);
+      if(ids.length){
+        const { data: profiles, error } = await supabaseClient
+          .from('profiles')
+          .select('id,email,is_active,last_login_at,last_activity_at')
+          .in('id', ids);
+        if(error) throw error;
+
+        const byId = Object.fromEntries((profiles||[]).map(p=>[String(p.id),p]));
+        userAccounts = employees
+          .filter(e=>e.profileId && byId[String(e.profileId)])
+          .map(e=>{
+            const p = byId[String(e.profileId)];
+            const last = p.last_login_at || p.last_activity_at;
+            return {
+              employeeId:e.id,
+              userId:p.id,
+              email:p.email,
+              active:p.is_active !== false,
+              lastLogin:last ? new Date(last).getTime() : 0
+            };
+          });
+      } else {
+        userAccounts = [];
+      }
+    }catch(err){
+      console.error('Erro a carregar contas de utilizador:',err);
+      userAccounts = [];
+    }
+  }
+
   const withAccount = userAccounts.length;
   const activeAccounts = userAccounts.filter(a=>a.active).length;
-  const noAccount = employees.length - withAccount;
-  const loginsThisMonth = userAccounts.filter(a=>a.active && (now - a.lastLogin) < 30*day).length;
+  const noAccount = Math.max(0, employees.length - withAccount);
+  const loginsThisMonth = userAccounts.filter(a=>a.active && a.lastLogin && (now - a.lastLogin) < 30*day).length;
 
   document.getElementById('users-kpi-grid').innerHTML = `
     <div class="kpi-card"><div class="label">Total de Colaboradores</div><div class="value">${employees.length}</div><div class="delta flat">na instituição</div></div>
@@ -5974,19 +6234,19 @@ function renderUsers(){
   `;
 
   document.getElementById('users-table-body').innerHTML = employees.map(e=>{
-    const acc = userAccounts.find(a=>a.employeeId===e.id);
+    const acc = userAccounts.find(a=>String(a.employeeId)===String(e.id));
     let stateBadge, emailCell, actions;
     if(!acc){
       stateBadge = `<span class="badge conta-pendente">Não criada</span>`;
       emailCell = `<span class="user-email muted">—</span>`;
-      actions = `<button class="attach-btn" onclick="openUserDrawer(${e.id})">+ Criar conta</button>`;
+      actions = `<button class="attach-btn" onclick="openUserDrawer('${e.id}')">+ Criar conta</button>`;
     } else {
       stateBadge = `<span class="badge ${acc.active?'conta-ativa':'conta-inativa'}">${acc.active?'Ativa':'Inativa'}</span>`;
       emailCell = `<span class="user-email">${acc.email}</span>`;
       actions = `
         <div class="row-actions">
-          <button class="btn-toggle" onclick="resetPassword(${e.id})">Repor password</button>
-          <button class="btn-toggle" onclick="toggleAccountActive(${e.id})">${acc.active?'Desativar':'Ativar'}</button>
+          <button class="btn-toggle" onclick="resetPassword('${e.id}')">Repor password</button>
+          <button class="btn-toggle" onclick="toggleAccountActive('${e.id}')">${acc.active?'Desativar':'Ativar'}</button>
         </div>`;
     }
     return `
@@ -5995,17 +6255,21 @@ function renderUsers(){
       <td>${e.team}</td>
       <td>${emailCell}</td>
       <td>${stateBadge}</td>
-      <td class="user-email ${acc?'':'muted'}">${acc ? relativeTime(acc.lastLogin) : '—'}</td>
+      <td class="user-email ${acc?'':'muted'}">${acc && acc.lastLogin ? relativeTime(acc.lastLogin) : '—'}</td>
       <td>${actions}</td>
     </tr>`;
   }).join('');
 }
 
 function openUserDrawer(employeeId){
-  const emp = employees.find(e=>e.id===employeeId);
+  const emp = employees.find(e=>String(e.id)===String(employeeId));
+  if(!emp){
+    showToast('Colaborador não encontrado.', true);
+    return;
+  }
   document.getElementById('user-drawer').dataset.employeeId = employeeId;
   document.getElementById('user-drawer-emp-name').textContent = `A criar conta para: ${emp.name}`;
-  const suggested = emp.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'.') + '@larbompastor.pt';
+  const suggested = emp.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'.') + '@picaaqui.pt';
   document.getElementById('u-email').value = suggested;
   document.getElementById('u-password').value = genPassword();
   document.getElementById('user-drawer').classList.add('open');
@@ -6015,24 +6279,69 @@ function closeUserDrawer(){
   document.getElementById('user-drawer').classList.remove('open');
   document.getElementById('user-drawer-overlay').classList.remove('open');
 }
-function saveUserAccount(){
-  const employeeId = parseInt(document.getElementById('user-drawer').dataset.employeeId);
-  const email = document.getElementById('u-email').value.trim();
+async function saveUserAccount(){
+  const employeeId = document.getElementById('user-drawer').dataset.employeeId;
+  const email = document.getElementById('u-email').value.trim().toLowerCase();
   const password = document.getElementById('u-password').value.trim() || genPassword();
+
+  if(!employeeId){ showToast('Colaborador não selecionado.', true); return; }
   if(!isValidEmail(email)){ showToast('Indique um email de login válido.', true); return; }
-  if(userAccounts.some(a=>a.email.toLowerCase()===email.toLowerCase())){ showToast('Já existe uma conta com este email.', true); return; }
-  if(password.length < 6){ showToast('A palavra-passe deve ter pelo menos 6 caracteres.', true); return; }
-  userAccounts.push({employeeId, email, password, active:true, lastLogin: Date.now()});
-  closeUserDrawer();
-  renderUsers();
-  showToast('Conta criada. O colaborador já pode aceder ao Portal.');
+  if(password.length < 8){ showToast('A palavra-passe deve ter pelo menos 8 caracteres.', true); return; }
+  if(!supabaseClient){ showToast('Serviço de autenticação indisponível.', true); return; }
+
+  const btn = document.getElementById('user-drawer-save-btn');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'A criar…';
+
+  try{
+    const { data, error } = await supabaseClient.functions.invoke(
+      'save-employee-account',
+      { body: { employee_id: employeeId, email, password } }
+    );
+
+    if(error){
+      let message = error.message || 'Não foi possível criar a conta.';
+      try{
+        if(error.context && typeof error.context.json === 'function'){
+          const body = await error.context.json();
+          if(body?.error) message = body.error;
+        }
+      }catch(_){}
+      throw new Error(message);
+    }
+    if(!data?.ok) throw new Error(data?.error || 'Não foi possível criar a conta.');
+
+    const emp = employees.find(e=>String(e.id)===String(employeeId));
+    if(emp) emp.profileId = data.user_id;
+
+    closeUserDrawer();
+    await renderUsers();
+    showToast(`Conta criada com sucesso para ${email}.`);
+  }catch(err){
+    console.error('Erro ao criar conta de colaborador:',err);
+    showToast('Erro ao criar utilizador: ' + (err.message || 'tente novamente.'), true);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 }
-function resetPassword(employeeId){
-  const emp = employees.find(e=>e.id===employeeId);
-  const acc = userAccounts.find(a=>a.employeeId===employeeId);
-  const newPass = genPassword();
-  if(acc) acc.password = newPass;
-  showToast(`Nova password para ${emp.name}: ${newPass}`);
+async function resetPassword(employeeId){
+  const acc = userAccounts.find(a=>String(a.employeeId)===String(employeeId));
+  if(!acc?.email){
+    showToast('Esta conta não tem email associado.', true);
+    return;
+  }
+  try{
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(acc.email, {
+      redirectTo: PASSWORD_RECOVERY_REDIRECT
+    });
+    if(error) throw error;
+    showToast(`Email de recuperação enviado para ${acc.email}.`);
+  }catch(err){
+    console.error(err);
+    showToast('Não foi possível enviar a recuperação de palavra-passe: ' + (err.message || ''), true);
+  }
 }
 function toggleAccountActive(employeeId){
   const acc = userAccounts.find(a=>a.employeeId===employeeId);
