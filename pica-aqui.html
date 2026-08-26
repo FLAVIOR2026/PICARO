@@ -800,6 +800,179 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
 .analytics-periods{display:flex;gap:6px;align-items:center}.analytics-periods button{border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:8px;padding:7px 11px;font-size:12px;cursor:pointer}.analytics-periods button.active{background:#0b3e3a;color:#fff;border-color:#0b3e3a}.analytics-kpis{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:10px;margin-bottom:16px}.analytics-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.analytics-card .ak-label{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);font-weight:700}.analytics-card .ak-value{font-size:22px;font-weight:800;margin-top:6px}.analytics-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}.analytics-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}.analytics-list{padding:8px 16px 16px}.analytics-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #eef1f2;font-size:12px}.analytics-row:last-child{border-bottom:0}.analytics-row .name{min-width:120px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.analytics-row .bar{height:6px;border-radius:999px;background:#e8efee;flex:2;overflow:hidden}.analytics-row .bar>i{display:block;height:100%;background:#0b3e3a;border-radius:999px}.analytics-row .count{font-family:var(--font-mono);font-size:11px;min-width:38px;text-align:right}.analytics-hours{display:flex;align-items:end;gap:4px;height:110px;padding:14px 16px 12px}.analytics-hour{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%}.analytics-hour i{display:block;width:100%;max-width:18px;background:#173a63;border-radius:2px 2px 0 0;min-height:2px}.analytics-hour span{font-size:8px;color:var(--ink-faint);margin-top:4px}.analytics-funnel{padding:14px 16px}.funnel-row{margin:8px 0}.funnel-label{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}.funnel-track{height:8px;border-radius:999px;background:#edf1f2;overflow:hidden}.funnel-fill{height:100%;background:linear-gradient(90deg,#0d3a63,#f05a25)}.analytics-empty{padding:24px;text-align:center;color:var(--ink-faint);font-size:12px}.analytics-table-wrap{overflow:auto}.analytics-table-wrap table{min-width:900px}@media(max-width:1100px){.analytics-kpis{grid-template-columns:repeat(3,1fr)}.analytics-grid-3{grid-template-columns:1fr}.analytics-grid-2{grid-template-columns:1fr}}@media(max-width:680px){.analytics-kpis{grid-template-columns:repeat(2,1fr)}}
 </style>
 
+
+<style id="pica-mobile-navigation-fix">
+@media (max-width: 768px) {
+  /* Top bar must remain usable on iPhone */
+  #admin-dashboard-screen .topbar,
+  #dashboard-screen .topbar {
+    min-height: 64px !important;
+    height: 64px !important;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 900 !important;
+    background: rgba(255,255,255,.98) !important;
+  }
+
+  #admin-hamburger-btn,
+  #sa-hamburger-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 46px !important;
+    width: 46px !important;
+    height: 46px !important;
+    min-width: 46px !important;
+    border: 1px solid #d7dfe3 !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    color: #0b3e3a !important;
+    font-size: 26px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    position: relative !important;
+    z-index: 1002 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08) !important;
+  }
+
+  #admin-dashboard-screen .search-box,
+  #dashboard-screen .search-box {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 46px !important;
+  }
+
+  #admin-dashboard-screen .topbar-right,
+  #dashboard-screen .topbar-right {
+    display: flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+    gap: 6px !important;
+    max-width: 56% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  #admin-dashboard-screen .topbar-right::-webkit-scrollbar,
+  #dashboard-screen .topbar-right::-webkit-scrollbar { display:none !important; }
+
+  #admin-dashboard-screen .topbar-right button,
+  #dashboard-screen .topbar-right button {
+    flex: 0 0 auto !important;
+    min-height: 42px !important;
+    white-space: nowrap !important;
+    padding: 8px 11px !important;
+    font-size: 11px !important;
+  }
+
+  /* Hide search at very narrow widths so menu stays obvious */
+  @media (max-width: 520px) {
+    #admin-dashboard-screen .search-box,
+    #dashboard-screen .search-box {
+      display: none !important;
+    }
+    #admin-dashboard-screen .topbar-right,
+    #dashboard-screen .topbar-right {
+      max-width: calc(100vw - 76px) !important;
+      flex: 1 1 auto !important;
+    }
+  }
+
+  /* Sidebars slide over the page */
+  #admin-sidebar,
+  #sa-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    height: 100dvh !important;
+    width: min(84vw, 310px) !important;
+    max-width: 310px !important;
+    z-index: 1200 !important;
+    transform: translateX(-105%) !important;
+    transition: transform .22s ease !important;
+    box-shadow: 12px 0 34px rgba(0,0,0,.18) !important;
+    overflow-y: auto !important;
+  }
+
+  #admin-sidebar.open,
+  #sa-sidebar.open {
+    transform: translateX(0) !important;
+  }
+
+  #admin-sidebar-overlay,
+  #sa-sidebar-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1150 !important;
+    background: rgba(4,22,21,.48) !important;
+    backdrop-filter: blur(2px) !important;
+    display: none !important;
+  }
+
+  #admin-sidebar-overlay.open,
+  #sa-sidebar-overlay.open {
+    display: block !important;
+  }
+
+  #admin-dashboard-screen .main-col,
+  #dashboard-screen .main-col {
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  #admin-dashboard-screen .main-content,
+  #dashboard-screen .main-content {
+    padding: 20px 14px 90px !important;
+  }
+
+  /* Page headings/buttons stack cleanly */
+  #admin-dashboard-screen .page-head,
+  #dashboard-screen .page-head {
+    align-items: flex-start !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+  }
+
+  #new-colab-btn {
+    min-height: 46px !important;
+    padding: 11px 16px !important;
+    font-size: 13px !important;
+    touch-action: manipulation !important;
+  }
+
+  /* Drawers become full-width sheets on phones */
+  .drawer {
+    width: min(94vw, 470px) !important;
+    max-width: 94vw !important;
+  }
+
+  /* Prevent tables/forms from forcing the entire page sideways */
+  .panel { max-width: 100% !important; }
+  .panel-body { overflow-x: auto !important; }
+}
+
+@media (max-width: 430px) {
+  #admin-dashboard-screen .main-content,
+  #dashboard-screen .main-content {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+  }
+}
+</style>
+
 </head>
 <body>
 
@@ -4550,53 +4723,92 @@ async function uploadEmployeePhoto(employeeId, file){
 }
 
 async function saveColaboradorSupabase(formData){
+  if(!supabaseClient){
+    showToast('Serviço de dados indisponível.', true);
+    return;
+  }
+
   const teamId = supaTeamNameToId[formData.team] || null;
-  const payload = {
-    institution_id: currentInstitutionId,
-    team_id: teamId,
-    full_name: formData.name,
-    status: mapLocalStatusToSupa(formData.status),
-    notes: `Horário: ${formData.schedule}\nMobile: ${formData.mobileClockIn ? 'sim' : 'não'}\nGPS: ${formData.requireGPS ? 'sim' : 'não'}`,
-  };
-  if(pendingPhotoAction === 'remove'){
-    payload.photo_url = null;
+  const notes = `Horário: ${formData.schedule}
+Mobile: ${formData.mobileClockIn ? 'sim' : 'não'}
+GPS: ${formData.requireGPS ? 'sim' : 'não'}`;
+
+  const btn = document.getElementById('drawer-save-btn');
+  const originalLabel = btn ? btn.textContent : 'Guardar';
+
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = editingEmployeeId ? 'A guardar…' : 'A criar…';
   }
 
   try {
-    let targetId = editingEmployeeId;
-    if(editingEmployeeId){
-      payload.vacation_days_total = formData.vacation; // saldo simples: assume-se 0 dias usados no protótipo
-      if(pendingPhotoAction === 'set' && pendingPhotoFile){
-        payload.photo_url = await uploadEmployeePhoto(editingEmployeeId, pendingPhotoFile);
+    const { data, error } = await supabaseClient.functions.invoke(
+      'save-employee',
+      {
+        body: {
+          employee_id: editingEmployeeId || null,
+          institution_id: currentInstitutionId,
+          full_name: formData.name,
+          team_id: teamId,
+          status: mapLocalStatusToSupa(formData.status),
+          notes,
+          vacation_days_total: formData.vacation,
+          pin: formData.pin || null
+        }
       }
-      const { error } = await supabaseClient.from('employees').update(payload).eq('id', editingEmployeeId);
-      if(error) throw error;
-      if(formData.pin){
-        const { error: pinError } = await supabaseClient.rpc('admin_set_employee_pin', { p_employee_id: editingEmployeeId, p_pin: formData.pin });
-        if(pinError) throw pinError;
-      }
-      showToast('Colaborador atualizado com sucesso.');
-    } else {
-      payload.vacation_days_total = formData.vacation;
-      payload.vacation_days_used = 0;
-      const { data: inserted, error } = await supabaseClient.from('employees').insert(payload).select().single();
-      if(error) throw error;
-      targetId = inserted.id;
-      const pin = formData.pin || String(Math.floor(1000+Math.random()*9000));
-      const { error: pinError } = await supabaseClient.rpc('admin_set_employee_pin', { p_employee_id: inserted.id, p_pin: pin });
-      if(pinError) throw pinError;
-      if(pendingPhotoAction === 'set' && pendingPhotoFile){
-        const photoUrl = await uploadEmployeePhoto(inserted.id, pendingPhotoFile);
-        await supabaseClient.from('employees').update({photo_url: photoUrl}).eq('id', inserted.id);
-      }
-      showToast('Colaborador criado com sucesso.');
+    );
+
+    if(error){
+      let message = error.message || 'Não foi possível guardar o colaborador.';
+      try{
+        if(error.context && typeof error.context.json === 'function'){
+          const body = await error.context.json();
+          if(body?.error) message = body.error;
+        }
+      }catch(_){}
+      throw new Error(message);
     }
+
+    if(!data?.ok){
+      throw new Error(data?.error || 'Não foi possível guardar o colaborador.');
+    }
+
+    const savedId = data.employee_id;
+
+    // A fotografia é opcional. O colaborador fica criado mesmo que o upload falhe.
+    if(savedId && pendingPhotoAction === 'set' && pendingPhotoFile){
+      try{
+        const photoUrl = await uploadEmployeePhoto(savedId, pendingPhotoFile);
+        const { error: photoError } = await supabaseClient
+          .from('employees')
+          .update({photo_url: photoUrl})
+          .eq('id', savedId);
+        if(photoError) console.warn('Fotografia não atualizada:', photoError);
+      }catch(photoErr){
+        console.warn('Fotografia não enviada:', photoErr);
+      }
+    }else if(savedId && pendingPhotoAction === 'remove'){
+      try{
+        await supabaseClient.from('employees').update({photo_url:null}).eq('id', savedId);
+      }catch(_){}
+    }
+
     await loadEmployeesFromSupabase(currentInstitutionId);
     closeColabDrawer();
     renderColaboradores();
+
+    showToast(editingEmployeeId
+      ? 'Colaborador atualizado com sucesso.'
+      : 'Colaborador criado com sucesso.');
+
   } catch(err){
-    console.error(err);
-    showToast('Erro ao gravar no sistema: ' + (err.message || 'tente novamente.'), true);
+    console.error('Erro ao guardar colaborador:', err);
+    showToast('Erro ao guardar colaborador: ' + (err.message || 'tente novamente.'), true);
+  } finally {
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    }
   }
 }
 
