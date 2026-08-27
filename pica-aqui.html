@@ -5235,6 +5235,7 @@ async function loadEmployeesFromSupabase(institutionId){
     return {
       id: row.id,
       profileId: row.profile_id || null,
+      teamId: row.team_id || null,
       _supa: true,
       name: row.full_name,
       team: row.teams ? row.teams.name : '—',
@@ -5266,7 +5267,7 @@ async function saveColaboradorSupabase(formData){
     return;
   }
 
-  let teamId = supaTeamNameToId[formData.team] || null;
+  let teamId = teams.find(t=>t.name===formData.team)?.id || supaTeamNameToId[formData.team] || null;
   if(!teamId && formData.team){
     const team = teams.find(t=>t.name===formData.team);
     teamId = team?.id || null;
@@ -5325,6 +5326,14 @@ GPS: ${formData.requireGPS ? 'sim' : 'não'}`;
     }
 
     const savedId = data.employee_id;
+
+    if(savedId){
+      const { error: teamError } = await supabaseClient.rpc('set_employee_team',{
+        p_employee_id:savedId,
+        p_team_id:teamId
+      });
+      if(teamError) throw teamError;
+    }
 
     // A fotografia é opcional. O colaborador fica criado mesmo que o upload falhe.
     if(savedId && pendingPhotoAction === 'set' && pendingPhotoFile){
@@ -5492,56 +5501,22 @@ function closeTeamDrawer(){
   editingTeamName = null;
 }
 async function saveTeam(){
-  const name = document.getElementById('tf-name').value.trim();
-  if(!name){
-    showToast('O nome da equipa é obrigatório.', true);
-    return;
-  }
+  const name=document.getElementById('tf-name').value.trim();
+  if(!name){showToast('O nome da equipa é obrigatório.',true);return;}
 
-  const dup = teams.find(t =>
-    t.name.toLowerCase() === name.toLowerCase() &&
-    t.name !== editingTeamName
-  );
-  if(dup){
-    showToast('Já existe uma equipa com esse nome.', true);
-    return;
-  }
-
-  const btn = document.getElementById('team-drawer-save-btn');
-  const original = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = editingTeamName ? 'A guardar…' : 'A criar…';
+  const existing=editingTeamName ? teams.find(t=>t.name===editingTeamName) : null;
+  const btn=document.getElementById('team-drawer-save-btn');
+  const old=btn.textContent; btn.disabled=true; btn.textContent=existing?'A guardar…':'A criar…';
 
   try{
     if(currentInstitutionId){
-      if(editingTeamName){
-        const existing = teams.find(t=>t.name===editingTeamName);
-        if(!existing?.id){
-          throw new Error('Não foi possível identificar a equipa a editar.');
-        }
-
-        const { error } = await supabaseClient
-          .from('teams')
-          .update({ name })
-          .eq('id', existing.id)
-          .eq('institution_id', currentInstitutionId);
-
-        if(error) throw error;
-
-        // Não é preciso atualizar employees.team_id ao mudar o nome:
-        // os colaboradores já apontam para a mesma equipa pelo UUID.
-      }else{
-        const { error } = await supabaseClient
-          .from('teams')
-          .insert({
-            institution_id: currentInstitutionId,
-            name,
-            description: null,
-            min_staff_required: 0
-          });
-
-        if(error) throw error;
-      }
+      const {data,error}=await supabaseClient.rpc('save_team',{
+        p_institution_id:currentInstitutionId,
+        p_team_id:existing?.id||null,
+        p_name:name
+      });
+      if(error) throw error;
+      if(!data?.id) throw new Error('A equipa não foi devolvida pelo servidor.');
 
       await loadSupaTeamMap(currentInstitutionId);
       await loadEmployeesFromSupabase(currentInstitutionId);
@@ -5551,34 +5526,25 @@ async function saveTeam(){
       renderColaboradores();
       populateTeamSelects();
 
-      showToast(editingTeamName ? 'Equipa atualizada com sucesso.' : 'Equipa criada com sucesso.');
+      showToast(existing?'Equipa atualizada com sucesso.':'Equipa criada com sucesso.');
       return;
     }
 
-    // fallback local/demo
-    if(editingTeamName){
-      const t = teams.find(x=>x.name===editingTeamName);
-      if(editingTeamName !== name){
-        employees.forEach(e=>{ if(e.team===editingTeamName) e.team = name; });
-        punchRecords.forEach(p=>{ if(p.team===editingTeamName) p.team = name; });
+    if(existing){
+      if(editingTeamName!==name){
+        employees.forEach(e=>{if(e.team===editingTeamName)e.team=name;});
       }
-      t.name = name;
-      showToast('Equipa atualizada.');
-    } else {
-      teams.push({name, scheduled:0, present:0});
-      showToast('Equipa criada.');
+      existing.name=name;
+    }else{
+      teams.push({name,scheduled:0,present:0});
     }
-
-    closeTeamDrawer();
-    renderEquipas();
-    populateTeamSelects();
+    closeTeamDrawer(); renderEquipas(); populateTeamSelects();
 
   }catch(err){
-    console.error('Erro ao guardar equipa:', err);
-    showToast('Erro ao guardar equipa: ' + (err.message || 'tente novamente.'), true);
+    console.error('Erro ao guardar equipa:',err);
+    showToast('Erro ao guardar equipa: '+(err.message||''),true);
   }finally{
-    btn.disabled = false;
-    btn.textContent = original;
+    btn.disabled=false; btn.textContent=old;
   }
 }
 async function deleteTeam(name){
