@@ -988,6 +988,38 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
 }
 </style>
 
+
+<style id="time-bank-styles">
+.time-bank-positive{color:#24734d;font-weight:800}
+.time-bank-negative{color:#b43f3f;font-weight:800}
+.time-bank-zero{color:var(--ink-faint);font-weight:700}
+@media(max-width:760px){
+  #page-banco-horas .kpi-grid{grid-template-columns:repeat(2,1fr)!important}
+}
+</style>
+
+
+<style id="roster-generator-styles">
+.rg-shift-option{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:9px;padding:9px 10px;background:#fff;font-size:12px}
+.rg-shift-dot{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.rg-preview-card{border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:8px;background:var(--surface-2)}
+.rg-preview-title{font-weight:800;font-size:12px;margin-bottom:6px}
+.rg-preview-line{font-size:11.5px;color:var(--ink-soft);line-height:1.55}
+.rg-warning{border-color:#f0d7a5;background:#fff8eb}
+.rg-good{border-color:#d5eadf;background:#eff9f3}
+@media(max-width:560px){
+  #rg-shifts{grid-template-columns:1fr!important}
+}
+</style>
+
+
+<style id="shift-swaps-styles">
+@media(max-width:700px){
+  #page-trocas .kpi-grid{grid-template-columns:repeat(2,1fr)!important}
+  #ep-page-trocas .panel-body{overflow-x:auto}
+}
+</style>
+
 </head>
 <body>
 
@@ -1114,6 +1146,9 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
     <button class="nav-item" data-nav="instituicoes"><span class="ic">▢</span>Empresas/Instituições</button>
     <button class="nav-item" data-nav="licencas"><span class="ic">◈</span>Licenças</button>
     <button class="nav-item" data-nav="admins"><span class="ic">◍</span>Administradores</button>
+    <div class="nav-section-label">Terminais</div>
+    <button class="nav-item" data-nav="terminal-ponto"><span class="ic">⏱</span>Terminal de Ponto</button>
+    <button class="nav-item" data-nav="terminal-acessos"><span class="ic">▣</span>Terminal de Acessos</button>
     <div class="nav-section-label">Sistema</div>
     <button class="nav-item" data-nav="definicoes"><span class="ic">⚙</span>Definições</button>
     <div class="sidebar-footer">
@@ -1280,7 +1315,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           <div class="panel-body" style="padding-top:16px;">
             <table>
               <thead>
-                <tr><th>Empresa/Instituição</th><th>Plano</th><th>Estado</th><th>Valor</th><th>Colaboradores</th><th>Expira em</th><th>Dias restantes</th><th></th></tr>
+                <tr><th>Empresa/Instituição</th><th>Plano</th><th>Estado</th><th>Licença base</th><th>Add-ons</th><th>Total</th><th>Colaboradores</th><th>Expira em</th><th>Dias restantes</th><th></th></tr>
               </thead>
               <tbody id="lic-table-body"></tbody>
             </table>
@@ -1668,6 +1703,41 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
   </div>
 </div>
 
+
+<!-- ================= LICENÇA BLOQUEADA ================= -->
+<div id="license-blocked-screen" hidden>
+  <div style="min-height:100vh;background:linear-gradient(180deg,#f4f7f7,#eef4f3);display:flex;align-items:center;justify-content:center;padding:24px;">
+    <div style="width:min(680px,100%);background:#fff;border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lg);overflow:hidden;">
+      <div style="background:#073d3b;padding:26px;text-align:center;color:#fff;">
+        <div class="brand" style="justify-content:center;color:#fff;"><div class="brand-mark"></div>Pica-Aqui</div>
+      </div>
+      <div style="padding:30px;">
+        <div class="badge expired" style="margin-bottom:14px;">Acesso suspenso</div>
+        <h1 style="font-family:var(--font-display);font-size:26px;margin-bottom:10px;">Licença sem acesso ao sistema</h1>
+        <p id="license-blocked-message" style="color:var(--ink-soft);line-height:1.65;margin-bottom:22px;"></p>
+
+        <div style="background:#f8faf9;border:1px solid #e2e8e6;border-radius:12px;padding:16px 18px;margin-bottom:20px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><div class="hint">Instituição</div><strong id="license-blocked-inst">—</strong></div>
+            <div><div class="hint">Plano</div><strong id="license-blocked-plan">—</strong></div>
+            <div><div class="hint">Estado</div><strong id="license-blocked-status">—</strong></div>
+            <div><div class="hint">Data de validade</div><strong id="license-blocked-expiry">—</strong></div>
+          </div>
+        </div>
+
+        <div class="hint-chip" style="margin-bottom:20px;">
+          Depois de a licença ser renovada/reativada pelo Pica-Aqui, basta atualizar esta página ou iniciar sessão novamente.
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
+          <button class="btn-secondary" id="license-blocked-refresh">Verificar novamente</button>
+          <button class="btn-primary" id="license-blocked-logout">Terminar sessão</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ================= ADMIN DA INSTITUIÇÃO DASHBOARD ================= -->
 <div id="admin-dashboard-screen" hidden>
   <div class="sidebar-overlay" id="admin-sidebar-overlay"></div>
@@ -1686,6 +1756,8 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
     <button class="nav-item" data-nav="ponto"><span class="ic">⏱</span>Registos de Ponto</button>
     <div class="nav-section-label">Gestão</div>
     <button class="nav-item" data-nav="relatorios"><span class="ic">▧</span>Relatórios</button>
+    <button class="nav-item" data-nav="trocas"><span class="ic">⇄</span>Trocas de Turno</button>
+    <button class="nav-item" data-nav="banco-horas"><span class="ic">◴</span>Banco de Horas</button>
     <button class="nav-item" data-nav="ferias"><span class="ic">☀</span>Férias</button>
     <button class="nav-item" data-nav="faltas"><span class="ic">▨</span>Faltas</button>
     <button class="nav-item" data-nav="utilizadores"><span class="ic">◎</span>Utilizadores</button>
@@ -1837,7 +1909,10 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
             <h1>Escalas</h1>
             <div class="sub" id="escala-week-sub"></div>
           </div>
-          <button class="btn-outline" id="escala-copy-btn">Copiar semana anterior</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-add" id="escala-generator-btn">⚙ Gerar escala</button>
+            <button class="btn-outline" id="escala-copy-btn">Copiar semana anterior</button>
+          </div>
         </div>
         <div class="toolbar">
           <div class="filter-group">
@@ -1850,6 +1925,9 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           </div>
         </div>
         <div id="escala-coverage-alerts" style="margin-bottom:12px;"></div>
+        <div class="hint-chip" style="margin-bottom:12px;">
+          <strong>Regras:</strong> férias/ausências aprovadas e sobreposição de turnos são bloqueadas. Descanso inferior a 11h, excesso de horas semanais e cobertura mínima geram aviso e exigem confirmação.
+        </div>
         <div class="panel">
           <div class="panel-body" style="padding-top:16px; overflow-x:auto;">
             <table class="roster-table">
@@ -1892,7 +1970,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           <div class="panel-body" style="padding-top:16px;">
             <table>
               <thead>
-                <tr><th>Colaborador</th><th>Equipa</th><th>Turno</th><th>Entrada prevista</th><th>Entrada real</th><th>Saída prevista</th><th>Saída real</th><th>Estado</th></tr>
+                <tr><th>Colaborador</th><th>Equipa</th><th>Turno</th><th>Entrada prevista</th><th>Entrada real</th><th>Saída prevista</th><th>Saída real</th><th>Trabalhado</th><th>Extra</th><th>Estado</th></tr>
               </thead>
               <tbody id="ponto-table-body"></tbody>
             </table>
@@ -1996,61 +2074,20 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
         </div>
       </div>
 
-      <div class="page" id="page-definicoes" hidden>
+      
+      <div class="page" id="page-terminal-ponto" hidden>
         <div class="page-head">
           <div>
-            <h1>Definições</h1>
-            <div class="sub">Regras aplicadas a esta empresa/instituição</div>
+            <h1>Terminal de Ponto</h1>
+            <div class="sub">Configuração do equipamento HIKVISION usado para registos de ponto</div>
           </div>
         </div>
-
-        <div class="grid-2">
-          <div class="panel">
-            <div class="panel-head">
-              <div><h3>Fuso horário</h3><div class="sub">Usado nos horários, escalas e no relógio do Quiosque</div></div>
-            </div>
-            <div class="panel-body" style="padding-top:16px;">
-              <div class="field">
-                <label>Fuso horário desta empresa/instituição</label>
-                <select class="select-input" id="ad-timezone" style="width:100%;">
-                  <option value="Europe/Lisbon">Europa/Lisboa (WET/WEST)</option>
-                  <option value="Atlantic/Azores">Atlântico/Açores</option>
-                  <option value="Atlantic/Madeira">Atlântico/Madeira</option>
-                  <option value="America/Sao_Paulo">América/São Paulo</option>
-                  <option value="Africa/Luanda">África/Luanda</option>
-                  <option value="Africa/Maputo">África/Maputo</option>
-                </select>
-              </div>
-              <div class="hint" style="font-size:11.5px; color:var(--ink-faint);">Todas as horas mostradas na app (escalas, ponto, relatórios) passam a ser calculadas neste fuso horário.</div>
-            </div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <div><h3>Assiduidade</h3><div class="sub">Regras usadas para classificar entradas e horas extra</div></div>
-            </div>
-            <div class="panel-body" style="padding-top:16px;">
-              <div class="field">
-                <label>Tolerância de atraso (minutos)</label>
-                <input type="number" id="ad-late-tolerance" min="0" max="120" value="10">
-                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Uma entrada até este número de minutos depois da hora do turno ainda conta como "Pontual". A partir daqui conta como "Atraso".</div>
-              </div>
-              <div class="field">
-                <label>Hora extra a partir de (minutos)</label>
-                <input type="number" id="ad-overtime-threshold" min="0" max="120" value="15">
-                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Só passa a contar como hora extra (e a ser incluída na compensação dos Relatórios) quem sair depois da hora do turno mais este número de minutos.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
         <!-- ================= HIKVISION ================= -->
         <div class="panel" style="margin-top:16px;">
           <div class="panel-head">
             <div>
-              <h3>HIKVISION</h3>
-              <div class="sub">Ligação remota por HTTP/HTTPS, DNS/IP e porta configurável</div>
+              <h3>Terminal de Ponto HIKVISION</h3>
+              <div class="sub">Equipamento HIKVISION usado para picagens de entrada/saída</div>
             </div>
             <span id="hik-status-badge" class="status-tag" style="white-space:nowrap;">Não configurado</span>
           </div>
@@ -2175,6 +2212,169 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
         </div>
 
 
+
+      </div>
+
+      <div class="page" id="page-terminal-acessos" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Terminal de Acessos</h1>
+            <div class="sub">Controlo de acessos HIKVISION · add-on faturado por pessoa ativa</div>
+          </div>
+          <span class="badge" id="access-addon-badge">A carregar…</span>
+        </div>
+
+        <div class="kpi-grid" id="access-addon-kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
+
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-head">
+            <div>
+              <h3>Add-on Controlo de Acessos</h3>
+              <div class="sub">1,00 € por pessoa ativa / mês</div>
+            </div>
+            <button class="btn-add" id="access-addon-toggle-btn">Ativar add-on</button>
+          </div>
+          <div class="panel-body">
+            <div class="hint-chip">
+              Só são faturadas as pessoas com permissão de acesso ativa. Uma pessoa pode ter acesso a vários terminais sem duplicar a mensalidade.
+            </div>
+          </div>
+        </div>
+
+        <div id="access-addon-content">
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-head">
+              <div>
+                <h3>Equipamento de controlo de acessos</h3>
+                <div class="sub">Ex.: HIKVISION DS-K1T341 · DNS/IP e porta configurável</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="grid-2">
+                <div>
+                  <div class="field"><label>Nome</label><input id="ac-hik-name" placeholder="Entrada principal"></div>
+                  <div class="field"><label>Identificador interno</label><input id="ac-hik-device-key" value="access-1"></div>
+                  <div class="field"><label>Protocolo</label><select class="select-input" id="ac-hik-protocol"><option value="http">HTTP</option><option value="https">HTTPS</option></select></div>
+                  <div class="field"><label>IP / Host / DNS</label><input id="ac-hik-host" placeholder="acessos.cliente.pt"></div>
+                </div>
+                <div>
+                  <div class="field"><label>Porta</label><input type="number" id="ac-hik-port" min="1" max="65535" value="80"></div>
+                  <div class="field"><label>Utilizador</label><input id="ac-hik-username" placeholder="admin"></div>
+                  <div class="field"><label>Password</label><input type="password" id="ac-hik-password" placeholder="Password do terminal" autocomplete="new-password"></div>
+                  <div class="field"><label style="display:flex;gap:8px;align-items:center;"><input type="checkbox" id="ac-hik-enabled" checked style="width:auto;"> Terminal ativo</label></div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:10px;">
+                <button class="btn-add" id="ac-hik-save-btn">Guardar terminal de acessos</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-head">
+              <div>
+                <h3>Nova permissão de acesso</h3>
+                <div class="sub">Código/PIN, validade e horário autorizado</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="grid-2">
+                <div>
+                  <div class="field"><label>Colaborador</label><select class="select-input" id="ac-person-employee"></select></div>
+                  <div class="field"><label>Nome no terminal</label><input id="ac-person-name" placeholder="Nome da pessoa"></div>
+                  <div class="field"><label>Código / PIN</label><input id="ac-person-pin" inputmode="numeric" maxlength="12" placeholder="4 a 12 dígitos"></div>
+                  <div class="field"><label>Terminal</label><select class="select-input" id="ac-person-device"></select></div>
+                </div>
+                <div>
+                  <div class="grid-2">
+                    <div class="field"><label>Válido de</label><input type="datetime-local" id="ac-valid-from"></div>
+                    <div class="field"><label>Válido até</label><input type="datetime-local" id="ac-valid-until"></div>
+                  </div>
+                  <div class="grid-2">
+                    <div class="field"><label>Hora início</label><input type="time" id="ac-time-from" value="08:00"></div>
+                    <div class="field"><label>Hora fim</label><input type="time" id="ac-time-until" value="18:00"></div>
+                  </div>
+                  <div class="field">
+                    <label>Dias permitidos</label>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;">
+                      <label><input type="checkbox" class="ac-day" data-day="monday" checked> Seg</label>
+                      <label><input type="checkbox" class="ac-day" data-day="tuesday" checked> Ter</label>
+                      <label><input type="checkbox" class="ac-day" data-day="wednesday" checked> Qua</label>
+                      <label><input type="checkbox" class="ac-day" data-day="thursday" checked> Qui</label>
+                      <label><input type="checkbox" class="ac-day" data-day="friday" checked> Sex</label>
+                      <label><input type="checkbox" class="ac-day" data-day="saturday"> Sáb</label>
+                      <label><input type="checkbox" class="ac-day" data-day="sunday"> Dom</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <button class="btn-add" id="ac-permission-save-btn">Criar permissão</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><div><h3>Pessoas autorizadas</h3><div class="sub">Permissões configuradas e estado de sincronização</div></div></div>
+            <div class="panel-body" style="padding-top:0;overflow:auto;">
+              <table>
+                <thead><tr><th>Pessoa</th><th>Terminal</th><th>Validade</th><th>Horário</th><th>Estado</th><th></th></tr></thead>
+                <tbody id="access-permissions-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<div class="page" id="page-definicoes" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Definições</h1>
+            <div class="sub">Regras aplicadas a esta empresa/instituição</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head">
+              <div><h3>Fuso horário</h3><div class="sub">Usado nos horários, escalas e no relógio do Quiosque</div></div>
+            </div>
+            <div class="panel-body" style="padding-top:16px;">
+              <div class="field">
+                <label>Fuso horário desta empresa/instituição</label>
+                <select class="select-input" id="ad-timezone" style="width:100%;">
+                  <option value="Europe/Lisbon">Europa/Lisboa (WET/WEST)</option>
+                  <option value="Atlantic/Azores">Atlântico/Açores</option>
+                  <option value="Atlantic/Madeira">Atlântico/Madeira</option>
+                  <option value="America/Sao_Paulo">América/São Paulo</option>
+                  <option value="Africa/Luanda">África/Luanda</option>
+                  <option value="Africa/Maputo">África/Maputo</option>
+                </select>
+              </div>
+              <div class="hint" style="font-size:11.5px; color:var(--ink-faint);">Todas as horas mostradas na app (escalas, ponto, relatórios) passam a ser calculadas neste fuso horário.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div><h3>Assiduidade</h3><div class="sub">Regras usadas para classificar entradas e horas extra</div></div>
+            </div>
+            <div class="panel-body" style="padding-top:16px;">
+              <div class="field">
+                <label>Tolerância de atraso (minutos)</label>
+                <input type="number" id="ad-late-tolerance" min="0" max="120" value="10">
+                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Uma entrada até este número de minutos depois da hora do turno ainda conta como "Pontual". A partir daqui conta como "Atraso".</div>
+              </div>
+              <div class="field">
+                <label>Hora extra a partir de (minutos)</label>
+                <input type="number" id="ad-overtime-threshold" min="0" max="120" value="15">
+                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Só passa a contar como hora extra (e a ser incluída na compensação dos Relatórios) quem sair depois da hora do turno mais este número de minutos.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
         <div class="panel">
           <div class="panel-body" style="padding-top:16px; display:flex; justify-content:flex-end; gap:10px;">
             <div class="sub" style="flex:1; align-self:center;">Estas regras aplicam-se a todos os colaboradores desta empresa/instituição.</div>
@@ -2183,7 +2383,87 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
         </div>
       </div>
 
-      <div class="page" id="page-relatorios" hidden>
+      
+      
+      <div class="page" id="page-trocas" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Trocas de Turno</h1>
+            <div class="sub">Pedidos dos colaboradores — o colega aceita primeiro e o Admin dá a aprovação final</div>
+          </div>
+          <button class="btn-outline" id="swap-admin-refresh">Atualizar</button>
+        </div>
+
+        <div class="kpi-grid" id="swap-admin-kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;"></div>
+
+        <div class="panel">
+          <div class="panel-body" style="padding-top:16px;overflow:auto;">
+            <table>
+              <thead>
+                <tr><th>Data</th><th>Pedido por</th><th>Troca com</th><th>Turnos</th><th>Motivo</th><th>Estado</th><th></th></tr>
+              </thead>
+              <tbody id="swap-admin-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+<div class="page" id="page-banco-horas" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Banco de Horas</h1>
+            <div class="sub">Saldo real entre horas previstas, horas trabalhadas e ajustes administrativos</div>
+          </div>
+          <button class="btn-add" id="time-bank-adjust-btn">+ Ajuste manual</button>
+        </div>
+
+        <div class="toolbar">
+          <div class="filter-group">
+            <select class="select-input" id="time-bank-team-filter"><option value="">Todas as equipas</option></select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="action-btn" id="time-bank-prev-btn">←</button>
+            <div id="time-bank-month-label" style="min-width:150px;text-align:center;font-weight:700;font-size:13px;"></div>
+            <button class="action-btn" id="time-bank-next-btn">→</button>
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="time-bank-kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;"></div>
+
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-head">
+            <div>
+              <h3>Saldo por colaborador</h3>
+              <div class="sub">Saldo = trabalhadas − previstas + ajustes manuais</div>
+            </div>
+          </div>
+          <div class="panel-body" style="padding-top:0;overflow:auto;">
+            <table>
+              <thead>
+                <tr><th>Colaborador</th><th>Equipa</th><th>Previstas</th><th>Trabalhadas</th><th>Diferença</th><th>Ajustes</th><th>Saldo final</th></tr>
+              </thead>
+              <tbody id="time-bank-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Histórico de ajustes</h3>
+              <div class="sub">Créditos e débitos manuais aplicados ao mês selecionado</div>
+            </div>
+          </div>
+          <div class="panel-body" style="padding-top:0;overflow:auto;">
+            <table>
+              <thead><tr><th>Data</th><th>Colaborador</th><th>Ajuste</th><th>Motivo</th><th>Notas</th><th></th></tr></thead>
+              <tbody id="time-bank-adjustments-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+<div class="page" id="page-relatorios" hidden>
         <div class="page-head">
           <div>
             <h1>Relatórios</h1>
@@ -2238,7 +2518,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           <div class="panel-body" style="padding-top:8px;">
             <table>
               <thead>
-                <tr><th>Colaborador</th><th>Equipa</th><th>Escalados</th><th>Pontual</th><th>Atraso</th><th>Falta</th><th>Assiduidade</th><th>Horas extra</th><th>Compensação</th></tr>
+                <tr><th>Colaborador</th><th>Equipa</th><th>Escalados</th><th>Pontual</th><th>Atraso</th><th>Falta</th><th>Assiduidade</th><th>Previstas</th><th>Trabalhadas</th><th>Horas extra</th><th>Compensação</th></tr>
               </thead>
               <tbody id="relatorio-table-body"></tbody>
             </table>
@@ -2246,6 +2526,51 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
+<div class="overlay" id="time-bank-drawer-overlay"></div>
+<div class="drawer" id="time-bank-drawer">
+  <div class="drawer-head">
+    <div>
+      <h3>Ajuste do Banco de Horas</h3>
+      <div class="sub">Use valores positivos para crédito e negativos para débito.</div>
+    </div>
+    <button class="drawer-close" id="time-bank-drawer-close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="field">
+      <label>Colaborador</label>
+      <select class="select-input" id="tb-employee"></select>
+    </div>
+    <div class="field">
+      <label>Data do ajuste</label>
+      <input type="date" id="tb-date">
+    </div>
+    <div class="field">
+      <label>Ajuste em horas</label>
+      <input type="number" step="0.25" id="tb-hours" placeholder="Ex.: 2 ou -1.5">
+      <div class="hint">Ex.: +2h adiciona duas horas; -1,5h retira uma hora e meia.</div>
+    </div>
+    <div class="field">
+      <label>Motivo</label>
+      <select class="select-input" id="tb-reason">
+        <option value="correcao">Correção administrativa</option>
+        <option value="compensacao">Compensação</option>
+        <option value="credito">Crédito extraordinário</option>
+        <option value="debito">Débito</option>
+        <option value="outro">Outro</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Notas</label>
+      <textarea id="tb-notes" rows="3" placeholder="Opcional"></textarea>
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn-secondary" id="time-bank-drawer-cancel">Cancelar</button>
+    <button class="btn-primary" id="time-bank-drawer-save">Guardar ajuste</button>
   </div>
 </div>
 
@@ -2479,6 +2804,9 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
       <label>Hora de fim</label>
       <input type="time" id="sf-end" value="15:00">
     </div>
+    <div class="hint-chip" id="sf-overnight-hint" style="margin-top:-4px;">
+      Se a hora de fim for igual ou anterior à hora de início, o turno termina automaticamente no dia seguinte.
+    </div>
     <div class="field">
       <label>Cor identificativa</label>
       <input type="color" id="sf-color" value="#145C54" style="height:42px; padding:4px; cursor:pointer;">
@@ -2487,6 +2815,72 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
   <div class="drawer-foot">
     <button class="btn-secondary" id="shift-drawer-cancel-btn">Cancelar</button>
     <button class="btn-primary" id="shift-drawer-save-btn">Guardar</button>
+  </div>
+</div>
+
+
+<div class="overlay" id="roster-generator-overlay"></div>
+<div class="drawer" id="roster-generator-drawer" style="max-width:560px;">
+  <div class="drawer-head">
+    <div>
+      <h3>Gerador de Escalas</h3>
+      <div class="sub">Cria uma proposta semanal usando os turnos já existentes.</div>
+    </div>
+    <button class="drawer-close" id="roster-generator-close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="field">
+      <label>Equipa</label>
+      <select class="select-input" id="rg-team">
+        <option value="">Todas as equipas</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Turnos a utilizar</label>
+      <div id="rg-shifts" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label>Dias de trabalho por semana</label>
+        <input type="number" id="rg-work-days" min="1" max="7" value="5">
+      </div>
+      <div class="field">
+        <label>Descanso mínimo entre turnos</label>
+        <input type="number" id="rg-min-rest" min="0" max="24" step="1" value="11">
+        <div class="hint">Horas mínimas entre o fim de um turno e o início do seguinte.</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="toggle-row">
+        <span>Respeitar horas semanais do colaborador</span>
+        <input type="checkbox" id="rg-respect-hours" checked>
+        <span class="toggle-switch"></span>
+      </label>
+    </div>
+
+    <div class="field">
+      <label class="toggle-row">
+        <span>Substituir a escala existente desta semana</span>
+        <input type="checkbox" id="rg-replace-existing">
+        <span class="toggle-switch"></span>
+      </label>
+      <div class="hint">Desligado: apenas preenche dias ainda vazios.</div>
+    </div>
+
+    <div class="hint-chip">
+      O gerador não atribui turnos a colaboradores suspensos ou em férias aprovadas.
+      Turnos overnight contam integralmente para o dia em que começam.
+    </div>
+
+    <div id="rg-preview" style="margin-top:14px;"></div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn-secondary" id="roster-generator-cancel">Cancelar</button>
+    <button class="btn-outline" id="roster-generator-preview-btn">Gerar proposta</button>
+    <button class="btn-primary" id="roster-generator-apply-btn" disabled>Aplicar escala</button>
   </div>
 </div>
 
@@ -2533,6 +2927,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
     <button class="portal-tab" data-tab="ponto">Ponto</button>
     <button class="portal-tab" data-tab="ferias">Férias</button>
     <button class="portal-tab" data-tab="faltas">Faltas</button>
+    <button class="portal-tab" data-tab="trocas">Trocas</button>
     <button class="portal-tab" data-tab="dados">Dados Pessoais</button>
   </div>
 
@@ -2546,7 +2941,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
         <div class="panel-head"><div><h3>Próximos turnos</h3><div class="sub">Escala prevista para os próximos dias</div></div></div>
         <div class="panel-body" style="padding-top:8px;">
           <table>
-            <thead><tr><th>Data</th><th>Equipa</th><th>Turno</th></tr></thead>
+            <thead><tr><th>Data</th><th>Equipa</th><th>Turno</th><th></th></tr></thead>
             <tbody id="ep-upcoming-body"></tbody>
           </table>
         </div>
@@ -2590,6 +2985,22 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
       </div>
     </div>
 
+
+    <div class="page" id="ep-page-trocas" hidden>
+      <div class="page-head">
+        <div><h1>Trocas de Turno</h1><div class="sub">Peça uma troca e acompanhe a resposta do colega e do Admin</div></div>
+        <button class="btn-add" id="ep-new-swap-btn">+ Pedir troca</button>
+      </div>
+      <div class="panel">
+        <div class="panel-body" style="padding-top:8px;overflow:auto;">
+          <table>
+            <thead><tr><th>Data</th><th>Com</th><th>Turnos</th><th>Motivo</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="ep-swaps-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
     <div class="page" id="ep-page-dados" hidden>
       <div class="page-head">
         <div><h1>Dados Pessoais</h1><div class="sub">Os seus dados na empresa/instituição</div></div>
@@ -2614,6 +3025,40 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
+<div class="overlay" id="ep-swap-drawer-overlay"></div>
+<div class="drawer" id="ep-swap-drawer">
+  <div class="drawer-head">
+    <div>
+      <h3>Pedir troca de turno</h3>
+      <div class="sub">Selecione o seu turno e o colega com quem pretende trocar.</div>
+    </div>
+    <button class="drawer-close" id="ep-swap-drawer-close">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="field">
+      <label>O meu turno</label>
+      <select class="select-input" id="ep-swap-my-roster"></select>
+    </div>
+    <div class="field">
+      <label>Trocar com</label>
+      <select class="select-input" id="ep-swap-target"></select>
+      <div class="hint" id="ep-swap-target-hint">São mostrados apenas colegas escalados no mesmo dia e disponíveis para troca.</div>
+    </div>
+    <div class="field">
+      <label>Motivo</label>
+      <textarea id="ep-swap-reason" rows="3" placeholder="Opcional — explique brevemente o pedido"></textarea>
+    </div>
+    <div class="hint-chip">
+      Depois de enviar, o colega precisa de aceitar. Só depois o Admin pode aprovar e alterar a escala.
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn-secondary" id="ep-swap-drawer-cancel">Cancelar</button>
+    <button class="btn-primary" id="ep-swap-drawer-save">Enviar pedido</button>
   </div>
 </div>
 
@@ -2800,6 +3245,7 @@ let editingShiftId = null;
 /* ---- Escalas (roster) ---- */
 let rosterEntries = []; // {employeeId, date, shiftId, isDayOff, notes, teamId}
 let rosterApprovedVacations = [];
+let rosterApprovedAbsences = [];
 let rosterModalContext = null;
 const dowNames = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
 const monthsPt = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
@@ -3803,7 +4249,45 @@ function formatLicenseAmount(inst){
   }
 }
 
-function renderLicencas(){
+async function renderLicencas(){
+  // Carrega o custo atual do add-on de acessos por instituição.
+  try{
+    const ids=institutions.map(i=>i.id).filter(Boolean);
+    if(ids.length && supabaseClient){
+      const [addonsRes,permsRes]=await Promise.all([
+        supabaseClient.from('institution_addons')
+          .select('institution_id,enabled,unit_price_cents')
+          .eq('addon_code','hikvision_access_control')
+          .in('institution_id',ids),
+        supabaseClient.from('hikvision_access_permissions')
+          .select('institution_id,employee_id,external_person_no,person_name,valid_from,valid_until,enabled')
+          .in('institution_id',ids)
+          .eq('enabled',true)
+      ]);
+      if(addonsRes.error) throw addonsRes.error;
+      if(permsRes.error) throw permsRes.error;
+      const nowIso=new Date().toISOString();
+      const addonByInst=Object.fromEntries((addonsRes.data||[]).map(a=>[String(a.institution_id),a]));
+      institutions.forEach(inst=>{
+        const addon=addonByInst[String(inst.id)];
+        const keys=new Set();
+        if(addon?.enabled){
+          (permsRes.data||[]).filter(x=>String(x.institution_id)===String(inst.id) && x.valid_from<=nowIso && x.valid_until>=nowIso).forEach(x=>{
+            keys.add(x.employee_id ? `e:${x.employee_id}` : `x:${String(x.external_person_no||x.person_name||'').trim().toLowerCase()}`);
+          });
+        }
+        const people=keys.size;
+        const unit=Number(addon?.unit_price_cents||100);
+        const months=inst.billingCycle==='annual'?12:1;
+        inst.accessAddonPeople=people;
+        inst.accessAddonCents=addon?.enabled ? people*unit*months : 0;
+        inst.accessAddonEnabled=!!addon?.enabled;
+      });
+    }
+  }catch(err){
+    console.warn('Não foi possível calcular add-ons nas licenças:',err);
+  }
+
   const activeCount = institutions.filter(i=>i.licenseStatus==='active').length;
   const expiringSoon = institutions.filter(i=> i.expiresAt && i.expiresAt - now > 0 && i.expiresAt - now < 30*day).length;
   const expiredCount = institutions.filter(i=>i.licenseStatus==='expired' || (i.expiresAt && i.expiresAt < now)).length;
@@ -3818,7 +4302,7 @@ function renderLicencas(){
 
   const body = document.getElementById('lic-table-body');
   if(!institutions.length){
-    body.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--ink-faint); padding:28px;">Ainda não existem licenças.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--ink-faint); padding:28px;">Ainda não existem licenças.</td></tr>`;
     return;
   }
 
@@ -3834,6 +4318,14 @@ function renderLicencas(){
       <td>
         <div style="font-family:var(--font-mono); font-weight:600;">${formatLicenseAmount(inst)}</div>
         <div style="font-size:11px; color:var(--ink-faint);">${cycleLabel}</div>
+      </td>
+      <td>
+        <div style="font-family:var(--font-mono);font-weight:600;">${inst.accessAddonCents ? new Intl.NumberFormat('pt-PT',{style:'currency',currency:inst.currency||'EUR'}).format(inst.accessAddonCents/100) : '—'}</div>
+        <div style="font-size:11px;color:var(--ink-faint);">${inst.accessAddonEnabled ? `${inst.accessAddonPeople||0} pessoa(s) em acessos` : 'sem add-ons ativos'}</div>
+      </td>
+      <td>
+        <div style="font-family:var(--font-mono);font-weight:800;">${inst.priceCents!=null ? new Intl.NumberFormat('pt-PT',{style:'currency',currency:inst.currency||'EUR'}).format((Number(inst.priceCents||0)+Number(inst.accessAddonCents||0))/100) : '—'}</div>
+        <div style="font-size:11px;color:var(--ink-faint);">base + add-ons</div>
       </td>
       <td>${inst.employees}/${inst.limit || 0}</td>
       <td style="font-family:var(--font-mono); font-size:12.5px;">${inst.expiresAt ? fmtDate(inst.expiresAt) : '—'}</td>
@@ -4749,6 +5241,7 @@ async function loadEmployeesFromSupabase(institutionId){
       schedule: m ? m[1] : '—',
       status: mapSupaStatusToLocal(row.status),
       vacation: (Number(row.vacation_days_total)||0) - (Number(row.vacation_days_used)||0),
+      weeklyHours: Number(row.weekly_hours || 40),
       pin: null,
       hasPin: !!row.pin_hash,
       photoUrl: row.photo_url || null,
@@ -5044,7 +5537,10 @@ function renderTurnos(){
         </div>
       </td>
       <td style="font-family:var(--font-mono);">${s.start}</td>
-      <td style="font-family:var(--font-mono);">${s.end}</td>
+      <td style="font-family:var(--font-mono);">
+        ${s.end}${isOvernightShift(s) ? ' <span class="next-day-tag">dia seguinte</span>' : ''}
+        <div style="font-size:10.5px;color:var(--ink-faint);margin-top:3px;">${formatDurationMinutes(shiftDurationMinutes(s))}</div>
+      </td>
       <td>${count}</td>
       <td>
         <div class="row-actions">
@@ -5066,7 +5562,22 @@ function openShiftDrawer(id){
   document.getElementById('sf-color').value = s ? s.color : '#145C54';
   document.getElementById('shift-drawer').classList.add('open');
   document.getElementById('shift-drawer-overlay').classList.add('open');
+  refreshShiftOvernightHint();
 }
+function refreshShiftOvernightHint(){
+  const start=document.getElementById('sf-start')?.value;
+  const end=document.getElementById('sf-end')?.value;
+  const hint=document.getElementById('sf-overnight-hint');
+  if(!start||!end||!hint) return;
+  const overnight=end<=start;
+  const fake={start,end,overnight};
+  hint.textContent = overnight
+    ? `Turno noturno: termina no dia seguinte · duração ${formatDurationMinutes(shiftDurationMinutes(fake))}.`
+    : `Turno no mesmo dia · duração ${formatDurationMinutes(shiftDurationMinutes(fake))}.`;
+}
+document.getElementById('sf-start').addEventListener('input', refreshShiftOvernightHint);
+document.getElementById('sf-end').addEventListener('input', refreshShiftOvernightHint);
+
 function closeShiftDrawer(){
   document.getElementById('shift-drawer').classList.remove('open');
   document.getElementById('shift-drawer-overlay').classList.remove('open');
@@ -5093,6 +5604,8 @@ async function loadShiftsFromSupabase(institutionId){
     start: (row.start_time||'00:00').slice(0,5),
     end: (row.end_time||'00:00').slice(0,5),
     color: row.color || '#145C54',
+    overnight: row.overnight === true,
+    breakMinutes: Number(row.break_minutes || 0),
   }));
 }
 
@@ -5106,7 +5619,7 @@ async function saveShift(){
   if(currentInstitutionId){
     const payload = {
       institution_id: currentInstitutionId, name, start_time: start, end_time: end,
-      overnight: end < start, color,
+      overnight: end <= start, color,
     };
     try {
       if(editingShiftId){
@@ -5132,14 +5645,14 @@ async function saveShift(){
   if(editingShiftId){
     const s = shifts.find(x=>x.id==editingShiftId);
     const oldLabel = shiftLabel(s);
-    s.name = name; s.start = start; s.end = end; s.color = color;
+    s.name = name; s.start = start; s.end = end; s.color = color; s.overnight = end <= start;
     const newLabel = shiftLabel(s);
     if(oldLabel !== newLabel){
       employees.forEach(e=>{ if(e.schedule===oldLabel) e.schedule = newLabel; });
     }
     showToast('Turno atualizado.');
   } else {
-    shifts.push({id: nextShiftId++, name, start, end, color});
+    shifts.push({id: nextShiftId++, name, start, end, color, overnight:end <= start});
     showToast('Turno criado.');
   }
   closeShiftDrawer();
@@ -5207,6 +5720,83 @@ function renderEscalaHeader(){
   document.getElementById('escala-header-row').innerHTML = html;
 }
 
+
+function rosterEntryBounds(entry){
+  if(!entry || entry.isDayOff || !entry.shiftId) return null;
+  const shift=shifts.find(s=>String(s.id)===String(entry.shiftId));
+  if(!shift) return null;
+  return plannedShiftBounds(entry.date,shift);
+}
+
+function rosterHasOverlap(empId, ds, shift, proposalEntries=[]){
+  const candidate=plannedShiftBounds(ds,shift);
+  const all=[];
+  for(const r of rosterEntries){
+    if(String(r.employeeId)!==String(empId) || r.isDayOff || !r.shiftId) continue;
+    all.push(r);
+  }
+  for(const r of proposalEntries){
+    if(String(r.employeeId)!==String(empId) || r.isDayOff || !r.shiftId) continue;
+    const ix=all.findIndex(x=>x.date===r.date);
+    if(ix>=0) all[ix]=r; else all.push(r);
+  }
+  return all.some(r=>{
+    if(r.date===ds) return false;
+    const b=rosterEntryBounds(r);
+    return b && candidate.startAt < b.endAt && candidate.endAt > b.startAt;
+  });
+}
+
+function rosterValidationForAssignment(empId, ds, shiftId, proposalEntries=[], minRestHours=11){
+  const result={blocked:[],warnings:[]};
+  const emp=employees.find(e=>String(e.id)===String(empId));
+  const shift=shifts.find(s=>String(s.id)===String(shiftId));
+  if(!emp || !shift){
+    result.blocked.push('Colaborador ou turno inválido.');
+    return result;
+  }
+
+  const unavailable=employeeUnavailableReason(empId,ds);
+  if(unavailable==='vacation') result.blocked.push('O colaborador tem férias aprovadas nesta data.');
+  if(unavailable==='absence') result.blocked.push('O colaborador tem uma ausência aprovada nesta data.');
+  if(rosterHasOverlap(empId,ds,shift,proposalEntries)) result.blocked.push('Este turno sobrepõe outro turno do colaborador.');
+
+  if(!hasMinimumRest(empId,ds,shift,proposalEntries,minRestHours)){
+    result.warnings.push(`Descanso inferior a ${minRestHours} horas entre turnos.`);
+  }
+
+  const weeklyLimit=Number(emp.weeklyHours||40)*60;
+  const candidate={employeeId:emp.id,date:ds,shiftId:shift.id,isDayOff:false};
+  const future=[...proposalEntries.filter(x=>!(String(x.employeeId)===String(emp.id)&&x.date===ds)),candidate];
+  const total=employeeWeekScheduledMinutes(emp.id,future);
+  if(total>weeklyLimit){
+    result.warnings.push(`Carga semanal de ${formatDurationMinutes(total)} ultrapassa as ${emp.weeklyHours||40}h contratadas.`);
+  }
+
+  return result;
+}
+
+function coverageAfterAssignment(empId, ds, shiftId, isDayOff){
+  const emp=employees.find(e=>String(e.id)===String(empId));
+  if(!emp) return null;
+  const team=teams.find(t=>t.name===emp.team);
+  const minStaff=Number(team?.minStaff||0);
+  if(minStaff<=0) return null;
+
+  const teamEmployees=employees.filter(e=>e.team===emp.team && e.status!=='suspenso');
+  let scheduled=0;
+  for(const e of teamEmployees){
+    if(employeeUnavailableReason(e.id,ds)) continue;
+    if(String(e.id)===String(empId)){
+      if(!isDayOff && shiftId) scheduled++;
+      continue;
+    }
+    const r=getRosterEntry(e.id,ds);
+    if(r && !r.isDayOff && r.shiftId) scheduled++;
+  }
+  return {team:emp.team,scheduled,minStaff,below:scheduled<minStaff};
+}
+
 function renderRosterCoverageWarnings(dates){
   const el = document.getElementById('escala-coverage-alerts');
   if(!el) return;
@@ -5220,7 +5810,7 @@ function renderRosterCoverageWarnings(dates){
       const ds = dateStr(d);
       const teamEmployees = employees.filter(e=>e.team===team.name && e.status!=='suspenso');
       const scheduled = teamEmployees.filter(e=>{
-        if(employeeOnApprovedVacation(e.id, ds)) return false;
+        if(employeeUnavailableReason(e.id, ds)) return false;
         const r = getRosterEntry(e.id, ds);
         return r && !r.isDayOff && !!r.shiftId;
       }).length;
@@ -5241,6 +5831,327 @@ function renderRosterCoverageWarnings(dates){
   el.innerHTML = warnings.slice(0,12).map(w=>`<div class="coverage-alert">${w}</div>`).join('') +
     (warnings.length>12 ? `<div class="coverage-alert">+ ${warnings.length-12} outros avisos de cobertura.</div>` : '');
 }
+
+
+let generatedRosterProposal = null;
+
+function shiftNetMinutes(shift){
+  return Math.max(0, shiftDurationMinutes(shift) - Number(shift.breakMinutes || 0));
+}
+function employeeWeekScheduledMinutes(empId, proposalEntries=[]){
+  const base = rosterEntries.filter(r=>
+    String(r.employeeId)===String(empId) &&
+    !r.isDayOff &&
+    r.shiftId
+  );
+  const map = new Map();
+  for(const r of base) map.set(r.date, r);
+  for(const r of proposalEntries.filter(x=>String(x.employeeId)===String(empId))){
+    map.set(r.date, r);
+  }
+  let total=0;
+  for(const r of map.values()){
+    if(r.isDayOff || !r.shiftId) continue;
+    const s=shifts.find(x=>String(x.id)===String(r.shiftId));
+    if(s) total += shiftNetMinutes(s);
+  }
+  return total;
+}
+function proposedEntryBounds(ds, shift){
+  return plannedShiftBounds(ds, shift);
+}
+function hasMinimumRest(empId, ds, shift, proposalEntries, minRestHours){
+  const restMin = Number(minRestHours || 0) * 60;
+  if(restMin <= 0) return true;
+
+  const dates = getWeekDates(currentWeekStart).map(dateStr);
+  const idx = dates.indexOf(ds);
+  const cur = proposedEntryBounds(ds, shift);
+
+  const candidateFor = date=>{
+    const proposed = proposalEntries.find(x=>String(x.employeeId)===String(empId) && x.date===date);
+    if(proposed) return proposed;
+    return getRosterEntry(empId, date);
+  };
+
+  if(idx > 0){
+    const prev = candidateFor(dates[idx-1]);
+    if(prev && !prev.isDayOff && prev.shiftId){
+      const ps = shifts.find(s=>String(s.id)===String(prev.shiftId));
+      if(ps){
+        const pb = proposedEntryBounds(dates[idx-1], ps);
+        const gap = Math.round((cur.startAt - pb.endAt)/60000);
+        if(gap < restMin) return false;
+      }
+    }
+  }
+  if(idx < dates.length-1){
+    const next = candidateFor(dates[idx+1]);
+    if(next && !next.isDayOff && next.shiftId){
+      const ns = shifts.find(s=>String(s.id)===String(next.shiftId));
+      if(ns){
+        const nb = proposedEntryBounds(dates[idx+1], ns);
+        const gap = Math.round((nb.startAt - cur.endAt)/60000);
+        if(gap < restMin) return false;
+      }
+    }
+  }
+  return true;
+}
+
+function openRosterGenerator(){
+  const teamSel=document.getElementById('rg-team');
+  teamSel.innerHTML='<option value="">Todas as equipas</option>' +
+    teams.map(t=>`<option value="${analyticsEsc(t.name)}">${analyticsEsc(t.name)}</option>`).join('');
+
+  document.getElementById('rg-shifts').innerHTML = shifts.length
+    ? shifts.map(s=>`
+      <label class="rg-shift-option">
+        <input type="checkbox" class="rg-shift-check" value="${s.id}" checked>
+        <span class="rg-shift-dot" style="background:${s.color}"></span>
+        <span><strong>${analyticsEsc(s.name)}</strong><br><span style="color:var(--ink-faint)">${s.start}–${s.end}${isOvernightShift(s)?' (+1 dia)':''} · ${formatDurationMinutes(shiftNetMinutes(s))}</span></span>
+      </label>`).join('')
+    : '<div class="analytics-empty">Cria primeiro pelo menos um turno.</div>';
+
+  document.getElementById('rg-preview').innerHTML='';
+  document.getElementById('roster-generator-apply-btn').disabled=true;
+  generatedRosterProposal=null;
+  document.getElementById('roster-generator-drawer').classList.add('open');
+  document.getElementById('roster-generator-overlay').classList.add('open');
+}
+function closeRosterGenerator(){
+  document.getElementById('roster-generator-drawer').classList.remove('open');
+  document.getElementById('roster-generator-overlay').classList.remove('open');
+  generatedRosterProposal=null;
+}
+
+function buildRosterProposal(){
+  const selectedShiftIds = Array.from(document.querySelectorAll('.rg-shift-check:checked')).map(x=>x.value);
+  const usableShifts = shifts.filter(s=>selectedShiftIds.includes(String(s.id)));
+  if(!usableShifts.length) throw new Error('Seleciona pelo menos um turno.');
+
+  const teamFilter=document.getElementById('rg-team').value;
+  const workDays=Math.max(1,Math.min(7,Number(document.getElementById('rg-work-days').value)||5));
+  const minRest=Math.max(0,Number(document.getElementById('rg-min-rest').value)||0);
+  const respectHours=document.getElementById('rg-respect-hours').checked;
+  const replaceExisting=document.getElementById('rg-replace-existing').checked;
+  const dates=getWeekDates(currentWeekStart);
+
+  const targetEmployees = employees.filter(e=>
+    e.status==='ativo' &&
+    (!teamFilter || e.team===teamFilter)
+  );
+  if(!targetEmployees.length) throw new Error('Não existem colaboradores ativos para esta seleção.');
+
+  const proposal=[];
+  const warnings=[];
+  const assignedDays={};
+  const shiftLoad={};
+
+  targetEmployees.forEach(e=>{
+    assignedDays[String(e.id)]=0;
+  });
+
+  // If replacing, generator conceptually clears target cells before calculating.
+  const originalEntries = rosterEntries;
+  const existingLookup = (empId,ds)=>{
+    if(replaceExisting && targetEmployees.some(e=>String(e.id)===String(empId))) return null;
+    return originalEntries.find(r=>String(r.employeeId)===String(empId)&&r.date===ds);
+  };
+
+  // Helper with fairness: fewer days, then fewer minutes, then stable name.
+  const scoreEmployees = (a,b)=>{
+    const da=assignedDays[String(a.id)]||0, db=assignedDays[String(b.id)]||0;
+    if(da!==db) return da-db;
+    const ma=employeeWeekScheduledMinutes(a.id,proposal), mb=employeeWeekScheduledMinutes(b.id,proposal);
+    if(ma!==mb) return ma-mb;
+    return a.name.localeCompare(b.name);
+  };
+
+  // Generate team by team so minimum staff is meaningful.
+  const groups = teamFilter
+    ? [{name:teamFilter, employees:targetEmployees, minStaff:Number(teams.find(t=>t.name===teamFilter)?.minStaff||0)}]
+    : teams.map(t=>({
+        name:t.name,
+        employees:targetEmployees.filter(e=>e.team===t.name),
+        minStaff:Number(t.minStaff||0)
+      })).filter(g=>g.employees.length);
+
+  // Employees with no team still get a group.
+  const groupedIds=new Set(groups.flatMap(g=>g.employees.map(e=>String(e.id))));
+  const ungrouped=targetEmployees.filter(e=>!groupedIds.has(String(e.id)));
+  if(ungrouped.length) groups.push({name:'Sem equipa',employees:ungrouped,minStaff:0});
+
+  for(const group of groups){
+    for(let di=0; di<dates.length; di++){
+      const ds=dateStr(dates[di]);
+      const available=group.employees.filter(emp=>
+        !employeeUnavailableReason(emp.id,ds) &&
+        (!existingLookup(emp.id,ds) || replaceExisting) &&
+        (assignedDays[String(emp.id)]||0) < workDays
+      );
+
+      // Minimum coverage or, where not configured, distribute roughly workDays/7 of team each day.
+      const desired = group.minStaff>0
+        ? Math.min(group.minStaff, available.length)
+        : Math.min(available.length, Math.ceil(group.employees.length * workDays / 7));
+
+      let assignedToday=0;
+      const sorted=[...available].sort(scoreEmployees);
+
+      for(const emp of sorted){
+        if(assignedToday>=desired) break;
+
+        const weeklyLimitMin=Number(emp.weeklyHours||40)*60;
+        let candidates=[...usableShifts];
+
+        // Rotate shifts by day + employee to distribute them.
+        const seed=(di + Math.abs(hashStr(String(emp.id)))) % Math.max(1,candidates.length);
+        candidates=candidates.slice(seed).concat(candidates.slice(0,seed));
+
+        let chosen=null;
+        for(const shift of candidates){
+          const candidate={employeeId:emp.id,date:ds,shiftId:shift.id,isDayOff:false,notes:'Gerado automaticamente'};
+          const future=[...proposal,candidate];
+          const validation=rosterValidationForAssignment(emp.id,ds,shift.id,proposal,minRest);
+          if(validation.blocked.length) continue;
+          if(validation.warnings.some(w=>w.toLowerCase().includes('descanso'))) continue;
+          if(respectHours){
+            const mins=employeeWeekScheduledMinutes(emp.id,future);
+            if(mins > weeklyLimitMin) continue;
+          }
+          chosen=candidate;
+          break;
+        }
+
+        if(chosen){
+          proposal.push(chosen);
+          assignedDays[String(emp.id)]++;
+          assignedToday++;
+          shiftLoad[String(chosen.shiftId)]=(shiftLoad[String(chosen.shiftId)]||0)+1;
+        }
+      }
+
+      if(group.minStaff>0 && assignedToday<group.minStaff){
+        warnings.push(`${group.name} · ${pad2(dates[di].getDate())}/${pad2(dates[di].getMonth()+1)}: só foi possível escalar ${assignedToday} de ${group.minStaff} necessários.`);
+      }
+    }
+
+    for(const emp of group.employees){
+      const mins=employeeWeekScheduledMinutes(emp.id,proposal);
+      const limit=Number(emp.weeklyHours||40)*60;
+      if(respectHours && mins>limit){
+        warnings.push(`${emp.name}: ${formatDurationMinutes(mins)} excede as ${emp.weeklyHours||40}h semanais.`);
+      }
+      if((assignedDays[String(emp.id)]||0)<Math.min(workDays,7)){
+        warnings.push(`${emp.name}: ficou com ${assignedDays[String(emp.id)]||0} dia(s) de trabalho na proposta.`);
+      }
+    }
+  }
+
+  // Explicit day-off entries when replacing existing, for non-work days.
+  if(replaceExisting){
+    for(const emp of targetEmployees){
+      for(const d of dates){
+        const ds=dateStr(d);
+        if(employeeUnavailableReason(emp.id,ds)) continue;
+        const has=proposal.some(x=>String(x.employeeId)===String(emp.id)&&x.date===ds);
+        if(!has){
+          proposal.push({employeeId:emp.id,date:ds,shiftId:null,isDayOff:true,notes:'Folga gerada automaticamente'});
+        }
+      }
+    }
+  }
+
+  return {proposal,warnings,targetEmployees,replaceExisting,usableShifts,workDays,minRest,respectHours};
+}
+
+function previewRosterGenerator(){
+  try{
+    const result=buildRosterProposal();
+    generatedRosterProposal=result;
+
+    const workEntries=result.proposal.filter(x=>!x.isDayOff);
+    const offEntries=result.proposal.filter(x=>x.isDayOff);
+    const totalHours=workEntries.reduce((sum,r)=>{
+      const s=shifts.find(x=>String(x.id)===String(r.shiftId));
+      return sum+(s?shiftNetMinutes(s):0);
+    },0);
+
+    const perShift=result.usableShifts.map(s=>{
+      const c=workEntries.filter(r=>String(r.shiftId)===String(s.id)).length;
+      return `${s.name}: ${c}`;
+    }).join(' · ');
+
+    document.getElementById('rg-preview').innerHTML=`
+      <div class="rg-preview-card rg-good">
+        <div class="rg-preview-title">Proposta pronta</div>
+        <div class="rg-preview-line">${result.targetEmployees.length} colaborador(es) · ${workEntries.length} turnos · ${offEntries.length} folgas explícitas</div>
+        <div class="rg-preview-line">Carga total proposta: ${formatDurationMinutes(totalHours)}</div>
+        <div class="rg-preview-line">${analyticsEsc(perShift||'Sem turnos')}</div>
+      </div>
+      ${result.warnings.length ? `
+        <div class="rg-preview-card rg-warning">
+          <div class="rg-preview-title">Avisos (${result.warnings.length})</div>
+          ${result.warnings.slice(0,10).map(w=>`<div class="rg-preview-line">⚠ ${analyticsEsc(w)}</div>`).join('')}
+          ${result.warnings.length>10?`<div class="rg-preview-line">+ ${result.warnings.length-10} outros avisos</div>`:''}
+        </div>` : `
+        <div class="rg-preview-card rg-good"><div class="rg-preview-line">✓ Sem conflitos detetados nesta proposta.</div></div>`}
+    `;
+    document.getElementById('roster-generator-apply-btn').disabled=false;
+  }catch(err){
+    generatedRosterProposal=null;
+    document.getElementById('roster-generator-apply-btn').disabled=true;
+    document.getElementById('rg-preview').innerHTML=`<div class="rg-preview-card rg-warning"><div class="rg-preview-line">⚠ ${analyticsEsc(err.message||'Não foi possível gerar a escala.')}</div></div>`;
+  }
+}
+
+async function applyGeneratedRoster(){
+  if(!generatedRosterProposal) return;
+  const btn=document.getElementById('roster-generator-apply-btn');
+  const old=btn.textContent; btn.disabled=true; btn.textContent='A guardar…';
+
+  try{
+    const {proposal,targetEmployees,replaceExisting}=generatedRosterProposal;
+    const dates=getWeekDates(currentWeekStart).map(dateStr);
+
+    if(currentInstitutionId){
+      if(replaceExisting){
+        const ids=targetEmployees.map(e=>e.id);
+        const {error:delErr}=await supabaseClient.from('roster_entries')
+          .delete()
+          .eq('institution_id',currentInstitutionId)
+          .in('employee_id',ids)
+          .gte('work_date',dates[0])
+          .lte('work_date',dates[6]);
+        if(delErr) throw delErr;
+      }
+
+      for(const r of proposal){
+        await supaUpsertRoster(r.employeeId,r.date,r.shiftId,{
+          isDayOff:!!r.isDayOff,
+          notes:r.notes||''
+        });
+      }
+      await renderEscalas();
+    }else{
+      for(const r of proposal){
+        if(r.isDayOff) setRosterEntry(r.employeeId,r.date,null);
+        else setRosterEntry(r.employeeId,r.date,r.shiftId);
+      }
+      renderEscalas();
+    }
+
+    closeRosterGenerator();
+    showToast(`Escala gerada com sucesso — ${proposal.filter(x=>!x.isDayOff).length} turnos aplicados.`);
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao aplicar escala gerada: '+(err.message||''),true);
+  }finally{
+    btn.disabled=false; btn.textContent=old;
+  }
+}
+
 
 async function renderEscalas(){
   renderEscalaHeader();
@@ -5280,6 +6191,12 @@ async function renderEscalas(){
         </td>`;
       }
 
+      if(employeeOnApprovedAbsence(emp.id, ds)){
+        return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}">
+          <span class="roster-state-chip vacation" title="Ausência aprovada">Ausência</span>
+        </td>`;
+      }
+
       const entry = getRosterEntry(emp.id, ds);
 
       if(entry?.isDayOff){
@@ -5295,7 +6212,7 @@ async function renderEscalas(){
         if(s){
           return `<td class="roster-drop-cell${todayCls}" data-emp="${emp.id}" data-date="${ds}">
             <button class="roster-chip" draggable="true" style="background:${s.color};" onclick="openRosterModal('${emp.id}','${ds}')" title="${entry.notes ? analyticsEsc(entry.notes) : ''}">
-              ${s.name}<span class="rt">${s.start}–${s.end}${entry.notes ? ' · nota' : ''}</span>
+              ${s.name}<span class="rt">${s.start}–${s.end}${isOvernightShift(s)?' +1d':''}${entry.notes ? ' · nota' : ''}</span>
             </button>
           </td>`;
         }
@@ -5344,7 +6261,9 @@ function openRosterModal(empId, ds){
 
   rosterModalContext = {employeeId: empId, date: ds};
   const entry = getRosterEntry(empId, ds);
-  const onVacation = currentInstitutionId && employeeOnApprovedVacation(empId, ds);
+  const unavailableReason = currentInstitutionId ? employeeUnavailableReason(empId, ds) : null;
+  const onVacation = unavailableReason === 'vacation';
+  const onAbsence = unavailableReason === 'absence';
   const dObj = new Date(ds+'T00:00:00');
 
   document.getElementById('roster-modal-title').textContent =
@@ -5362,20 +6281,22 @@ function openRosterModal(empId, ds){
   document.getElementById('rm-notes').value = entry?.notes || '';
 
   const warning = document.getElementById('rm-availability-warning');
-  warning.hidden = !onVacation;
+  warning.hidden = !unavailableReason;
   warning.textContent = onVacation
     ? '⚠ Este colaborador tem férias aprovadas neste dia. Não é possível atribuir um turno.'
-    : '';
+    : onAbsence
+      ? '⚠ Este colaborador tem uma ausência aprovada neste dia. Não é possível atribuir um turno.'
+      : '';
 
-  shiftSel.disabled = !!onVacation;
-  document.getElementById('roster-modal-save-btn').disabled = !!onVacation;
+  shiftSel.disabled = !!unavailableReason;
+  document.getElementById('roster-modal-save-btn').disabled = !!unavailableReason;
 
   const swapWrap = document.getElementById('rm-swap-wrap');
   const swapSel = document.getElementById('rm-swap-target');
   const others = employees.filter(e=>
     String(e.id)!==String(empId) &&
     e.status==='ativo' &&
-    !employeeOnApprovedVacation(e.id, ds) &&
+    !employeeUnavailableReason(e.id, ds) &&
     getRosterEntry(e.id, ds) &&
     !getRosterEntry(e.id, ds)?.isDayOff
   );
@@ -5407,20 +6328,36 @@ async function loadApprovedVacationsForWeek(institutionId, weekStart){
   const dates = getWeekDates(weekStart);
   const from = dateStr(dates[0]), to = dateStr(dates[6]);
 
-  const { data, error } = await supabaseClient
-    .from('vacation_requests')
-    .select('employee_id,start_date,end_date,status')
-    .eq('institution_id', institutionId)
-    .eq('status', 'approved')
-    .lte('start_date', to)
-    .gte('end_date', from);
+  const [vacRes, absRes] = await Promise.all([
+    supabaseClient
+      .from('vacation_requests')
+      .select('employee_id,start_date,end_date,status')
+      .eq('institution_id', institutionId)
+      .eq('status', 'approved')
+      .lte('start_date', to)
+      .gte('end_date', from),
+    supabaseClient
+      .from('absence_requests')
+      .select('employee_id,start_date,end_date,status,category,reason')
+      .eq('institution_id', institutionId)
+      .eq('status', 'approved')
+      .lte('start_date', to)
+      .gte('end_date', from)
+  ]);
 
-  if(error){
-    console.warn('Não foi possível carregar férias aprovadas:', error);
+  if(vacRes.error){
+    console.warn('Não foi possível carregar férias aprovadas:', vacRes.error);
     rosterApprovedVacations = [];
-    return;
+  } else {
+    rosterApprovedVacations = vacRes.data || [];
   }
-  rosterApprovedVacations = data || [];
+
+  if(absRes.error){
+    console.warn('Não foi possível carregar ausências aprovadas:', absRes.error);
+    rosterApprovedAbsences = [];
+  } else {
+    rosterApprovedAbsences = absRes.data || [];
+  }
 }
 
 function employeeOnApprovedVacation(employeeId, ds){
@@ -5429,6 +6366,19 @@ function employeeOnApprovedVacation(employeeId, ds){
     v.start_date <= ds &&
     v.end_date >= ds
   );
+}
+
+function employeeOnApprovedAbsence(employeeId, ds){
+  return rosterApprovedAbsences.some(a=>
+    String(a.employee_id)===String(employeeId) &&
+    a.start_date <= ds &&
+    a.end_date >= ds
+  );
+}
+function employeeUnavailableReason(employeeId, ds){
+  if(employeeOnApprovedVacation(employeeId, ds)) return 'vacation';
+  if(employeeOnApprovedAbsence(employeeId, ds)) return 'absence';
+  return null;
 }
 
 async function loadRosterForWeek(institutionId, weekStart){
@@ -5514,6 +6464,27 @@ async function saveRosterModal(){
         const val = document.getElementById('rm-shift').value;
         const isDayOff = val === '__OFF__';
 
+        if(!isDayOff){
+          const selectedShift=shifts.find(s=>String(s.id)===String(val));
+          if(selectedShift){
+            const validation=rosterValidationForAssignment(employeeId,date,val,[],11);
+            if(validation.blocked.length){
+              showToast(validation.blocked.join(' '),true);
+              return;
+            }
+            if(validation.warnings.length){
+              const ok=confirm('Avisos desta escala:\n\n• '+validation.warnings.join('\n• ')+'\n\nGuardar mesmo assim?');
+              if(!ok) return;
+            }
+          }
+        }
+
+        const coverage=coverageAfterAssignment(employeeId,date,isDayOff?null:val,isDayOff);
+        if(coverage?.below){
+          const ok=confirm(`A equipa ${coverage.team} ficará com ${coverage.scheduled} pessoa(s) escalada(s), abaixo do mínimo ${coverage.minStaff}. Guardar mesmo assim?`);
+          if(!ok) return;
+        }
+
         await supaUpsertRoster(employeeId, date, isDayOff ? null : val, {
           isDayOff,
           notes
@@ -5549,8 +6520,8 @@ document.getElementById('roster-modal-save-btn').addEventListener('click', saveR
 
 /* ---------------- ESCALAS: ARRASTAR PARA TROCAR TURNOS ---------------- */
 async function performRosterSwap(empA, empB, ds){
-  if(employeeOnApprovedVacation(empA, ds) || employeeOnApprovedVacation(empB, ds)){
-    showToast('Não é possível trocar turnos com colaboradores de férias.', true);
+  if(employeeUnavailableReason(empA, ds) || employeeUnavailableReason(empB, ds)){
+    showToast('Não é possível trocar turnos com colaboradores de férias ou com ausência aprovada.', true);
     return;
   }
 
@@ -5558,6 +6529,17 @@ async function performRosterSwap(empA, empB, ds){
     try {
       const a = getRosterEntry(empA, ds);
       const b = getRosterEntry(empB, ds);
+
+      if(b?.shiftId){
+        const vb=rosterValidationForAssignment(empA,ds,b.shiftId,[],11);
+        if(vb.blocked.length) throw new Error(vb.blocked.join(' '));
+        if(vb.warnings.length && !confirm(`Avisos para ${employees.find(e=>String(e.id)===String(empA))?.name||'colaborador'}:\n• ${vb.warnings.join('\n• ')}\nContinuar troca?`)) return;
+      }
+      if(a?.shiftId){
+        const va=rosterValidationForAssignment(empB,ds,a.shiftId,[],11);
+        if(va.blocked.length) throw new Error(va.blocked.join(' '));
+        if(va.warnings.length && !confirm(`Avisos para ${employees.find(e=>String(e.id)===String(empB))?.name||'colaborador'}:\n• ${va.warnings.join('\n• ')}\nContinuar troca?`)) return;
+      }
 
       await supaUpsertRoster(empA, ds, b?.shiftId || null, {
         isDayOff:!!b?.isDayOff,
@@ -5684,20 +6666,134 @@ function strToMinutes(str){ const [h,m]=str.split(':').map(Number); return h*60+
 function minutesToStr(mins){ mins=((mins%1440)+1440)%1440; return `${pad2(Math.floor(mins/60))}:${pad2(mins%60)}`; }
 // Um turno é noturno quando a hora de fim é igual ou anterior à hora de início
 // (ex.: Noite 23:00–07:00) — ou seja, atravessa a meia-noite.
-function isOvernightShift(shift){ return strToMinutes(shift.end) <= strToMinutes(shift.start); }
+function isOvernightShift(shift){
+  if(typeof shift?.overnight === 'boolean') return shift.overnight;
+  return strToMinutes(shift.end) <= strToMinutes(shift.start);
+}
+function shiftDurationMinutes(shift){
+  const start = strToMinutes(shift.start);
+  let end = strToMinutes(shift.end);
+  if(isOvernightShift(shift)) end += 1440;
+  return Math.max(0, end - start);
+}
+function formatDurationMinutes(total){
+  const h=Math.floor(total/60), m=total%60;
+  return m ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`;
+}
+function normalizeClockDiffMinutes(actual, planned, crossesMidnight=false){
+  let a=strToMinutes(actual), p=strToMinutes(planned);
+  if(crossesMidnight && a < 12*60) a += 1440;
+  if(crossesMidnight) p += 1440;
+  return a-p;
+}
+
+
+/* ---------------- MOTOR ÚNICO DE JORNADA ----------------
+   Todas as áreas (Ponto, Relatórios e integrações) devem usar estas regras.
+   O dia do turno é sempre o dia em que o turno COMEÇA. */
+function localDateTimeFromParts(ds, hhmm, plusDays=0){
+  const [y,m,d] = ds.split('-').map(Number);
+  const [hh,mm] = hhmm.split(':').map(Number);
+  const dt = new Date(y, m-1, d, hh, mm, 0, 0);
+  if(plusDays) dt.setDate(dt.getDate()+plusDays);
+  return dt;
+}
+function plannedShiftBounds(ds, shift){
+  const startAt = localDateTimeFromParts(ds, shift.start, 0);
+  const endAt = localDateTimeFromParts(ds, shift.end, isOvernightShift(shift) ? 1 : 0);
+  return {startAt, endAt};
+}
+function clockHHMM(dt){
+  return dt ? `${pad2(dt.getHours())}:${pad2(dt.getMinutes())}` : null;
+}
+function calculateWorkday(ds, shift, actualInAt=null, actualOutAt=null){
+  const {startAt, endAt} = plannedShiftBounds(ds, shift);
+  const scheduledMinutes = Math.round((endAt-startAt)/60000);
+
+  if(!actualInAt){
+    return {
+      status:'falta',
+      scheduledMinutes,
+      workedMinutes:0,
+      lateMinutes:0,
+      earlyLeaveMinutes:0,
+      overtimeMinutes:0,
+      actualStart:null,
+      actualEnd:null,
+      outNextDay:false,
+      startAt,
+      endAt,
+      actualInAt:null,
+      actualOutAt:null
+    };
+  }
+
+  const lateRaw = Math.round((actualInAt-startAt)/60000);
+  const lateMinutes = Math.max(0, lateRaw);
+  const status = lateMinutes > adminSettings.lateToleranceMin ? 'atraso' : 'pontual';
+
+  let workedMinutes=0, earlyLeaveMinutes=0, overtimeMinutes=0;
+  if(actualOutAt && actualOutAt > actualInAt){
+    workedMinutes = Math.max(0, Math.round((actualOutAt-actualInAt)/60000));
+    const exitDiff = Math.round((actualOutAt-endAt)/60000);
+    if(exitDiff < 0) earlyLeaveMinutes = Math.abs(exitDiff);
+    if(exitDiff > adminSettings.overtimeThresholdMin) overtimeMinutes = exitDiff;
+  }
+
+  return {
+    status,
+    scheduledMinutes,
+    workedMinutes,
+    lateMinutes,
+    earlyLeaveMinutes,
+    overtimeMinutes,
+    actualStart:clockHHMM(actualInAt),
+    actualEnd:clockHHMM(actualOutAt),
+    outNextDay:!!actualOutAt && dateStr(actualOutAt)!==ds,
+    startAt,
+    endAt,
+    actualInAt,
+    actualOutAt
+  };
+}
+function findPunchPairForShift(events, ds, shift){
+  const {startAt,endAt} = plannedShiftBounds(ds,shift);
+  // Aceita entradas até 6h antes ou depois do início previsto.
+  // Isto também cobre um 23:00 → 06:00 cuja entrada só aconteça depois das 00:00.
+  const inMin = new Date(startAt.getTime()-6*60*60000);
+  const inMax = new Date(startAt.getTime()+6*60*60000);
+  const candidates = (events||[])
+    .filter(e=>e.type==='clock_in' && e.at>=inMin && e.at<=inMax)
+    .sort((a,b)=>Math.abs(a.at-startAt)-Math.abs(b.at-startAt));
+  const clockIn = candidates[0] || null;
+  if(!clockIn) return {inAt:null,outAt:null};
+
+  // Saída válida: depois da entrada e até 12h depois do fim previsto.
+  const outMax = new Date(endAt.getTime()+12*60*60000);
+  const clockOut = (events||[])
+    .filter(e=>e.type==='clock_out' && e.at>clockIn.at && e.at<=outMax)
+    .sort((a,b)=>a.at-b.at)[0] || null;
+
+  return {inAt:clockIn.at,outAt:clockOut?.at||null};
+}
+function formatMinutesHuman(mins){
+  mins=Math.max(0,Math.round(Number(mins||0)));
+  const h=Math.floor(mins/60), m=mins%60;
+  if(!h) return `${m} min`;
+  if(!m) return `${h}h`;
+  return `${h}h${String(m).padStart(2,'0')}`;
+}
 
 function getPunchFor(emp, ds, shift){
   const seed = hashStr(emp.id + '|' + ds);
-  if(seed % 100 < 8) return {status:'falta', actualStart:null, actualEnd:null, outNextDay:false};
-  const startOffset = (seed % 21) - 5;      // -5 .. +15 min
-  const endOffset = Math.floor(seed/7) % 11 - 3; // -3 .. +7 min
-  const status = startOffset > adminSettings.lateToleranceMin ? 'atraso' : 'pontual';
-  return {
-    status,
-    actualStart: minutesToStr(strToMinutes(shift.start) + startOffset),
-    actualEnd: minutesToStr(strToMinutes(shift.end) + endOffset),
-    outNextDay: isOvernightShift(shift),
-  };
+  if(seed % 100 < 8) return calculateWorkday(ds,shift,null,null);
+
+  const {startAt,endAt}=plannedShiftBounds(ds,shift);
+  const startOffset=(seed%21)-5;
+  const endOffset=Math.floor(seed/7)%11-3;
+  const actualInAt=new Date(startAt.getTime()+startOffset*60000);
+  const actualOutAt=new Date(endAt.getTime()+endOffset*60000);
+  return calculateWorkday(ds,shift,actualInAt,actualOutAt);
 }
 
 /* ---- Ligação ao serviço de dados (time_clock_entries) ----
@@ -5707,57 +6803,33 @@ function getPunchFor(emp, ds, shift){
    seguinte — e emparelhamos cada entrada com a primeira saída que aconteça
    depois dela, mesmo que já seja no dia seguinte. */
 async function loadPunchesForDate(institutionId, ds){
-  const nextDs = dateStr(addDays(new Date(ds+'T00:00:00'), 1));
+  const prevDs = dateStr(addDays(new Date(ds+'T00:00:00'), -1));
+  const next2 = dateStr(addDays(new Date(ds+'T00:00:00'), 2));
   const { data, error } = await supabaseClient
     .from('time_clock_entries')
-    .select('employee_id, type, recorded_at')
+    .select('employee_id,type,recorded_at')
     .eq('institution_id', institutionId)
-    .gte('recorded_at', `${ds}T00:00:00`)
-    .lte('recorded_at', `${nextDs}T23:59:59`);
+    .gte('recorded_at', `${prevDs}T12:00:00`)
+    .lte('recorded_at', `${next2}T12:00:00`);
+
   if(error){
-    console.warn('Erro a carregar o ponto da base de dados:', error);
-    showToast('Não foi possível carregar o ponto da base de dados.', true);
+    console.warn('Erro a carregar o ponto:', error);
+    showToast('Não foi possível carregar os registos de ponto.', true);
     return {};
   }
-  // Agrupa e ordena cronologicamente os eventos de cada colaborador
-  const byEmployeeEvents = {};
-  (data||[]).forEach(row=>{
-    if(!byEmployeeEvents[row.employee_id]) byEmployeeEvents[row.employee_id] = [];
-    byEmployeeEvents[row.employee_id].push({ type: row.type, at: new Date(row.recorded_at) });
-  });
 
   const byEmployee = {};
-  Object.entries(byEmployeeEvents).forEach(([empId, events])=>{
-    events.sort((a,b)=> a.at - b.at);
-    // Última entrada que aconteceu efetivamente no dia pedido (ds)
-    let lastIn = null;
-    events.forEach(ev=>{
-      if(ev.type==='clock_in' && dateStr(ev.at)===ds) lastIn = ev;
-    });
-    if(!lastIn) return; // sem entrada nesse dia -> falta (tratado à parte)
-    // Primeira saída que aconteça depois dessa entrada (pode ser já no dia seguinte)
-    const nextOut = events.find(ev=> ev.type==='clock_out' && ev.at > lastIn.at);
-    const outNextDay = nextOut ? dateStr(nextOut.at) !== ds : false;
-    byEmployee[empId] = {
-      in: `${pad2(lastIn.at.getHours())}:${pad2(lastIn.at.getMinutes())}`,
-      out: nextOut ? `${pad2(nextOut.at.getHours())}:${pad2(nextOut.at.getMinutes())}` : null,
-      outNextDay,
-      inAt: lastIn.at,
-      outAt: nextOut ? nextOut.at : null,
-    };
+  (data||[]).forEach(row=>{
+    if(!byEmployee[row.employee_id]) byEmployee[row.employee_id]=[];
+    byEmployee[row.employee_id].push({type:row.type,at:new Date(row.recorded_at)});
   });
+  Object.values(byEmployee).forEach(events=>events.sort((a,b)=>a.at-b.at));
   return byEmployee;
 }
-function realPunchFor(byEmployee, empId, shift){
-  const rec = byEmployee[empId];
-  if(!rec || !rec.in) return {status:'falta', actualStart:null, actualEnd:null, outNextDay:false};
-  const startOffset = strToMinutes(rec.in) - strToMinutes(shift.start);
-  return {
-    status: startOffset > adminSettings.lateToleranceMin ? 'atraso' : 'pontual',
-    actualStart: rec.in,
-    actualEnd: rec.out || null,
-    outNextDay: rec.outNextDay || false,
-  };
+function realPunchFor(byEmployee, empId, ds, shift){
+  const events = byEmployee[empId] || [];
+  const pair = findPunchPairForShift(events, ds, shift);
+  return calculateWorkday(ds, shift, pair.inAt, pair.outAt);
 }
 
 function pontoDateLabel(d){
@@ -5771,7 +6843,7 @@ async function renderPonto(){
 
   let punchesByEmployee = null;
   if(currentInstitutionId){
-    skeletonRows('ponto-table-body', 8, Math.min(employees.length||5, 6));
+    skeletonRows('ponto-table-body', 10, Math.min(employees.length||5, 6));
     await loadRosterForWeek(currentInstitutionId, getMonday(currentPontoDate));
     punchesByEmployee = await loadPunchesForDate(currentInstitutionId, ds);
   } else {
@@ -5785,7 +6857,7 @@ async function renderPonto(){
     const emp = employees.find(e=>e.id==r.employeeId);
     const shift = shifts.find(s=>s.id==r.shiftId);
     if(!emp || !shift) return null;
-    const punch = currentInstitutionId ? realPunchFor(punchesByEmployee, emp.id, shift) : getPunchFor(emp, ds, shift);
+    const punch = currentInstitutionId ? realPunchFor(punchesByEmployee, emp.id, ds, shift) : getPunchFor(emp, ds, shift);
     return {emp, shift, punch};
   }).filter(Boolean);
 
@@ -5815,11 +6887,16 @@ async function renderPonto(){
       <td>${r.shift.name}</td>
       <td style="font-family:var(--font-mono);">${r.shift.start}</td>
       <td style="font-family:var(--font-mono);">${r.punch.actualStart || '—'}</td>
-      <td style="font-family:var(--font-mono);">${r.shift.end}</td>
+      <td style="font-family:var(--font-mono);">${r.shift.end}${isOvernightShift(r.shift) ? ' <span class="next-day-tag" title="Fim previsto no dia seguinte">dia seguinte</span>' : ''}</td>
       <td style="font-family:var(--font-mono);">${r.punch.actualEnd ? r.punch.actualEnd + (r.punch.outNextDay ? ' <span class="next-day-tag" title="Saída registada no dia seguinte">dia seguinte</span>' : '') : '—'}</td>
-      <td><span class="status-tag ${r.punch.status}">${statusTagLabel[r.punch.status]}</span></td>
+      <td style="font-family:var(--font-mono);">${r.punch.actualEnd ? formatMinutesHuman(r.punch.workedMinutes) : '—'}</td>
+      <td style="font-family:var(--font-mono);">${r.punch.overtimeMinutes ? '+'+formatMinutesHuman(r.punch.overtimeMinutes) : '—'}</td>
+      <td>
+        <span class="status-tag ${r.punch.status}">${statusTagLabel[r.punch.status]}</span>
+        ${r.punch.earlyLeaveMinutes ? `<div style="font-size:10px;color:var(--red);margin-top:3px;">saída ${formatMinutesHuman(r.punch.earlyLeaveMinutes)} cedo</div>` : ''}
+      </td>
     </tr>
-  `).join('') : `<tr><td colspan="8" style="text-align:center; color:var(--ink-faint); padding:26px;">Sem colaboradores escalados para este dia com os filtros atuais.</td></tr>`;
+  `).join('') : `<tr><td colspan="10" style="text-align:center; color:var(--ink-faint); padding:26px;">Sem colaboradores escalados para este dia com os filtros atuais.</td></tr>`;
 }
 
 document.getElementById('ponto-prev-btn').addEventListener('click', ()=>{ currentPontoDate = addDays(currentPontoDate,-1); renderPonto(); });
@@ -6359,28 +7436,344 @@ document.getElementById('u-password-generate').addEventListener('click', ()=>{
   document.getElementById('u-password').value = genPassword();
 });
 
+
+/* ---------------- BANCO DE HORAS ---------------- */
+let timeBankMonth = new Date();
+timeBankMonth = new Date(timeBankMonth.getFullYear(), timeBankMonth.getMonth(), 1);
+let timeBankRows = [];
+let timeBankAdjustments = [];
+
+function monthBounds(d){
+  const first=new Date(d.getFullYear(),d.getMonth(),1);
+  const last=new Date(d.getFullYear(),d.getMonth()+1,0);
+  return {first,last,from:dateStr(first),to:dateStr(last)};
+}
+function signedMinutesLabel(mins){
+  const n=Math.round(Number(mins||0));
+  if(n===0) return '0h';
+  return `${n>0?'+':'−'}${formatMinutesHuman(Math.abs(n))}`;
+}
+function signedClass(mins){
+  return Number(mins)>0?'time-bank-positive':Number(mins)<0?'time-bank-negative':'time-bank-zero';
+}
+function timeBankReasonLabel(v){
+  return {correcao:'Correção administrativa',compensacao:'Compensação',credito:'Crédito extraordinário',debito:'Débito',outro:'Outro'}[v]||v||'—';
+}
+
+async function loadTimeBankMonth(){
+  if(!currentInstitutionId) return [];
+  const {from,to,last}=monthBounds(timeBankMonth);
+  const next2=dateStr(addDays(last,2));
+
+  const [rosterRes,punchRes,adjustRes]=await Promise.all([
+    supabaseClient.from('roster_entries')
+      .select('employee_id,shift_type_id,work_date,is_day_off')
+      .eq('institution_id',currentInstitutionId)
+      .gte('work_date',from).lte('work_date',to),
+    supabaseClient.from('time_clock_entries')
+      .select('employee_id,type,recorded_at')
+      .eq('institution_id',currentInstitutionId)
+      .gte('recorded_at',`${from}T00:00:00`)
+      .lte('recorded_at',`${next2}T12:00:00`),
+    supabaseClient.from('time_bank_adjustments')
+      .select('id,employee_id,adjustment_date,minutes,reason,notes,created_at')
+      .eq('institution_id',currentInstitutionId)
+      .gte('adjustment_date',from).lte('adjustment_date',to)
+      .order('adjustment_date',{ascending:false})
+  ]);
+
+  if(rosterRes.error) throw rosterRes.error;
+  if(punchRes.error) throw punchRes.error;
+  if(adjustRes.error) throw adjustRes.error;
+
+  timeBankAdjustments=adjustRes.data||[];
+
+  const eventsByEmployee={};
+  (punchRes.data||[]).forEach(row=>{
+    if(!eventsByEmployee[row.employee_id]) eventsByEmployee[row.employee_id]=[];
+    eventsByEmployee[row.employee_id].push({type:row.type,at:new Date(row.recorded_at)});
+  });
+  Object.values(eventsByEmployee).forEach(a=>a.sort((x,y)=>x.at-y.at));
+
+  const base=Object.fromEntries(employees.map(emp=>[String(emp.id),{
+    emp,
+    scheduledMinutes:0,
+    workedMinutes:0,
+    overtimeMinutes:0,
+    earlyLeaveMinutes:0,
+    adjustmentMinutes:0,
+    shifts:0
+  }]));
+
+  for(const r of rosterRes.data||[]){
+    if(r.is_day_off||!r.shift_type_id) continue;
+    const item=base[String(r.employee_id)];
+    const shift=shifts.find(s=>String(s.id)===String(r.shift_type_id));
+    if(!item||!shift) continue;
+    const pair=findPunchPairForShift(eventsByEmployee[r.employee_id]||[],r.work_date,shift);
+    const calc=calculateWorkday(r.work_date,shift,pair.inAt,pair.outAt);
+    item.scheduledMinutes+=calc.scheduledMinutes;
+    item.workedMinutes+=calc.workedMinutes;
+    item.overtimeMinutes+=calc.overtimeMinutes;
+    item.earlyLeaveMinutes+=calc.earlyLeaveMinutes;
+    item.shifts++;
+  }
+
+  for(const a of timeBankAdjustments){
+    const item=base[String(a.employee_id)];
+    if(item) item.adjustmentMinutes+=Number(a.minutes||0);
+  }
+
+  timeBankRows=Object.values(base).map(x=>({
+    ...x,
+    differenceMinutes:x.workedMinutes-x.scheduledMinutes,
+    finalBalanceMinutes:x.workedMinutes-x.scheduledMinutes+x.adjustmentMinutes
+  }));
+
+  return timeBankRows;
+}
+
+function populateTimeBankFilters(){
+  const sel=document.getElementById('time-bank-team-filter');
+  const current=sel.value;
+  sel.innerHTML='<option value="">Todas as equipas</option>'+teams.map(t=>`<option value="${analyticsEsc(t.name)}">${analyticsEsc(t.name)}</option>`).join('');
+  if([...sel.options].some(o=>o.value===current)) sel.value=current;
+
+  const es=document.getElementById('tb-employee');
+  es.innerHTML=employees.map(e=>`<option value="${e.id}">${analyticsEsc(e.name)} · ${analyticsEsc(e.team)}</option>`).join('');
+}
+
+function renderTimeBankData(){
+  populateTimeBankFilters();
+  const team=document.getElementById('time-bank-team-filter').value;
+  const rows=timeBankRows.filter(r=>!team||r.emp.team===team);
+  const monthName=new Intl.DateTimeFormat('pt-PT',{month:'long',year:'numeric'}).format(timeBankMonth);
+  document.getElementById('time-bank-month-label').textContent=monthName.charAt(0).toUpperCase()+monthName.slice(1);
+
+  const scheduled=rows.reduce((s,r)=>s+r.scheduledMinutes,0);
+  const worked=rows.reduce((s,r)=>s+r.workedMinutes,0);
+  const adjustments=rows.reduce((s,r)=>s+r.adjustmentMinutes,0);
+  const balance=rows.reduce((s,r)=>s+r.finalBalanceMinutes,0);
+
+  document.getElementById('time-bank-kpis').innerHTML=`
+    <div class="kpi-card"><div class="label">Horas previstas</div><div class="value">${formatMinutesHuman(scheduled)}</div><div class="delta flat">pela escala</div></div>
+    <div class="kpi-card"><div class="label">Horas trabalhadas</div><div class="value">${formatMinutesHuman(worked)}</div><div class="delta flat">pelas picagens</div></div>
+    <div class="kpi-card"><div class="label">Ajustes manuais</div><div class="value ${signedClass(adjustments)}">${signedMinutesLabel(adjustments)}</div><div class="delta flat">créditos/débitos</div></div>
+    <div class="kpi-card"><div class="label">Saldo final</div><div class="value ${signedClass(balance)}">${signedMinutesLabel(balance)}</div><div class="delta flat">do mês</div></div>
+  `;
+
+  document.getElementById('time-bank-body').innerHTML=rows.length?rows.map(r=>`
+    <tr>
+      <td class="inst-name">${analyticsEsc(r.emp.name)}</td>
+      <td>${analyticsEsc(r.emp.team)}</td>
+      <td>${formatMinutesHuman(r.scheduledMinutes)}</td>
+      <td>${formatMinutesHuman(r.workedMinutes)}</td>
+      <td class="${signedClass(r.differenceMinutes)}">${signedMinutesLabel(r.differenceMinutes)}</td>
+      <td class="${signedClass(r.adjustmentMinutes)}">${signedMinutesLabel(r.adjustmentMinutes)}</td>
+      <td class="${signedClass(r.finalBalanceMinutes)}">${signedMinutesLabel(r.finalBalanceMinutes)}</td>
+    </tr>`).join(''):'<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--ink-faint);">Sem colaboradores neste filtro.</td></tr>';
+
+  const empById=Object.fromEntries(employees.map(e=>[String(e.id),e]));
+  const adjustmentsFiltered=timeBankAdjustments.filter(a=>{
+    const emp=empById[String(a.employee_id)];
+    return emp && (!team||emp.team===team);
+  });
+  document.getElementById('time-bank-adjustments-body').innerHTML=adjustmentsFiltered.length?adjustmentsFiltered.map(a=>`
+    <tr>
+      <td>${new Date(a.adjustment_date+'T12:00:00').toLocaleDateString('pt-PT')}</td>
+      <td>${analyticsEsc(empById[String(a.employee_id)]?.name||'—')}</td>
+      <td class="${signedClass(a.minutes)}">${signedMinutesLabel(a.minutes)}</td>
+      <td>${analyticsEsc(timeBankReasonLabel(a.reason))}</td>
+      <td>${analyticsEsc(a.notes||'—')}</td>
+      <td><button class="action-btn" title="Eliminar ajuste" onclick="deleteTimeBankAdjustment('${a.id}')">🗑</button></td>
+    </tr>`).join(''):'<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--ink-faint);">Sem ajustes manuais neste mês.</td></tr>';
+}
+
+async function renderTimeBank(){
+  try{
+    document.getElementById('time-bank-body').innerHTML='<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--ink-faint);">A calcular banco de horas…</td></tr>';
+    await loadTimeBankMonth();
+    renderTimeBankData();
+  }catch(err){
+    console.error('Banco de horas:',err);
+    showToast('Erro ao calcular banco de horas: '+(err.message||''),true);
+  }
+}
+
+function openTimeBankDrawer(){
+  populateTimeBankFilters();
+  const {from,to}=monthBounds(timeBankMonth);
+  const today=dateStr(new Date());
+  document.getElementById('tb-date').value=(today>=from&&today<=to)?today:from;
+  document.getElementById('tb-hours').value='';
+  document.getElementById('tb-reason').value='correcao';
+  document.getElementById('tb-notes').value='';
+  document.getElementById('time-bank-drawer').classList.add('open');
+  document.getElementById('time-bank-drawer-overlay').classList.add('open');
+}
+function closeTimeBankDrawer(){
+  document.getElementById('time-bank-drawer').classList.remove('open');
+  document.getElementById('time-bank-drawer-overlay').classList.remove('open');
+}
+
+async function saveTimeBankAdjustment(){
+  const employeeId=document.getElementById('tb-employee').value;
+  const adjustmentDate=document.getElementById('tb-date').value;
+  const hours=Number(document.getElementById('tb-hours').value);
+  const reason=document.getElementById('tb-reason').value;
+  const notes=document.getElementById('tb-notes').value.trim()||null;
+
+  if(!employeeId||!adjustmentDate||!Number.isFinite(hours)||hours===0){
+    showToast('Indica colaborador, data e um ajuste diferente de zero.',true);
+    return;
+  }
+  const minutes=Math.round(hours*60);
+  const btn=document.getElementById('time-bank-drawer-save');
+  const old=btn.textContent;btn.disabled=true;btn.textContent='A guardar…';
+
+  try{
+    const {data:{user}}=await supabaseClient.auth.getUser();
+    const {error}=await supabaseClient.from('time_bank_adjustments').insert({
+      institution_id:currentInstitutionId,
+      employee_id:employeeId,
+      adjustment_date:adjustmentDate,
+      minutes,
+      reason,
+      notes,
+      created_by:user?.id||null
+    });
+    if(error) throw error;
+    closeTimeBankDrawer();
+    await renderTimeBank();
+    showToast('Ajuste do banco de horas guardado.');
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao guardar ajuste: '+(err.message||''),true);
+  }finally{btn.disabled=false;btn.textContent=old;}
+}
+
+async function deleteTimeBankAdjustment(id){
+  if(!confirm('Eliminar este ajuste do banco de horas?')) return;
+  try{
+    const {error}=await supabaseClient.from('time_bank_adjustments').delete().eq('id',id);
+    if(error) throw error;
+    await renderTimeBank();
+    showToast('Ajuste eliminado.');
+  }catch(err){showToast('Erro ao eliminar ajuste: '+(err.message||''),true);}
+}
+
+document.getElementById('time-bank-adjust-btn').addEventListener('click',openTimeBankDrawer);
+document.getElementById('time-bank-drawer-close').addEventListener('click',closeTimeBankDrawer);
+document.getElementById('time-bank-drawer-cancel').addEventListener('click',closeTimeBankDrawer);
+document.getElementById('time-bank-drawer-overlay').addEventListener('click',closeTimeBankDrawer);
+document.getElementById('time-bank-drawer-save').addEventListener('click',saveTimeBankAdjustment);
+document.getElementById('time-bank-team-filter').addEventListener('change',renderTimeBankData);
+document.getElementById('time-bank-prev-btn').addEventListener('click',()=>{
+  timeBankMonth=new Date(timeBankMonth.getFullYear(),timeBankMonth.getMonth()-1,1);renderTimeBank();
+});
+document.getElementById('time-bank-next-btn').addEventListener('click',()=>{
+  timeBankMonth=new Date(timeBankMonth.getFullYear(),timeBankMonth.getMonth()+1,1);renderTimeBank();
+});
+
+
 /* ---------------- RELATÓRIOS ---------------- */
+let attendanceReportCache = [];
+let reportDailyWorkdays = [];
+
+function reportPeriodBounds(){
+  const currentMonday=getMonday(new Date());
+  const fromDate=addDays(currentMonday,-7);
+  const toDate=addDays(currentMonday,6);
+  return {from:dateStr(fromDate),to:dateStr(toDate),fromDate,toDate};
+}
+
+async function loadRealAttendanceReport(){
+  if(!currentInstitutionId) return computeAttendanceReport();
+
+  const {from,to,fromDate,toDate}=reportPeriodBounds();
+  const afterTo=dateStr(addDays(toDate,2));
+
+  const [rosterRes,punchRes] = await Promise.all([
+    supabaseClient.from('roster_entries')
+      .select('employee_id,shift_type_id,work_date,is_day_off')
+      .eq('institution_id',currentInstitutionId)
+      .gte('work_date',from).lte('work_date',to),
+    supabaseClient.from('time_clock_entries')
+      .select('employee_id,type,recorded_at')
+      .eq('institution_id',currentInstitutionId)
+      .gte('recorded_at',`${from}T00:00:00`)
+      .lte('recorded_at',`${afterTo}T12:00:00`)
+  ]);
+
+  if(rosterRes.error) throw rosterRes.error;
+  if(punchRes.error) throw punchRes.error;
+
+  const eventsByEmployee={};
+  (punchRes.data||[]).forEach(row=>{
+    if(!eventsByEmployee[row.employee_id]) eventsByEmployee[row.employee_id]=[];
+    eventsByEmployee[row.employee_id].push({type:row.type,at:new Date(row.recorded_at)});
+  });
+  Object.values(eventsByEmployee).forEach(v=>v.sort((a,b)=>a.at-b.at));
+
+  reportDailyWorkdays=[];
+  for(const r of rosterRes.data||[]){
+    if(r.is_day_off || !r.shift_type_id) continue;
+    const emp=employees.find(e=>String(e.id)===String(r.employee_id));
+    const shift=shifts.find(s=>String(s.id)===String(r.shift_type_id));
+    if(!emp||!shift) continue;
+    const pair=findPunchPairForShift(eventsByEmployee[r.employee_id]||[],r.work_date,shift);
+    const calc=calculateWorkday(r.work_date,shift,pair.inAt,pair.outAt);
+    reportDailyWorkdays.push({emp,shift,date:r.work_date,...calc});
+  }
+
+  return employees.map(emp=>{
+    const days=reportDailyWorkdays.filter(d=>String(d.emp.id)===String(emp.id));
+    const pontual=days.filter(d=>d.status==='pontual').length;
+    const atraso=days.filter(d=>d.status==='atraso').length;
+    const falta=days.filter(d=>d.status==='falta').length;
+    const scheduled=days.length;
+    const present=pontual+atraso;
+    const assiduidade=scheduled?Math.round((present/scheduled)*100):0;
+    const overtimeMin=days.reduce((s,d)=>s+d.overtimeMinutes,0);
+    const workedMin=days.reduce((s,d)=>s+d.workedMinutes,0);
+    const scheduledMin=days.reduce((s,d)=>s+d.scheduledMinutes,0);
+    const earlyLeaveMin=days.reduce((s,d)=>s+d.earlyLeaveMinutes,0);
+    return {
+      emp,scheduled,pontual,atraso,falta,assiduidade,
+      overtimeHrs:Math.round((overtimeMin/60)*10)/10,
+      workedHrs:Math.round((workedMin/60)*10)/10,
+      scheduledHrs:Math.round((scheduledMin/60)*10)/10,
+      earlyLeaveHrs:Math.round((earlyLeaveMin/60)*10)/10
+    };
+  });
+}
+
+
 function computeAttendanceReport(){
   return employees.map(emp=>{
-    const entries = rosterEntries.filter(r=>r.employeeId===emp.id);
-    let pontual=0, atraso=0, falta=0, overtimeMin=0;
+    const entries=rosterEntries.filter(r=>String(r.employeeId)===String(emp.id) && !r.isDayOff && r.shiftId);
+    let pontual=0,atraso=0,falta=0,overtimeMin=0,workedMin=0,scheduledMin=0,earlyLeaveMin=0;
     entries.forEach(r=>{
-      const shift = shifts.find(s=>s.id===r.shiftId);
+      const shift=shifts.find(s=>String(s.id)===String(r.shiftId));
       if(!shift) return;
-      const punch = getPunchFor(emp, r.date, shift);
-      if(punch.status==='pontual') pontual++;
-      else if(punch.status==='atraso') atraso++;
+      const calc=getPunchFor(emp,r.date,shift);
+      if(calc.status==='pontual') pontual++;
+      else if(calc.status==='atraso') atraso++;
       else falta++;
-      if(punch.actualEnd){
-        const diff = strToMinutes(punch.actualEnd) - strToMinutes(shift.end);
-        if(diff > adminSettings.overtimeThresholdMin) overtimeMin += diff;
-      }
+      overtimeMin+=calc.overtimeMinutes;
+      workedMin+=calc.workedMinutes;
+      scheduledMin+=calc.scheduledMinutes;
+      earlyLeaveMin+=calc.earlyLeaveMinutes;
     });
-    const scheduled = entries.length;
-    const present = pontual+atraso;
-    const assiduidade = scheduled ? Math.round((present/scheduled)*100) : 0;
-    const overtimeHrs = Math.round((overtimeMin/60)*10)/10;
-    return {emp, scheduled, pontual, atraso, falta, assiduidade, overtimeHrs};
+    const scheduled=entries.length,present=pontual+atraso;
+    const assiduidade=scheduled?Math.round((present/scheduled)*100):0;
+    return {
+      emp,scheduled,pontual,atraso,falta,assiduidade,
+      overtimeHrs:Math.round((overtimeMin/60)*10)/10,
+      workedHrs:Math.round((workedMin/60)*10)/10,
+      scheduledHrs:Math.round((scheduledMin/60)*10)/10,
+      earlyLeaveHrs:Math.round((earlyLeaveMin/60)*10)/10
+    };
   });
 }
 
@@ -6468,11 +7861,11 @@ function populateRelatorioFilters(){
 }
 
 function getFilteredReport(){
-  const teamFilter = document.getElementById('rel-filter-team').value;
-  const empFilter = document.getElementById('rel-filter-employee').value;
-  let report = computeAttendanceReport();
-  if(empFilter) report = report.filter(r=>String(r.emp.id)===empFilter);
-  else if(teamFilter) report = report.filter(r=>r.emp.team===teamFilter);
+  const teamFilter=document.getElementById('rel-filter-team').value;
+  const empFilter=document.getElementById('rel-filter-employee').value;
+  let report=attendanceReportCache.length ? [...attendanceReportCache] : computeAttendanceReport();
+  if(empFilter) report=report.filter(r=>String(r.emp.id)===empFilter);
+  else if(teamFilter) report=report.filter(r=>r.emp.team===teamFilter);
   return report;
 }
 
@@ -6487,8 +7880,15 @@ function relatorioScopeLabel(){
   return 'Relatório de toda a empresa/instituição';
 }
 
-function renderRelatorios(){
+async function renderRelatorios(){
   populateRelatorioFilters();
+  try{
+    attendanceReportCache = await loadRealAttendanceReport();
+  }catch(err){
+    console.error('Erro ao calcular relatório real:',err);
+    showToast('Não foi possível calcular o relatório real: '+(err.message||''),true);
+    attendanceReportCache = computeAttendanceReport();
+  }
   const report = getFilteredReport();
   document.getElementById('rel-scope-label').textContent = relatorioScopeLabel();
 
@@ -6506,6 +7906,8 @@ function renderRelatorios(){
     <div class="kpi-card"><div class="label">Compensação a Pagar</div><div class="value">${fmtEuro(totalCompensacao)}</div><div class="delta flat">taxa × 1.5</div></div>
     <div class="kpi-card"><div class="label">Total de Faltas</div><div class="value">${totalFaltas}</div><div class="delta ${totalFaltas?'down':'flat'}">no período</div></div>
     <div class="kpi-card"><div class="label">Total de Atrasos</div><div class="value">${totalAtrasos}</div><div class="delta ${totalAtrasos?'down':'flat'}">no período</div></div>
+    <div class="kpi-card"><div class="label">Horas Previstas</div><div class="value">${report.reduce((s,r)=>s+(r.scheduledHrs||0),0).toFixed(1)}h</div><div class="delta flat">pela escala</div></div>
+    <div class="kpi-card"><div class="label">Horas Trabalhadas</div><div class="value">${report.reduce((s,r)=>s+(r.workedHrs||0),0).toFixed(1)}h</div><div class="delta flat">pelas picagens</div></div>
   `;
 
   const overtimeItems = [...report].sort((a,b)=>b.overtimeHrs-a.overtimeHrs).slice(0,8)
@@ -6533,10 +7935,12 @@ function renderRelatorios(){
       <td>${r.atraso}</td>
       <td>${r.falta}</td>
       <td>${r.assiduidade}%</td>
+      <td>${(r.scheduledHrs||0).toFixed(1)}h</td>
+      <td>${(r.workedHrs||0).toFixed(1)}h</td>
       <td>${r.overtimeHrs}h</td>
       <td>${fmtEuro(overtimeCompensation(r.overtimeHrs))}</td>
     </tr>
-  `).join('') : `<tr><td colspan="9" style="text-align:center; color:var(--ink-faint); padding:20px;">Sem dados para este filtro.</td></tr>`;
+  `).join('') : `<tr><td colspan="11" style="text-align:center; color:var(--ink-faint); padding:20px;">Sem dados para este filtro.</td></tr>`;
 }
 
 document.getElementById('rel-filter-team').addEventListener('change', ()=>{
@@ -6548,8 +7952,8 @@ document.getElementById('rel-overtime-rate').addEventListener('input', renderRel
 
 function exportReportCSV(){
   const report = getFilteredReport();
-  const header = ['Colaborador','Equipa','Escalados','Pontual','Atraso','Falta','Assiduidade (%)','Horas extra','Compensação (€)'];
-  const rows = report.map(r=>[r.emp.name, r.emp.team, r.scheduled, r.pontual, r.atraso, r.falta, r.assiduidade, r.overtimeHrs, overtimeCompensation(r.overtimeHrs).toFixed(2)]);
+  const header = ['Colaborador','Equipa','Escalados','Pontual','Atraso','Falta','Assiduidade (%)','Horas previstas','Horas trabalhadas','Horas extra','Compensação (€)'];
+  const rows = report.map(r=>[r.emp.name, r.emp.team, r.scheduled, r.pontual, r.atraso, r.falta, r.assiduidade, r.scheduledHrs||0, r.workedHrs||0, r.overtimeHrs, overtimeCompensation(r.overtimeHrs).toFixed(2)]);
   const csv = [header, ...rows].map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\r\n');
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -6570,7 +7974,7 @@ function individualDailyBreakdownHTML(emp){
     return `<tr>
       <td>${formatPtDate(r.date)}</td><td>${shift.name}</td>
       <td>${shift.start}</td><td>${punch.actualStart || '—'}</td>
-      <td>${shift.end}</td><td>${punch.actualEnd || '—'}</td>
+      <td>${shift.end}${isOvernightShift(shift)?' (+1 dia)':''}</td><td>${punch.actualEnd ? punch.actualEnd + (punch.outNextDay?' (+1 dia)':'') : '—'}</td>
       <td>${statusTagLabel[punch.status]}</td>
     </tr>`;
   }).join('');
@@ -6831,6 +8235,81 @@ if(supabaseClient){
 }
 
 
+
+/* ---------------- CONTROLO DE LICENÇA ---------------- */
+let currentLicenseGate = null;
+
+function licenseReasonMessage(gate){
+  const reason=gate?.reason;
+  if(reason==='license_expired') return 'A licença desta instituição terminou. Para voltar a utilizar o sistema, é necessário concluir a renovação.';
+  if(reason==='license_cancelled') return 'A licença desta instituição foi cancelada. Contacte o Pica-Aqui para reativar o serviço.';
+  if(reason==='license_suspended') return 'A licença desta instituição encontra-se suspensa.';
+  if(reason==='license_missing') return 'Esta instituição ainda não tem uma licença válida associada.';
+  if(reason==='institution_suspended') return 'Esta instituição encontra-se suspensa e não pode aceder ao sistema.';
+  if(reason==='institution_deleted') return 'Esta instituição já não está ativa no sistema.';
+  return 'O acesso desta instituição encontra-se temporariamente indisponível devido ao estado da licença.';
+}
+function licenseStatusLabel(v){
+  return {active:'Ativa',demo:'Demo',trial:'Trial',expired:'Expirada',suspended:'Suspensa',cancelled:'Cancelada'}[v]||v||'—';
+}
+async function getMyLicenseGate(){
+  if(!supabaseClient) return {access_allowed:false,reason:'service_unavailable'};
+  const {data,error}=await supabaseClient.rpc('get_my_license_gate');
+  if(error) throw error;
+  return data||{access_allowed:false,reason:'unknown'};
+}
+function showLicenseBlocked(gate){
+  currentLicenseGate=gate;
+  document.getElementById('login-screen').hidden=true;
+  document.getElementById('dashboard-screen').hidden=true;
+  document.getElementById('admin-dashboard-screen').hidden=true;
+  document.getElementById('employee-portal-screen').hidden=true;
+  document.getElementById('license-blocked-screen').hidden=false;
+
+  document.getElementById('license-blocked-message').textContent=licenseReasonMessage(gate);
+  document.getElementById('license-blocked-inst').textContent=gate?.institution_name||'—';
+  document.getElementById('license-blocked-plan').textContent=gate?.plan ? planDisplayName(gate.plan) : '—';
+  document.getElementById('license-blocked-status').textContent=licenseStatusLabel(gate?.license_status);
+  document.getElementById('license-blocked-expiry').textContent=gate?.expiration_date
+    ? new Date(gate.expiration_date+'T12:00:00').toLocaleDateString('pt-PT')
+    : '—';
+}
+async function enforceLicenseGate(){
+  const gate=await getMyLicenseGate();
+  currentLicenseGate=gate;
+  if(gate?.access_allowed) return true;
+  showLicenseBlocked(gate);
+  return false;
+}
+
+document.getElementById('license-blocked-refresh').addEventListener('click', async()=>{
+  const btn=document.getElementById('license-blocked-refresh');
+  const old=btn.textContent; btn.disabled=true; btn.textContent='A verificar…';
+  try{
+    const gate=await getMyLicenseGate();
+    if(gate?.access_allowed){
+      document.getElementById('license-blocked-screen').hidden=true;
+      const {data:{user}}=await supabaseClient.auth.getUser();
+      if(!user) throw new Error('Sessão expirada.');
+      const {data:profile,error}=await supabaseClient.from('profiles').select('*').eq('id',user.id).single();
+      if(error||!profile) throw error||new Error('Perfil não encontrado.');
+      await routeAfterSupabaseLogin(profile,user);
+    }else{
+      showLicenseBlocked(gate);
+      showToast('A licença ainda não está ativa.',true);
+    }
+  }catch(err){
+    showToast('Não foi possível verificar a licença: '+(err.message||''),true);
+  }finally{btn.disabled=false;btn.textContent=old;}
+});
+document.getElementById('license-blocked-logout').addEventListener('click',()=>{
+  picaroSignOut();
+  document.getElementById('license-blocked-screen').hidden=true;
+  document.getElementById('login-screen').hidden=false;
+  credentialForm.reset();
+});
+
+
 /* ---------------- LOGIN (auto-detecção de acesso) ---------------- */
 const credentialForm = document.getElementById('credential-form');
 const submitBtn = document.getElementById('login-submit-btn');
@@ -6856,6 +8335,7 @@ async function routeAfterSupabaseLogin(profile, supaUser){
 
   if(profile.role === 'admin'){
     currentInstitutionId = profile.institution_id;
+    if(!(await enforceLicenseGate())) return;
     document.getElementById('login-screen').hidden = true;
     document.getElementById('admin-dashboard-screen').hidden = false;
     if(currentInstitutionId){
@@ -6895,6 +8375,7 @@ async function routeAfterSupabaseLogin(profile, supaUser){
   }
 
   if(profile.role === 'employee'){
+    if(!(await enforceLicenseGate())) return;
     const { data: empRow, error: empError } = await supabaseClient
       .from('employees')
       .select('*, teams(name)')
@@ -6981,7 +8462,8 @@ let lastActivityAt = Date.now();
 function isLoggedInScreenVisible(){
   return !document.getElementById('dashboard-screen').hidden
       || !document.getElementById('admin-dashboard-screen').hidden
-      || !document.getElementById('employee-portal-screen').hidden;
+      || !document.getElementById('employee-portal-screen').hidden
+      || !document.getElementById('license-blocked-screen').hidden;
 }
 
 setInterval(()=>{
@@ -6991,6 +8473,7 @@ setInterval(()=>{
   document.getElementById('dashboard-screen').hidden = true;
   document.getElementById('admin-dashboard-screen').hidden = true;
   document.getElementById('employee-portal-screen').hidden = true;
+  document.getElementById('license-blocked-screen').hidden = true;
   currentEmployee = null;
   document.getElementById('login-screen').hidden = false;
   credentialForm.reset();
@@ -7470,8 +8953,243 @@ wireSidebarNav('#admin-dashboard-screen', {
   faltas:{id:'page-faltas', render:renderFaltas},
   utilizadores:{id:'page-utilizadores', render:renderUsers},
   relatorios:{id:'page-relatorios', render:renderRelatorios},
+  trocas:{id:'page-trocas', render:renderAdminShiftSwaps},
+  'banco-horas':{id:'page-banco-horas', render:renderTimeBank},
+  'terminal-ponto':{id:'page-terminal-ponto', render:loadHikvisionConfig},
+  'terminal-acessos':{id:'page-terminal-acessos', render:renderTerminalAcessos},
   definicoes:{id:'page-definicoes', render:renderAdminDefinicoes},
 });
+
+
+
+/* ================= HIKVISION: CONTROLO DE ACESSOS ================= */
+let hikAccessAddon = {enabled:false,unit_price_cents:100,active_people:0,monthly_total_cents:0};
+let hikAccessDevices = [];
+let hikAccessPermissions = [];
+
+function euroCents(c){ return new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(c||0)/100); }
+
+async function loadAccessControlData(){
+  if(!currentInstitutionId || !supabaseClient) return;
+
+  const [sumRes, devRes, permRes] = await Promise.all([
+    supabaseClient.rpc('get_hikvision_access_addon_summary',{p_institution_id:currentInstitutionId}),
+    supabaseClient.from('hikvision_devices').select('*').eq('institution_id',currentInstitutionId).eq('purpose','access_control').order('created_at'),
+    supabaseClient.from('hikvision_access_permissions')
+      .select('id,device_id,employee_id,person_name,valid_from,valid_until,access_start_time,access_end_time,enabled,sync_status,last_sync_at,last_sync_error')
+      .eq('institution_id',currentInstitutionId).order('created_at',{ascending:false})
+  ]);
+
+  if(sumRes.error) throw sumRes.error;
+  if(devRes.error) throw devRes.error;
+  if(permRes.error) throw permRes.error;
+
+  const s = Array.isArray(sumRes.data) ? (sumRes.data[0]||{}) : (sumRes.data||{});
+  hikAccessAddon = {
+    enabled:!!s.enabled,
+    unit_price_cents:Number(s.unit_price_cents||100),
+    active_people:Number(s.active_people||0),
+    monthly_total_cents:Number(s.monthly_total_cents||0)
+  };
+  hikAccessDevices = devRes.data || [];
+  hikAccessPermissions = permRes.data || [];
+}
+
+function fillAccessControlUI(){
+  const badge=document.getElementById('access-addon-badge');
+  const btn=document.getElementById('access-addon-toggle-btn');
+  const content=document.getElementById('access-addon-content');
+
+  badge.textContent = hikAccessAddon.enabled ? 'Add-on ativo' : 'Add-on inativo';
+  badge.className = `badge ${hikAccessAddon.enabled?'active':'suspended'}`;
+  btn.textContent = hikAccessAddon.enabled ? 'Desativar add-on' : 'Ativar add-on';
+  content.style.opacity = hikAccessAddon.enabled ? '1' : '.5';
+  content.style.pointerEvents = hikAccessAddon.enabled ? 'auto' : 'none';
+
+  document.getElementById('access-addon-kpis').innerHTML = `
+    <div class="kpi-card"><div class="label">Preço unitário</div><div class="value">${euroCents(hikAccessAddon.unit_price_cents)}</div><div class="delta flat">por pessoa / mês</div></div>
+    <div class="kpi-card"><div class="label">Pessoas ativas</div><div class="value">${hikAccessAddon.active_people}</div><div class="delta flat">com acesso válido</div></div>
+    <div class="kpi-card"><div class="label">Total mensal</div><div class="value">${euroCents(hikAccessAddon.monthly_total_cents)}</div><div class="delta flat">add-on acessos</div></div>
+  `;
+
+  const dsel=document.getElementById('ac-person-device');
+  dsel.innerHTML = hikAccessDevices.length ? hikAccessDevices.map(d=>`<option value="${d.id}">${hikEsc(d.name)} · ${hikEsc(d.host)}:${d.port}</option>`).join('') : '<option value="">Guarde primeiro um terminal</option>';
+
+  const esel=document.getElementById('ac-person-employee');
+  esel.innerHTML = '<option value="">— Visitante / externo —</option>' + employees.map(e=>`<option value="${e.id}">${hikEsc(e.name)}</option>`).join('');
+
+  const deviceById=Object.fromEntries(hikAccessDevices.map(d=>[String(d.id),d]));
+  const body=document.getElementById('access-permissions-body');
+  body.innerHTML = hikAccessPermissions.length ? hikAccessPermissions.map(p=>`
+    <tr>
+      <td><strong>${hikEsc(p.person_name)}</strong></td>
+      <td>${hikEsc(deviceById[String(p.device_id)]?.name || '—')}</td>
+      <td>${new Date(p.valid_from).toLocaleDateString('pt-PT')} → ${new Date(p.valid_until).toLocaleDateString('pt-PT')}</td>
+      <td>${String(p.access_start_time||'').slice(0,5)}–${String(p.access_end_time||'').slice(0,5)}</td>
+      <td>
+        <span class="badge ${
+          p.sync_status==='synced' ? 'active' :
+          p.sync_status==='synced_partial' ? 'demo' :
+          p.sync_status==='error' ? 'expired' : 'demo'
+        }">${
+          p.sync_status==='synced' ? 'Sincronizado' :
+          p.sync_status==='synced_partial' ? 'Parcial' :
+          p.sync_status==='error' ? 'Erro' : 'Pendente'
+        }</span>
+        ${p.last_sync_error ? `<div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px;max-width:220px;">${hikEsc(p.last_sync_error)}</div>` : ''}
+      </td>
+      <td><button class="btn-toggle" onclick="syncAccessPermission('${p.id}', this)">Sincronizar</button></td>
+    </tr>`).join('') : '<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--ink-faint);">Ainda não existem permissões de acesso.</td></tr>';
+
+  const first=hikAccessDevices[0];
+  document.getElementById('ac-hik-name').value=first?.name||'';
+  document.getElementById('ac-hik-device-key').value=first?.device_key||'access-1';
+  document.getElementById('ac-hik-protocol').value=first?.protocol||'http';
+  document.getElementById('ac-hik-host').value=first?.host||'';
+  document.getElementById('ac-hik-port').value=first?.port||80;
+  document.getElementById('ac-hik-username').value=first?.username||'';
+  document.getElementById('ac-hik-password').value='';
+  document.getElementById('ac-hik-enabled').checked=first?.enabled!==false;
+}
+
+async function renderTerminalAcessos(){
+  const nowLocal=new Date();
+  const later=new Date(nowLocal.getTime()+30*24*60*60*1000);
+  const localValue=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*60000);return z.toISOString().slice(0,16);};
+  if(!document.getElementById('ac-valid-from').value) document.getElementById('ac-valid-from').value=localValue(nowLocal);
+  if(!document.getElementById('ac-valid-until').value) document.getElementById('ac-valid-until').value=localValue(later);
+  try{
+    await loadAccessControlData();
+    fillAccessControlUI();
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao carregar controlo de acessos: '+(err.message||''),true);
+  }
+}
+
+async function toggleAccessAddon(){
+  const enable=!hikAccessAddon.enabled;
+  const msg = enable
+    ? 'Ativar Controlo de Acessos por 1,00 € por pessoa ativa/mês?'
+    : 'Desativar o add-on Controlo de Acessos?';
+  if(!confirm(msg)) return;
+  try{
+    const {data,error}=await supabaseClient.functions.invoke('toggle-hikvision-access-addon',{body:{institution_id:currentInstitutionId,enabled:enable}});
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível alterar o add-on.');
+    await renderTerminalAcessos();
+    showToast(enable?'Add-on Controlo de Acessos ativado.':'Add-on desativado.');
+  }catch(err){showToast('Erro no add-on: '+(err.message||''),true);}
+}
+
+async function saveAccessDevice(){
+  if(!hikAccessAddon.enabled){showToast('Ativa primeiro o add-on.',true);return;}
+  const existing=hikAccessDevices[0]||null;
+  const password=document.getElementById('ac-hik-password').value;
+  if(!existing && !password){showToast('Indica a password do terminal.',true);return;}
+
+  const body={
+    device_id:existing?.id||null,
+    institution_id:currentInstitutionId,
+    device_key:document.getElementById('ac-hik-device-key').value.trim()||'access-1',
+    name:document.getElementById('ac-hik-name').value.trim()||'Terminal de Acessos',
+    protocol:document.getElementById('ac-hik-protocol').value,
+    host:document.getElementById('ac-hik-host').value.trim(),
+    port:Number(document.getElementById('ac-hik-port').value),
+    username:document.getElementById('ac-hik-username').value.trim()||null,
+    password:password||null,
+    enabled:document.getElementById('ac-hik-enabled').checked
+  };
+  if(!body.host){showToast('Indica o Host/DNS do terminal.',true);return;}
+  try{
+    const {data,error}=await supabaseClient.functions.invoke('save-hikvision-device',{body});
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível guardar o terminal.');
+    await supabaseClient.from('hikvision_devices').update({purpose:'access_control'}).eq('id',data.device.id);
+    await renderTerminalAcessos();
+    showToast('Terminal de acessos guardado.');
+  }catch(err){showToast('Erro ao guardar terminal: '+(err.message||''),true);}
+}
+
+async function syncAccessPermission(permissionId, button){
+  const original = button?.textContent || 'Sincronizar';
+  if(button){
+    button.disabled = true;
+    button.textContent = 'A sincronizar…';
+  }
+
+  try{
+    const {data,error}=await supabaseClient.functions.invoke(
+      'sync-hikvision-access',
+      {body:{permission_id:permissionId}}
+    );
+
+    if(error){
+      let message=error.message||'Não foi possível sincronizar.';
+      try{
+        if(error.context && typeof error.context.json==='function'){
+          const body=await error.context.json();
+          if(body?.error) message=body.error;
+        }
+      }catch(_){}
+      throw new Error(message);
+    }
+
+    if(!data?.ok) throw new Error(data?.message||data?.error||'O terminal recusou a sincronização.');
+
+    showToast(data.message || 'Acesso sincronizado com o terminal.');
+    await renderTerminalAcessos();
+  }catch(err){
+    console.error('Erro de sincronização HIKVISION:',err);
+    showToast('Erro ao sincronizar acesso: '+(err.message||''),true);
+    await renderTerminalAcessos();
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=original;
+    }
+  }
+}
+
+async function saveAccessPermission(){
+  if(!hikAccessAddon.enabled){showToast('Ativa primeiro o add-on.',true);return;}
+  const employeeId=document.getElementById('ac-person-employee').value||null;
+  const emp=employees.find(e=>String(e.id)===String(employeeId));
+  const personName=(document.getElementById('ac-person-name').value.trim() || emp?.name || '');
+  const deviceId=document.getElementById('ac-person-device').value;
+  const pin=document.getElementById('ac-person-pin').value.trim();
+  const validFrom=document.getElementById('ac-valid-from').value;
+  const validUntil=document.getElementById('ac-valid-until').value;
+  if(!personName||!deviceId||!pin||!validFrom||!validUntil){showToast('Preenche pessoa, terminal, PIN e validade.',true);return;}
+
+  const days={}; document.querySelectorAll('.ac-day').forEach(c=>days[c.dataset.day]=c.checked);
+  try{
+    const {data,error}=await supabaseClient.functions.invoke('save-hikvision-access-permission',{body:{
+      institution_id:currentInstitutionId,device_id:deviceId,employee_id:employeeId,person_name:personName,pin,
+      valid_from:new Date(validFrom).toISOString(),valid_until:new Date(validUntil).toISOString(),
+      access_start_time:document.getElementById('ac-time-from').value,
+      access_end_time:document.getElementById('ac-time-until').value,
+      ...days
+    }});
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível criar a permissão.');
+    document.getElementById('ac-person-pin').value='';
+    showToast('Permissão criada. A sincronizar com o terminal…');
+    try{
+      const syncRes = await supabaseClient.functions.invoke(
+        'sync-hikvision-access',
+        {body:{permission_id:data.permission.id}}
+      );
+      if(syncRes.error) throw syncRes.error;
+      if(!syncRes.data?.ok) throw new Error(syncRes.data?.message||syncRes.data?.error||'Sincronização recusada.');
+      showToast(syncRes.data.message || 'Permissão sincronizada.');
+    }catch(syncErr){
+      console.error(syncErr);
+      showToast('Permissão criada, mas a sincronização falhou: '+(syncErr.message||''),true);
+    }
+    await renderTerminalAcessos();
+  }catch(err){showToast('Erro ao criar permissão: '+(err.message||''),true);}
+}
 
 
 /* ================= HIKVISION: CONFIGURAÇÃO ================= */
@@ -7594,6 +9312,7 @@ async function loadHikvisionConfig(){
       .from('hikvision_devices')
       .select('*')
       .eq('institution_id', currentInstitutionId)
+      .eq('purpose', 'time_clock')
       .order('created_at', {ascending:true});
 
     if(devErr) throw devErr;
@@ -7675,6 +9394,9 @@ async function saveHikvisionDevice(){
     if(error) throw error;
     if(!data?.ok) throw new Error(data?.error || 'Não foi possível guardar o equipamento.');
 
+    if(data?.device?.id){
+      await supabaseClient.from('hikvision_devices').update({purpose:'time_clock'}).eq('id', data.device.id);
+    }
     document.getElementById('ad-hik-password').value = '';
     await loadHikvisionConfig();
     showToast('Equipamento HIKVISION guardado com segurança.');
@@ -7807,7 +9529,6 @@ function renderAdminDefinicoes(){
   document.getElementById('ad-timezone').value = adminSettings.timezone;
   document.getElementById('ad-late-tolerance').value = adminSettings.lateToleranceMin;
   document.getElementById('ad-overtime-threshold').value = adminSettings.overtimeThresholdMin;
-  loadHikvisionConfig();
 }
 function saveAdminDefinicoes(){
   adminSettings.timezone = document.getElementById('ad-timezone').value;
@@ -7817,6 +9538,15 @@ function saveAdminDefinicoes(){
   if(!Number.isFinite(adminSettings.overtimeThresholdMin) || adminSettings.overtimeThresholdMin < 0) adminSettings.overtimeThresholdMin = 15;
   showToast('Definições guardadas com sucesso.');
 }
+document.getElementById('access-addon-toggle-btn').addEventListener('click', toggleAccessAddon);
+document.getElementById('ac-hik-save-btn').addEventListener('click', saveAccessDevice);
+document.getElementById('ac-permission-save-btn').addEventListener('click', saveAccessPermission);
+document.getElementById('ac-person-employee').addEventListener('change', ()=>{
+  const id=document.getElementById('ac-person-employee').value;
+  const emp=employees.find(e=>String(e.id)===String(id));
+  if(emp) document.getElementById('ac-person-name').value=emp.name;
+});
+
 document.getElementById('ad-save-btn').addEventListener('click', saveAdminDefinicoes);
 document.getElementById('ad-hik-save-btn').addEventListener('click', saveHikvisionDevice);
 document.getElementById('ad-hik-test-btn').addEventListener('click', testHikvisionConnection);
@@ -7876,6 +9606,181 @@ document.getElementById('admin-logout-btn').addEventListener('click', ()=>{
   showToast('Sessão terminada.');
 });
 
+
+/* ---------------- TROCAS DE TURNO ---------------- */
+let myShiftSwaps=[];
+let adminShiftSwaps=[];
+
+function swapStatusPresentation(s){
+  if(s.status==='approved') return {text:'Aprovado',cls:'active'};
+  if(s.status==='rejected') return {text:'Rejeitado',cls:'expired'};
+  if(s.counterpart_accepted) return {text:'A aguardar Admin',cls:'demo'};
+  return {text:'A aguardar colega',cls:'demo'};
+}
+
+async function loadMyShiftSwaps(){
+  if(!supabaseClient || !currentEmployee) return;
+  const {data,error}=await supabaseClient.rpc('get_my_shift_swaps');
+  if(error) throw error;
+  myShiftSwaps=data||[];
+}
+
+async function renderEmployeeSwaps(){
+  const body=document.getElementById('ep-swaps-body');
+  if(!body) return;
+  body.innerHTML='<tr><td colspan="6" style="padding:22px;text-align:center;color:var(--ink-faint);">A carregar pedidos…</td></tr>';
+  try{
+    await loadMyShiftSwaps();
+    body.innerHTML=myShiftSwaps.length?myShiftSwaps.map(s=>{
+      const st=swapStatusPresentation(s);
+      let actions='';
+      if(s.status==='pending' && s.my_role==='recipient' && !s.counterpart_accepted){
+        actions=`<div class="row-actions"><button class="approve-btn" onclick="respondEmployeeSwap('${s.swap_id}',true)">Aceitar</button><button class="reject-btn" onclick="respondEmployeeSwap('${s.swap_id}',false)">Recusar</button></div>`;
+      }else if(s.status==='pending' && s.my_role==='requester'){
+        actions=`<button class="btn-toggle" onclick="cancelEmployeeSwap('${s.swap_id}')">Cancelar</button>`;
+      }
+      return `<tr>
+        <td>${new Date(s.work_date+'T12:00:00').toLocaleDateString('pt-PT')}</td>
+        <td>${analyticsEsc(s.other_employee_name||'—')}</td>
+        <td><strong>${analyticsEsc(s.my_shift_name||'—')}</strong> ⇄ ${analyticsEsc(s.other_shift_name||'—')}</td>
+        <td>${analyticsEsc(s.reason||'—')}</td>
+        <td><span class="badge ${st.cls}">${st.text}</span>${s.review_notes?`<div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px;">${analyticsEsc(s.review_notes)}</div>`:''}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--ink-faint);">Ainda não existem pedidos de troca.</td></tr>';
+  }catch(err){
+    console.error(err);
+    body.innerHTML='<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--red);">Não foi possível carregar as trocas.</td></tr>';
+  }
+}
+
+async function openEmployeeSwapDrawer(rosterId=null){
+  if(!currentEmployee) return;
+  const select=document.getElementById('ep-swap-my-roster');
+  const today=dateStr(new Date());
+  const own=rosterEntries.filter(r=>r.id && r.date>=today && !r.isDayOff && r.shiftId).sort((a,b)=>a.date.localeCompare(b.date));
+  select.innerHTML=own.length?own.map(r=>{
+    const s=shifts.find(x=>String(x.id)===String(r.shiftId));
+    return `<option value="${r.id}">${formatPtDate(r.date)} · ${analyticsEsc(s?.name||'Turno')} (${s?.start||'—'}–${s?.end||'—'}${s&&isOvernightShift(s)?' +1d':''})</option>`;
+  }).join(''):'<option value="">Sem turnos futuros disponíveis</option>';
+
+  if(rosterId && own.some(r=>String(r.id)===String(rosterId))) select.value=rosterId;
+  document.getElementById('ep-swap-reason').value='';
+  await loadSwapCandidates(select.value);
+  document.getElementById('ep-swap-drawer').classList.add('open');
+  document.getElementById('ep-swap-drawer-overlay').classList.add('open');
+}
+function closeEmployeeSwapDrawer(){
+  document.getElementById('ep-swap-drawer').classList.remove('open');
+  document.getElementById('ep-swap-drawer-overlay').classList.remove('open');
+}
+async function loadSwapCandidates(rosterId){
+  const target=document.getElementById('ep-swap-target');
+  if(!rosterId){target.innerHTML='<option value="">Sem candidatos</option>';return;}
+  target.innerHTML='<option value="">A carregar…</option>';
+  try{
+    const {data,error}=await supabaseClient.rpc('get_swap_candidates',{p_roster_entry_id:rosterId});
+    if(error) throw error;
+    target.innerHTML=(data||[]).length?(data||[]).map(c=>`<option value="${c.roster_entry_id}">${analyticsEsc(c.employee_name)} · ${analyticsEsc(c.shift_name)} (${String(c.start_time).slice(0,5)}–${String(c.end_time).slice(0,5)}${c.overnight?' +1d':''})</option>`).join(''):'<option value="">Não existem colegas disponíveis nesse dia</option>';
+  }catch(err){
+    console.error(err);
+    target.innerHTML='<option value="">Erro ao carregar candidatos</option>';
+  }
+}
+async function submitEmployeeSwap(){
+  const a=document.getElementById('ep-swap-my-roster').value;
+  const b=document.getElementById('ep-swap-target').value;
+  const reason=document.getElementById('ep-swap-reason').value.trim();
+  if(!a||!b){showToast('Seleciona o teu turno e um colega disponível.',true);return;}
+  const btn=document.getElementById('ep-swap-drawer-save'),old=btn.textContent;btn.disabled=true;btn.textContent='A enviar…';
+  try{
+    const {data,error}=await supabaseClient.rpc('request_shift_swap',{p_roster_entry_a_id:a,p_roster_entry_b_id:b,p_reason:reason||null});
+    if(error) throw error;
+    closeEmployeeSwapDrawer();
+    await renderEmployeeSwaps();
+    showToast('Pedido enviado. Aguarda a resposta do colega.');
+  }catch(err){showToast('Erro ao pedir troca: '+(err.message||''),true);}
+  finally{btn.disabled=false;btn.textContent=old;}
+}
+async function respondEmployeeSwap(id,accept){
+  try{
+    const {error}=await supabaseClient.rpc('respond_shift_swap',{p_swap_id:id,p_accept:accept});
+    if(error) throw error;
+    await renderEmployeeSwaps();
+    showToast(accept?'Troca aceite. Aguarda aprovação do Admin.':'Troca recusada.');
+  }catch(err){showToast('Erro ao responder à troca: '+(err.message||''),true);}
+}
+async function cancelEmployeeSwap(id){
+  if(!confirm('Cancelar este pedido de troca?')) return;
+  try{
+    const {error}=await supabaseClient.from('shift_swaps').delete().eq('id',id).eq('status','pending');
+    if(error) throw error;
+    await renderEmployeeSwaps();
+    showToast('Pedido cancelado.');
+  }catch(err){showToast('Erro ao cancelar pedido: '+(err.message||''),true);}
+}
+
+async function renderAdminShiftSwaps(){
+  const body=document.getElementById('swap-admin-body');
+  if(!body||!currentInstitutionId) return;
+  body.innerHTML='<tr><td colspan="7" style="padding:22px;text-align:center;color:var(--ink-faint);">A carregar pedidos…</td></tr>';
+  try{
+    const {data,error}=await supabaseClient.rpc('get_admin_shift_swaps',{p_institution_id:currentInstitutionId});
+    if(error) throw error;
+    adminShiftSwaps=data||[];
+    const pending=adminShiftSwaps.filter(s=>s.status==='pending').length;
+    const ready=adminShiftSwaps.filter(s=>s.status==='pending'&&s.counterpart_accepted).length;
+    const approved=adminShiftSwaps.filter(s=>s.status==='approved').length;
+    const rejected=adminShiftSwaps.filter(s=>s.status==='rejected').length;
+    document.getElementById('swap-admin-kpis').innerHTML=`
+      <div class="kpi-card"><div class="label">Pendentes</div><div class="value">${pending}</div><div class="delta flat">total</div></div>
+      <div class="kpi-card"><div class="label">Prontas para aprovação</div><div class="value">${ready}</div><div class="delta ${ready?'down':'flat'}">colega já aceitou</div></div>
+      <div class="kpi-card"><div class="label">Aprovadas</div><div class="value">${approved}</div><div class="delta up">histórico</div></div>
+      <div class="kpi-card"><div class="label">Rejeitadas</div><div class="value">${rejected}</div><div class="delta flat">histórico</div></div>`;
+
+    body.innerHTML=adminShiftSwaps.length?adminShiftSwaps.map(s=>{
+      const st=swapStatusPresentation(s);
+      const actions=s.status==='pending'
+        ? `<div class="row-actions">${s.counterpart_accepted?`<button class="approve-btn" onclick="reviewAdminSwap('${s.swap_id}',true)">Aprovar</button>`:''}<button class="reject-btn" onclick="reviewAdminSwap('${s.swap_id}',false)">Rejeitar</button></div>`
+        : '';
+      return `<tr>
+        <td>${new Date(s.work_date+'T12:00:00').toLocaleDateString('pt-PT')}</td>
+        <td class="inst-name">${analyticsEsc(s.requester_name)}</td>
+        <td>${analyticsEsc(s.recipient_name)}</td>
+        <td><strong>${analyticsEsc(s.requester_shift||'—')}</strong> ⇄ ${analyticsEsc(s.recipient_shift||'—')}</td>
+        <td>${analyticsEsc(s.reason||'—')}</td>
+        <td><span class="badge ${st.cls}">${st.text}</span>${s.review_notes?`<div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px;">${analyticsEsc(s.review_notes)}</div>`:''}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="7" style="padding:24px;text-align:center;color:var(--ink-faint);">Ainda não existem pedidos de troca.</td></tr>';
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao carregar trocas de turno: '+(err.message||''),true);
+  }
+}
+async function reviewAdminSwap(id,approve){
+  const notes=prompt(approve?'Notas da aprovação (opcional):':'Motivo da rejeição (opcional):','') ?? null;
+  if(notes===null) return;
+  try{
+    const {error}=await supabaseClient.rpc('review_shift_swap',{p_swap_id:id,p_approve:approve,p_review_notes:notes||null});
+    if(error) throw error;
+    await renderAdminShiftSwaps();
+    if(approve){
+      await loadRosterForWeek(currentInstitutionId,currentWeekStart);
+      showToast('Troca aprovada e escala atualizada.');
+    }else showToast('Troca rejeitada.');
+  }catch(err){showToast('Erro ao rever troca: '+(err.message||''),true);}
+}
+
+document.getElementById('ep-new-swap-btn').addEventListener('click',()=>openEmployeeSwapDrawer());
+document.getElementById('ep-swap-drawer-close').addEventListener('click',closeEmployeeSwapDrawer);
+document.getElementById('ep-swap-drawer-cancel').addEventListener('click',closeEmployeeSwapDrawer);
+document.getElementById('ep-swap-drawer-overlay').addEventListener('click',closeEmployeeSwapDrawer);
+document.getElementById('ep-swap-drawer-save').addEventListener('click',submitEmployeeSwap);
+document.getElementById('ep-swap-my-roster').addEventListener('change',e=>loadSwapCandidates(e.target.value));
+document.getElementById('swap-admin-refresh').addEventListener('click',renderAdminShiftSwaps);
+
+
 /* ---------------- PORTAL DO COLABORADOR ---------------- */
 document.querySelectorAll('.portal-tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
@@ -7884,6 +9789,7 @@ document.querySelectorAll('.portal-tab').forEach(tab=>{
     document.querySelectorAll('.portal-content .page').forEach(p=>p.hidden = true);
     document.getElementById('ep-page-'+tab.dataset.tab).hidden = false;
     if(tab.dataset.tab === 'ponto') renderEmployeePonto();
+    if(tab.dataset.tab === 'trocas') renderEmployeeSwaps();
   });
 });
 
@@ -7915,9 +9821,9 @@ async function renderEmployeePortal(){
   if(emp._supa){
     await loadShiftsFromSupabase(emp.institutionId);
     const { data, error } = await supabaseClient
-      .from('roster_entries').select('employee_id, shift_type_id, work_date')
+      .from('roster_entries').select('id, employee_id, shift_type_id, work_date, is_day_off')
       .eq('employee_id', emp.id).gte('work_date', dateStr(new Date())).order('work_date').limit(10);
-    if(!error) rosterEntries = (data||[]).map(row=>({employeeId: row.employee_id, date: row.work_date, shiftId: row.shift_type_id}));
+    if(!error) rosterEntries = (data||[]).map(row=>({id:row.id, employeeId: row.employee_id, date: row.work_date, shiftId: row.shift_type_id, isDayOff:!!row.is_day_off}));
     await loadMyVacationRequests(emp.id);
     await loadMyAbsenceRequests(emp.id);
   }
@@ -7939,11 +9845,12 @@ async function renderEmployeePortal(){
     .slice(0,6);
   document.getElementById('ep-upcoming-body').innerHTML = upcoming.length ? upcoming.map(r=>{
     const shift = shifts.find(s=>s.id==r.shiftId);
-    return `<tr><td style="font-family:var(--font-mono);">${formatPtDate(r.date)}</td><td>${emp.team}</td><td>${shift?shiftLabel(shift):'—'}</td></tr>`;
-  }).join('') : `<tr><td colspan="3" style="text-align:center; color:var(--ink-faint); padding:20px;">Sem turnos futuros escalados.</td></tr>`;
+    return `<tr><td style="font-family:var(--font-mono);">${formatPtDate(r.date)}</td><td>${emp.team}</td><td>${shift?shiftLabel(shift):'—'}</td><td>${r.id&&shift?`<button class="btn-toggle" onclick="openEmployeeSwapDrawer('${r.id}')">Pedir troca</button>`:''}</td></tr>`;
+  }).join('') : `<tr><td colspan="4" style="text-align:center; color:var(--ink-faint); padding:20px;">Sem turnos futuros escalados.</td></tr>`;
 
   renderEmployeeFerias();
   renderEmployeeFaltas();
+  renderEmployeeSwaps();
   renderEmployeeDados();
 }
 
