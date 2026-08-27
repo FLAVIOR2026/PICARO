@@ -5266,7 +5266,20 @@ async function saveColaboradorSupabase(formData){
     return;
   }
 
-  const teamId = supaTeamNameToId[formData.team] || null;
+  let teamId = supaTeamNameToId[formData.team] || null;
+  if(!teamId && formData.team){
+    const team = teams.find(t=>t.name===formData.team);
+    teamId = team?.id || null;
+  }
+  if(formData.team && !teamId){
+    // refresh map once before failing
+    await loadSupaTeamMap(currentInstitutionId);
+    teamId = supaTeamNameToId[formData.team] || teams.find(t=>t.name===formData.team)?.id || null;
+  }
+  if(formData.team && !teamId){
+    showToast('Não foi possível associar o colaborador à equipa selecionada.', true);
+    return;
+  }
   const notes = `Horário: ${formData.schedule}
 Mobile: ${formData.mobileClockIn ? 'sim' : 'não'}
 GPS: ${formData.requireGPS ? 'sim' : 'não'}`;
@@ -5331,9 +5344,12 @@ GPS: ${formData.requireGPS ? 'sim' : 'não'}`;
       }catch(_){}
     }
 
+    await loadSupaTeamMap(currentInstitutionId);
     await loadEmployeesFromSupabase(currentInstitutionId);
     closeColabDrawer();
     renderColaboradores();
+    renderEquipas();
+    populateTeamSelects();
 
     showToast(editingEmployeeId
       ? 'Colaborador atualizado com sucesso.'
@@ -5475,35 +5491,138 @@ function closeTeamDrawer(){
   document.getElementById('team-drawer-overlay').classList.remove('open');
   editingTeamName = null;
 }
-function saveTeam(){
+async function saveTeam(){
   const name = document.getElementById('tf-name').value.trim();
-  if(!name){ showToast('O nome da equipa é obrigatório.', true); return; }
-  const dup = teams.find(t => t.name.toLowerCase()===name.toLowerCase() && t.name!==editingTeamName);
-  if(dup){ showToast('Já existe uma equipa com esse nome.', true); return; }
-
-  if(editingTeamName){
-    const t = teams.find(x=>x.name===editingTeamName);
-    if(editingTeamName !== name){
-      employees.forEach(e=>{ if(e.team===editingTeamName) e.team = name; });
-      punchRecords.forEach(p=>{ if(p.team===editingTeamName) p.team = name; });
-    }
-    t.name = name;
-    showToast('Equipa atualizada.');
-  } else {
-    teams.push({name, scheduled:0, present:0});
-    showToast('Equipa criada.');
+  if(!name){
+    showToast('O nome da equipa é obrigatório.', true);
+    return;
   }
-  closeTeamDrawer();
-  renderEquipas();
-  populateTeamSelects();
+
+  const dup = teams.find(t =>
+    t.name.toLowerCase() === name.toLowerCase() &&
+    t.name !== editingTeamName
+  );
+  if(dup){
+    showToast('Já existe uma equipa com esse nome.', true);
+    return;
+  }
+
+  const btn = document.getElementById('team-drawer-save-btn');
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = editingTeamName ? 'A guardar…' : 'A criar…';
+
+  try{
+    if(currentInstitutionId){
+      if(editingTeamName){
+        const existing = teams.find(t=>t.name===editingTeamName);
+        if(!existing?.id){
+          throw new Error('Não foi possível identificar a equipa a editar.');
+        }
+
+        const { error } = await supabaseClient
+          .from('teams')
+          .update({ name })
+          .eq('id', existing.id)
+          .eq('institution_id', currentInstitutionId);
+
+        if(error) throw error;
+
+        // Não é preciso atualizar employees.team_id ao mudar o nome:
+        // os colaboradores já apontam para a mesma equipa pelo UUID.
+      }else{
+        const { error } = await supabaseClient
+          .from('teams')
+          .insert({
+            institution_id: currentInstitutionId,
+            name,
+            description: null,
+            min_staff_required: 0
+          });
+
+        if(error) throw error;
+      }
+
+      await loadSupaTeamMap(currentInstitutionId);
+      await loadEmployeesFromSupabase(currentInstitutionId);
+
+      closeTeamDrawer();
+      renderEquipas();
+      renderColaboradores();
+      populateTeamSelects();
+
+      showToast(editingTeamName ? 'Equipa atualizada com sucesso.' : 'Equipa criada com sucesso.');
+      return;
+    }
+
+    // fallback local/demo
+    if(editingTeamName){
+      const t = teams.find(x=>x.name===editingTeamName);
+      if(editingTeamName !== name){
+        employees.forEach(e=>{ if(e.team===editingTeamName) e.team = name; });
+        punchRecords.forEach(p=>{ if(p.team===editingTeamName) p.team = name; });
+      }
+      t.name = name;
+      showToast('Equipa atualizada.');
+    } else {
+      teams.push({name, scheduled:0, present:0});
+      showToast('Equipa criada.');
+    }
+
+    closeTeamDrawer();
+    renderEquipas();
+    populateTeamSelects();
+
+  }catch(err){
+    console.error('Erro ao guardar equipa:', err);
+    showToast('Erro ao guardar equipa: ' + (err.message || 'tente novamente.'), true);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = original;
+  }
 }
-function deleteTeam(name){
-  if(employees.some(e=>e.team===name)){ showToast('Não é possível eliminar: existem colaboradores nesta equipa.', true); return; }
+async function deleteTeam(name){
+  const team = teams.find(t=>t.name===name);
+  if(!team) return;
+
+  if(employees.some(e=>e.team===name)){
+    showToast('Não é possível eliminar: existem colaboradores nesta equipa.', true);
+    return;
+  }
+
   if(!confirm(`Eliminar a equipa "${name}"? Esta ação não pode ser desfeita.`)) return;
-  teams = teams.filter(t=>t.name!==name);
-  renderEquipas();
-  populateTeamSelects();
-  showToast('Equipa eliminada.');
+
+  try{
+    if(currentInstitutionId){
+      if(!team.id) throw new Error('Equipa sem identificador válido.');
+
+      const { error } = await supabaseClient
+        .from('teams')
+        .update({ deleted_at: new Date().toISOString() })
+        .eq('id', team.id)
+        .eq('institution_id', currentInstitutionId);
+
+      if(error) throw error;
+
+      await loadSupaTeamMap(currentInstitutionId);
+      await loadEmployeesFromSupabase(currentInstitutionId);
+      renderEquipas();
+      renderColaboradores();
+      populateTeamSelects();
+
+      showToast('Equipa eliminada com sucesso.');
+      return;
+    }
+
+    teams = teams.filter(t=>t.name!==name);
+    renderEquipas();
+    populateTeamSelects();
+    showToast('Equipa eliminada.');
+
+  }catch(err){
+    console.error('Erro ao eliminar equipa:', err);
+    showToast('Erro ao eliminar equipa: ' + (err.message || ''), true);
+  }
 }
 
 document.getElementById('new-team-btn').addEventListener('click', ()=>openTeamDrawer(null));
