@@ -2,7 +2,7 @@
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
   <title>Pica-Aqui — Gestão inteligente de ponto e equipas</title>
   <meta name="description" content="Pica-Aqui é uma plataforma de gestão de ponto, escalas, equipas, férias e assiduidade para empresas e instituições.">
   <meta name="robots" content="index,follow,max-image-preview:large">
@@ -1020,6 +1020,658 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
 }
 </style>
 
+
+<style id="settings-submenus-styles">
+.settings-subnav .btn-outline.active{
+  background:var(--brand);
+  color:#fff;
+  border-color:var(--brand);
+}
+@media(max-width:760px){
+  #admin-license-kpis{grid-template-columns:repeat(2,1fr)!important}
+  .settings-subnav{width:100%}
+  .settings-subnav .btn-outline{flex:1;min-width:120px}
+}
+</style>
+
+
+<style id="pwa-mobile-proportions">
+/* ===== PWA / MOBILE PROPORTIONS ===== */
+:root{
+  --mobile-pad: 14px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+html{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  overscroll-behavior-y:none;
+}
+body{
+  min-width:0;
+  overflow-x:hidden;
+  padding-left:var(--safe-left);
+  padding-right:var(--safe-right);
+}
+button, input, select, textarea{
+  touch-action:manipulation;
+}
+button, .btn-primary, .btn-add, .btn-outline, .btn-secondary, .btn-toggle, .action-btn{
+  min-height:42px;
+}
+input, select, textarea, .select-input{
+  min-height:44px;
+  font-size:16px !important; /* evita zoom automático em iOS */
+}
+table{
+  max-width:100%;
+}
+.panel, .kpi-card, .drawer, .roster-modal{
+  min-width:0;
+}
+img, canvas, svg{
+  max-width:100%;
+}
+
+/* Loading global: bloqueia duplo toque em qualquer ação de gravação/processamento */
+#global-action-loading{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  background:rgba(4,22,21,.24);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  padding-top:calc(20px + var(--safe-top));
+  padding-bottom:calc(20px + var(--safe-bottom));
+  pointer-events:all;
+}
+#global-action-loading[hidden]{ display:none !important; }
+.global-loading-card{
+  min-width:160px;
+  max-width:calc(100vw - 40px);
+  background:var(--surface,#fff);
+  border:1px solid var(--border,#e5e7eb);
+  border-radius:16px;
+  box-shadow:0 18px 48px rgba(0,0,0,.16);
+  padding:20px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:13px;
+}
+.global-spinner{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:3px solid rgba(20,92,84,.18);
+  border-top-color:var(--primary,#145C54);
+  animation:pica-spin .72s linear infinite;
+  flex:0 0 auto;
+}
+.global-loading-text{
+  font-size:14px;
+  font-weight:700;
+  color:var(--ink,#102126);
+}
+@keyframes pica-spin{ to{ transform:rotate(360deg); } }
+
+button.is-loading{
+  position:relative;
+  pointer-events:none !important;
+  opacity:.72;
+}
+button.is-loading::after{
+  content:"";
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  border:2px solid currentColor;
+  border-right-color:transparent;
+  display:inline-block;
+  margin-left:8px;
+  vertical-align:-2px;
+  animation:pica-spin .7s linear infinite;
+}
+
+/* Phones */
+@media(max-width:760px){
+  body{
+    background:var(--surface-alt,#f4f7f7);
+  }
+
+  #dashboard-screen,
+  #admin-dashboard-screen{
+    display:block !important;
+    width:100% !important;
+    min-height:100dvh !important;
+  }
+
+  #dashboard-screen[hidden],
+  #admin-dashboard-screen[hidden]{
+    display:none !important;
+  }
+
+  .main-col{
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  .topbar{
+    height:auto !important;
+    min-height:58px !important;
+    padding:
+      calc(8px + var(--safe-top))
+      calc(var(--mobile-pad) + var(--safe-right))
+      8px
+      calc(var(--mobile-pad) + var(--safe-left)) !important;
+    gap:8px !important;
+    align-items:center !important;
+  }
+  .topbar-right{
+    gap:7px !important;
+    min-width:0 !important;
+  }
+  .topbar-right .user-pill{
+    display:none !important;
+  }
+  .topbar-right .logout-btn{
+    min-height:40px !important;
+    padding:7px 10px !important;
+    font-size:11px !important;
+  }
+
+  .hamburger-btn{
+    width:44px !important;
+    height:44px !important;
+    min-width:44px !important;
+    min-height:44px !important;
+    font-size:23px !important;
+    color:var(--primary-dark,#073d3b) !important;
+    background:var(--surface,#fff) !important;
+    border:1px solid var(--border,#d9e1e1) !important;
+    box-shadow:0 2px 8px rgba(0,0,0,.07);
+  }
+
+  #admin-sidebar,
+  #sa-sidebar,
+  .sidebar{
+    width:min(86vw,320px) !important;
+    max-width:320px !important;
+    padding:
+      calc(16px + var(--safe-top))
+      12px
+      calc(18px + var(--safe-bottom))
+      12px !important;
+  }
+
+  .main-content{
+    padding:
+      18px
+      calc(var(--mobile-pad) + var(--safe-right))
+      calc(84px + var(--safe-bottom))
+      calc(var(--mobile-pad) + var(--safe-left)) !important;
+  }
+
+  .page-head{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:12px !important;
+    margin-bottom:16px !important;
+  }
+  .page-head > div:first-child{
+    min-width:0;
+  }
+  .page-head h1{
+    font-size:22px !important;
+    line-height:1.15 !important;
+  }
+  .page-head .sub{
+    font-size:12.5px !important;
+    line-height:1.45 !important;
+  }
+  .page-head > button,
+  .page-head > div:last-child:not(:first-child){
+    width:100%;
+  }
+  .page-head > div:last-child:not(:first-child){
+    display:flex !important;
+    flex-wrap:wrap !important;
+    gap:8px !important;
+  }
+  .page-head > div:last-child:not(:first-child) > button{
+    flex:1 1 130px;
+  }
+
+  .toolbar{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    gap:10px !important;
+    padding:10px !important;
+  }
+  .filter-group{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+  .filter-group > *{
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  .grid-2,
+  .grid-3,
+  .analytics-grid-2{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+
+  .kpi-grid,
+  .rel-kpi-grid,
+  .analytics-kpis,
+  #admin-license-kpis,
+  #access-addon-kpis,
+  #ponto-kpi-grid,
+  #time-bank-kpis,
+  #swap-admin-kpis,
+  #ferias-kpi-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:9px !important;
+  }
+  .kpi-card{
+    padding:13px !important;
+    border-radius:12px !important;
+  }
+  .kpi-card .label{
+    font-size:10.5px !important;
+  }
+  .kpi-card .value{
+    font-size:21px !important;
+    overflow-wrap:anywhere;
+  }
+  .kpi-card .delta{
+    font-size:10.5px !important;
+  }
+
+  .panel{
+    border-radius:12px !important;
+    margin-left:0 !important;
+    margin-right:0 !important;
+  }
+  .panel-head{
+    padding:14px !important;
+    gap:10px !important;
+    align-items:flex-start !important;
+    flex-wrap:wrap !important;
+  }
+  .panel-head h2,
+  .panel-head h3{
+    line-height:1.2 !important;
+  }
+  .panel-body{
+    padding-left:14px !important;
+    padding-right:14px !important;
+  }
+
+  /* Tables keep proportions: horizontal scroll instead of crushing columns */
+  .panel-body:has(> table),
+  .panel-body[style*="overflow:auto"],
+  .panel-body[style*="overflow-x:auto"]{
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch;
+  }
+  table{
+    width:max-content !important;
+    min-width:100% !important;
+    font-size:12px !important;
+  }
+  th, td{
+    white-space:nowrap;
+    padding:9px 10px !important;
+  }
+  td .row-actions{
+    min-width:max-content;
+  }
+
+  /* Roster */
+  .roster-table{
+    min-width:900px !important;
+  }
+  .roster-table th:first-child,
+  .roster-table td:first-child{
+    position:sticky;
+    left:0;
+    z-index:2;
+    background:var(--surface,#fff);
+    box-shadow:5px 0 8px rgba(0,0,0,.04);
+  }
+
+  /* Drawers / modals become mobile sheets */
+  .drawer{
+    width:100% !important;
+    max-width:none !important;
+    height:min(92dvh,900px) !important;
+    max-height:92dvh !important;
+    top:auto !important;
+    right:0 !important;
+    left:0 !important;
+    bottom:0 !important;
+    border-radius:18px 18px 0 0 !important;
+    padding-bottom:var(--safe-bottom);
+  }
+  .drawer.open{
+    transform:translateY(0) !important;
+  }
+  .drawer:not(.open){
+    transform:translateY(105%) !important;
+  }
+  .drawer-head{
+    padding:16px !important;
+    position:sticky;
+    top:0;
+    z-index:3;
+    background:var(--surface,#fff);
+    border-radius:18px 18px 0 0;
+  }
+  .drawer-body{
+    padding:14px 16px 24px !important;
+    overflow-y:auto !important;
+  }
+  .drawer-foot{
+    position:sticky;
+    bottom:0;
+    z-index:3;
+    padding:
+      12px
+      16px
+      calc(12px + var(--safe-bottom))
+      16px !important;
+    background:var(--surface,#fff);
+    display:grid !important;
+    grid-template-columns:1fr 1fr;
+    gap:8px !important;
+  }
+  .drawer-foot > *{
+    width:100% !important;
+  }
+
+  .roster-modal{
+    width:calc(100vw - 24px) !important;
+    max-width:calc(100vw - 24px) !important;
+    max-height:88dvh !important;
+    overflow:auto !important;
+  }
+
+  .field{
+    margin-bottom:13px !important;
+  }
+  .field label{
+    font-size:12px !important;
+  }
+
+  /* Access-control device picker */
+  #ac-person-devices{
+    grid-template-columns:1fr !important;
+  }
+  #access-device-groups > div{
+    overflow:hidden;
+  }
+
+  /* Settings submenu */
+  .settings-subnav{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    width:100% !important;
+  }
+  .settings-subnav .btn-outline{
+    width:100% !important;
+  }
+
+  /* Login / PWA entry */
+  .login-shell{
+    min-height:100dvh !important;
+    padding:
+      calc(16px + var(--safe-top))
+      calc(14px + var(--safe-right))
+      calc(20px + var(--safe-bottom))
+      calc(14px + var(--safe-left)) !important;
+  }
+  .login-card{
+    width:100% !important;
+    max-width:430px !important;
+    padding:20px 16px !important;
+  }
+  .role-tabs{
+    grid-template-columns:repeat(2,1fr) !important;
+  }
+
+  /* Kiosk remains touch-friendly */
+  #kiosk-screen{
+    min-height:100dvh !important;
+    overflow-x:hidden !important;
+  }
+  .kiosk-header{
+    min-height:64px !important;
+    height:auto !important;
+    padding:
+      calc(8px + var(--safe-top))
+      12px
+      8px
+      12px !important;
+    display:grid !important;
+    grid-template-columns:1fr auto !important;
+    gap:8px !important;
+  }
+  .kiosk-header .brand{
+    font-size:13px !important;
+  }
+  .kiosk-clock{
+    font-size:12px !important;
+  }
+  .kiosk-header > div:last-child{
+    grid-column:1 / -1;
+    width:100%;
+    gap:7px !important;
+  }
+  .kiosk-body{
+    padding:18px 12px calc(30px + var(--safe-bottom)) !important;
+  }
+  .kiosk-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+  .kiosk-tile,
+  .kiosk-action-btn{
+    min-width:0 !important;
+    min-height:100px !important;
+    padding:12px 8px !important;
+  }
+  .kiosk-action-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+  .kiosk-keypad{
+    width:min(100%,360px) !important;
+    gap:8px !important;
+  }
+  .kiosk-key{
+    min-height:58px !important;
+    font-size:22px !important;
+  }
+
+  /* Toasts on phone */
+  #toast-container{
+    left:12px !important;
+    right:12px !important;
+    bottom:calc(12px + var(--safe-bottom)) !important;
+    width:auto !important;
+  }
+  .toast{
+    max-width:none !important;
+    width:100% !important;
+  }
+}
+
+@media(max-width:430px){
+  .kpi-grid,
+  .rel-kpi-grid,
+  .analytics-kpis,
+  #admin-license-kpis,
+  #access-addon-kpis,
+  #ponto-kpi-grid,
+  #time-bank-kpis,
+  #swap-admin-kpis,
+  #ferias-kpi-grid{
+    grid-template-columns:1fr 1fr !important;
+  }
+  .kpi-card .value{
+    font-size:19px !important;
+  }
+  .btn-add, .btn-outline, .btn-secondary, .btn-primary, .btn-toggle{
+    font-size:12px !important;
+    padding-left:10px !important;
+    padding-right:10px !important;
+  }
+}
+
+@media(max-width:360px){
+  .kpi-grid,
+  .rel-kpi-grid,
+  .analytics-kpis,
+  #admin-license-kpis,
+  #access-addon-kpis,
+  #ponto-kpi-grid,
+  #time-bank-kpis,
+  #swap-admin-kpis,
+  #ferias-kpi-grid{
+    grid-template-columns:1fr !important;
+  }
+  .kiosk-grid,
+  .kiosk-action-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+</style>
+
+
+<style id="notification-mobile-dashboard-styles">
+.notification-bell-btn{
+  position:relative;
+  width:42px;height:42px;min-width:42px;border-radius:10px;
+  border:1px solid var(--border);background:var(--surface);font-size:18px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.notification-count{
+  position:absolute;right:-5px;top:-5px;min-width:19px;height:19px;padding:0 5px;
+  border-radius:10px;background:var(--red);color:#fff;font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;border:2px solid var(--surface);
+}
+.notification-overlay{
+  display:none;position:fixed;inset:0;z-index:4990;background:rgba(4,22,21,.36);
+}
+.notification-overlay.open{display:block;}
+.notification-center{
+  position:fixed;z-index:5000;top:0;right:0;width:min(430px,94vw);height:100dvh;
+  background:var(--surface);box-shadow:-14px 0 40px rgba(0,0,0,.18);
+  transform:translateX(105%);transition:transform .22s ease;
+  display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.notification-center.open{transform:translateX(0);}
+.notification-head{
+  padding:20px;display:flex;align-items:flex-start;justify-content:space-between;
+  border-bottom:1px solid var(--border);padding-top:calc(20px + env(safe-area-inset-top,0px));
+}
+.notification-head h3{font-family:var(--font-display);font-size:22px;margin:0 0 4px;}
+.notification-actions{padding:10px 14px;display:flex;gap:8px;border-bottom:1px solid var(--border);}
+.notification-actions .btn-outline{flex:1;}
+.notification-list{flex:1;overflow:auto;padding:10px;}
+.notification-item{
+  width:100%;border:1px solid var(--border);background:var(--surface);
+  border-radius:12px;padding:13px;margin-bottom:9px;text-align:left;
+  display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:start;
+}
+.notification-item.unread{background:var(--primary-light,#eef8f6);border-color:#cbe2de;}
+.notification-icon{
+  width:34px;height:34px;border-radius:9px;background:var(--surface-alt);
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.notification-title{font-size:13px;font-weight:800;margin-bottom:4px;}
+.notification-message{font-size:12px;line-height:1.45;color:var(--ink-soft);}
+.notification-time{font-size:10px;color:var(--ink-faint);white-space:nowrap;}
+.notification-empty{padding:40px 16px;text-align:center;color:var(--ink-faint);}
+
+.mobile-dashboard-only{display:none;}
+@media(max-width:760px){
+  .mobile-dashboard-only{display:block;margin-bottom:14px;}
+  #page-dashboard > .kpi-grid#admin-kpi-grid,
+  #page-dashboard > .grid-2,
+  #page-dashboard > .panel{
+    display:none !important;
+  }
+  .mobile-dashboard-kpis{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:10px;
+  }
+  .mobile-dashboard-kpi{
+    background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px;
+    box-shadow:var(--shadow-sm);
+  }
+  .mobile-dashboard-kpi .m-label{font-size:10.5px;color:var(--ink-faint);font-weight:700;}
+  .mobile-dashboard-kpi .m-value{font-family:var(--font-display);font-size:24px;font-weight:700;margin-top:3px;}
+  .mobile-dashboard-kpi .m-delta{font-size:10.5px;color:var(--ink-soft);margin-top:2px;}
+  .mobile-quick-actions{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px;
+  }
+  .mobile-quick-actions button{
+    border:1px solid var(--border);background:var(--surface);border-radius:12px;
+    min-height:78px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:6px;color:var(--ink);
+  }
+  .mobile-quick-actions span{font-size:21px;}
+  .mobile-quick-actions strong{font-size:10.5px;}
+  .mobile-notification-summary{
+    width:100%;border:1px solid var(--border);background:var(--surface);border-radius:12px;
+    min-height:48px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;
+    gap:9px;align-items:center;text-align:left;font-size:12px;color:var(--ink-soft);
+  }
+  .notification-center{width:100vw;max-width:none;}
+  .notification-bell-btn{width:40px;height:40px;min-width:40px;}
+}
+@media(max-width:380px){
+  .mobile-quick-actions{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+</style>
+
+
+<style id="pwa-controlled-update-styles">
+#pwa-update-banner{
+  position:fixed;z-index:90000;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));
+  transform:translateX(-50%);width:min(620px,calc(100vw - 28px));
+}
+#pwa-update-banner[hidden]{display:none!important;}
+.pwa-update-content{
+  background:#0C332E;color:#fff;border-radius:15px;padding:13px 14px 13px 16px;
+  box-shadow:0 16px 44px rgba(0,0,0,.25);display:flex;align-items:center;gap:14px;
+}
+.pwa-update-content>div{flex:1;min-width:0;}
+.pwa-update-content strong{display:block;font-size:13px;margin-bottom:2px;}
+.pwa-update-content span{display:block;font-size:11.5px;opacity:.82;line-height:1.35;}
+.pwa-update-content .btn-add{flex:0 0 auto;background:#fff;color:#0C332E;border-color:#fff;}
+@media(max-width:560px){
+  #pwa-update-banner{bottom:calc(10px + env(safe-area-inset-bottom,0px));}
+  .pwa-update-content{align-items:stretch;flex-direction:column;gap:10px;}
+  .pwa-update-content .btn-add{width:100%;}
+}
+</style>
+
 </head>
 <body>
 
@@ -1127,7 +1779,9 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
   <div class="kiosk-header">
     <div class="brand"><div class="brand-mark"></div>Pica-Aqui · Quiosque</div>
     <div class="kiosk-clock" id="kiosk-clock">--:--:--</div>
-    <div style="display:flex; align-items:center; gap:16px;">
+    <div style="display:flex; align-items:center; gap:12px;flex-wrap:wrap;justify-content:flex-end;">
+      <span id="kiosk-connection-status" class="badge active">Online</span>
+      <span id="kiosk-pending-status" class="badge demo" hidden>0 por sincronizar</span>
       <button class="kiosk-link" id="kiosk-unpair-btn" hidden>Desemparelhar dispositivo</button>
       <button class="kiosk-back" id="kiosk-exit-btn">Sair do Quiosque</button>
     </div>
@@ -1158,6 +1812,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
       <button class="hamburger-btn" id="sa-hamburger-btn">☰</button>
       <div class="search-box">🔍 <input type="text" placeholder="Pesquisar empresas/instituições, admins…"></div>
       <div class="topbar-right">
+        <button class="notification-bell-btn" id="sa-notification-btn" type="button" title="Notificações">🔔<span class="notification-count" id="sa-notification-count" hidden>0</span></button>
         <div class="user-pill">
           <div class="avatar">SA</div>
         </div>
@@ -1308,6 +1963,18 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           </div>
         </div>
         <div class="kpi-grid" id="lic-kpi-grid" style="grid-template-columns:repeat(4,1fr); margin-bottom:16px;"></div>
+        <div class="panel" id="access-addon-requests-panel" style="margin-bottom:16px;">
+          <div class="panel-head">
+            <div><h3>Pedidos de Controlo de Acessos</h3><div class="sub">Pedidos enviados pelos Administradores das instituições</div></div>
+            <span class="badge demo" id="access-addon-request-count">0 pendentes</span>
+          </div>
+          <div class="panel-body" style="padding-top:0;overflow:auto;">
+            <table>
+              <thead><tr><th>Instituição</th><th>Pedido</th><th>Lugares</th><th>Valor</th><th>Data</th><th></th></tr></thead>
+              <tbody id="access-addon-requests-body"></tbody>
+            </table>
+          </div>
+        </div>
         <div class="panel">
           <div class="panel-body" style="padding-top:16px;">
             <table>
@@ -1348,7 +2015,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           </div>
         </div>
 
-        <div class="grid-2">
+        <div class="grid-2" id="settings-presencas-general">
           <div class="panel">
             <div class="panel-head">
               <div><h3>Plataforma</h3><div class="sub">Identidade e valores por omissão para novas empresas/instituições</div></div>
@@ -1491,7 +2158,52 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           </div>
         </div>
 
-        <div class="panel">
+        
+        <section id="settings-licencas" hidden>
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-head">
+              <div>
+                <h2 style="font-family:var(--font-display);font-size:22px;">Licenças</h2>
+                <div class="sub">Licença da instituição e serviços contratados</div>
+              </div>
+              <span class="badge" id="admin-license-status">A carregar…</span>
+            </div>
+            <div class="panel-body">
+              <div class="kpi-grid" id="admin-license-kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;"></div>
+              <div class="panel" style="box-shadow:none;border:1px solid var(--border);">
+                <div class="panel-head"><div><h3>Composição da licença</h3><div class="sub">Valor base e add-ons emitidos pelo Super Admin</div></div></div>
+                <div class="panel-body" style="padding-top:0;overflow:auto;">
+                  <table>
+                    <thead><tr><th>Componente</th><th>Periodicidade</th><th>Quantidade</th><th>Valor</th><th>Estado</th></tr></thead>
+                    <tbody id="admin-license-components"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="panel" style="box-shadow:none;border:1px solid var(--border);margin-top:16px;">
+                <div class="panel-head"><div><h3>Pedir Controlo de Acessos</h3><div class="sub">Escolhe quantos lugares pretendes contratar. 1,00 € por lugar/mês.</div></div></div>
+                <div class="panel-body" style="padding-top:14px;">
+                  <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+                    <div class="field" style="margin:0;min-width:180px;">
+                      <label>N.º de pessoas / lugares</label>
+                      <input type="number" id="admin-access-request-units" min="1" step="1" value="1">
+                    </div>
+                    <div class="field" style="margin:0;flex:1;min-width:220px;">
+                      <label>Observação (opcional)</label>
+                      <input type="text" id="admin-access-request-note" placeholder="Ex.: apenas equipa de armazém">
+                    </div>
+                    <button type="button" class="btn-add" id="admin-access-request-btn" onclick="requestAccessAddonLicense()">Enviar pedido</button>
+                  </div>
+                  <div id="admin-access-request-state" style="margin-top:12px;"></div>
+                </div>
+              </div>
+              <div class="hint-chip" style="margin-top:14px;">
+                O pedido não ativa o add-on. O Super Admin recebe-o, emite a licença e envia a cobrança correspondente.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="panel" id="settings-presencas-save">
           <div class="panel-body" style="padding-top:16px; display:flex; justify-content:flex-end; gap:10px;">
             <div class="sub" style="flex:1; align-self:center;">As alterações aplicam-se a partir da próxima sincronização das empresas/instituições.</div>
             <button type="button" class="btn-add" id="sd-save-btn">Guardar alterações</button>
@@ -1751,6 +2463,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
     <button class="nav-item" data-nav="turnos"><span class="ic">◷</span>Turnos</button>
     <button class="nav-item" data-nav="escalas"><span class="ic">▦</span>Escalas</button>
     <button class="nav-item" data-nav="ponto"><span class="ic">⏱</span>Registos de Ponto</button>
+    <button class="nav-item" data-nav="historico-acessos" id="nav-access-history" hidden><span class="ic">🚪</span>Histórico de Acessos</button>
     <div class="nav-section-label">Gestão</div>
     <button class="nav-item" data-nav="relatorios"><span class="ic">▧</span>Relatórios</button>
     <button class="nav-item" data-nav="trocas"><span class="ic">⇄</span>Trocas de Turno</button>
@@ -1770,6 +2483,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
       <button class="hamburger-btn" id="admin-hamburger-btn">☰</button>
       <div class="search-box">🔍 <input type="text" placeholder="Pesquisar colaboradores, equipas…"></div>
       <div class="topbar-right">
+        <button class="notification-bell-btn" id="admin-notification-btn" type="button" title="Notificações">🔔<span class="notification-count" id="admin-notification-count" hidden>0</span></button>
         <button class="btn-outline" id="admin-tour-btn" style="padding:9px 15px; font-size:12.5px;" title="Rever a visita guiada">💡 Tour guiado</button>
         <button class="btn-outline" id="pairing-code-btn" style="padding:9px 15px; font-size:12.5px;">🔑 Código do Quiosque</button>
         <button class="btn-outline" id="admin-kiosk-btn" style="padding:9px 15px; font-size:12.5px;">🖥 Modo Quiosque</button>
@@ -1788,6 +2502,19 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           <div class="sub">Escala prevista vs. presença real — hoje</div>
         </div>
         <div class="live-pill"><span class="pulse-dot"></span>A atualizar ao vivo</div>
+      </div>
+
+      <div id="mobile-admin-dashboard" class="mobile-dashboard-only">
+        <div class="mobile-dashboard-kpis" id="mobile-dashboard-kpis"></div>
+        <div class="mobile-quick-actions">
+          <button type="button" onclick="openAdminNavPage('ponto')"><span>⏱</span><strong>Ponto</strong></button>
+          <button type="button" onclick="openAdminNavPage('escalas')"><span>▦</span><strong>Escalas</strong></button>
+          <button type="button" onclick="openAdminNavPage('colaboradores')"><span>◍</span><strong>Colaboradores</strong></button>
+          <button type="button" onclick="openAdminNavPage('definicoes')"><span>⚙</span><strong>Definições</strong></button>
+        </div>
+        <button type="button" class="mobile-notification-summary" id="mobile-notification-summary" onclick="openNotificationCenter()">
+          <span>🔔</span><span id="mobile-notification-text">Sem notificações novas</span><span>›</span>
+        </button>
       </div>
 
       <div class="kpi-grid" id="admin-kpi-grid"></div>
@@ -2076,6 +2803,41 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
 
       
 
+
+      <div class="page" id="page-historico-acessos" hidden>
+        <div class="page-head">
+          <div>
+            <h1>Histórico de Acessos</h1>
+            <div class="sub">Entradas e recusas registadas nos terminais de Controlo de Acessos</div>
+          </div>
+          <button class="btn-add" id="access-history-sync-btn">Atualizar dos terminais</button>
+        </div>
+
+        <div class="kpi-grid" id="access-history-kpis" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;"></div>
+
+        <div class="toolbar">
+          <div class="filter-group">
+            <select class="select-input" id="access-history-device"><option value="">Todos os terminais</option></select>
+            <select class="select-input" id="access-history-result">
+              <option value="">Todos os resultados</option>
+              <option value="authorized">Autorizados</option>
+              <option value="denied">Recusados</option>
+              <option value="unknown">Outros</option>
+            </select>
+            <input type="date" class="select-input" id="access-history-date">
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-body" style="padding-top:16px;overflow:auto;">
+            <table>
+              <thead><tr><th>Data / Hora</th><th>Pessoa</th><th>Terminal</th><th>Porta</th><th>Resultado</th><th>Motivo</th></tr></thead>
+              <tbody id="access-history-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
 <div class="page" id="page-definicoes" hidden>
         <div class="page-head">
           <div>
@@ -2084,9 +2846,10 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           </div>
         </div>
         <div class="toolbar" style="margin-bottom:16px;">
-          <div class="filter-group" style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button type="button" class="btn-outline" onclick="document.getElementById('settings-terminal-ponto')?.scrollIntoView({behavior:'smooth',block:'start'})">Terminal de Ponto</button>
-            <button type="button" class="btn-outline" onclick="document.getElementById('settings-terminal-acessos')?.scrollIntoView({behavior:'smooth',block:'start'})">Terminal de Acessos</button>
+          <div class="filter-group settings-subnav" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn-outline active" data-settings-tab="presencas">Presenças</button>
+            <button type="button" class="btn-outline" data-settings-tab="acessos">Terminal de Acessos</button>
+            <button type="button" class="btn-outline" data-settings-tab="licencas">Licenças</button>
           </div>
         </div>
 
@@ -2138,7 +2901,7 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
 
         <div class="panel-head">
           <div>
-            <h2 style="font-family:var(--font-display);font-size:22px;">Terminal de Ponto</h2>
+            <h2 style="font-family:var(--font-display);font-size:22px;">Terminal de Ponto / Presenças</h2>
             <div class="sub">Configuração do equipamento HIKVISION usado para registos de ponto</div>
           </div>
         </div>
@@ -2286,24 +3049,27 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
         <div class="panel-head">
           <div>
             <h2 style="font-family:var(--font-display);font-size:22px;">Terminal de Acessos</h2>
-            <div class="sub">Controlo de acessos HIKVISION · add-on faturado por pessoa ativa</div>
+            <div class="sub">Controlo de acessos HIKVISION · vários terminais por instituição</div>
           </div>
           <span class="badge" id="access-addon-badge">A carregar…</span>
         </div>
 
         <div class="kpi-grid" id="access-addon-kpis" style="grid-template-columns:repeat(3,1fr);margin-bottom:16px;"></div>
+        <div class="hint-chip" id="access-auto-sync-status" style="margin-bottom:16px;">
+          Sincronização automática HIKVISION ativa.
+        </div>
 
         <div class="panel" style="margin-bottom:16px;">
           <div class="panel-head">
             <div>
               <h3>Add-on Controlo de Acessos</h3>
-              <div class="sub">1,00 € por pessoa ativa / mês</div>
+              <div class="sub">1,00 € por lugar contratado / mês</div>
             </div>
-            <button class="btn-add" id="access-addon-toggle-btn">Ativar add-on</button>
+            <span class="badge demo" id="access-addon-managed-badge">Gerido pelo Super Admin</span>
           </div>
           <div class="panel-body">
             <div class="hint-chip">
-              Só são faturadas as pessoas com permissão de acesso ativa. Uma pessoa pode ter acesso a vários terminais sem duplicar a mensalidade.
+              Uma pessoa ocupa apenas 1 lugar da licença, mesmo que tenha acesso a vários terminais. Os terminais físicos não multiplicam o número de lugares contratados.
             </div>
           </div>
         </div>
@@ -2312,7 +3078,42 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
           <div class="panel" style="margin-bottom:16px;">
             <div class="panel-head">
               <div>
-                <h3>Equipamento de controlo de acessos</h3>
+                <h3>Terminais de Controlo de Acessos</h3>
+                <div class="sub">Todos os equipamentos desta instituição</div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button type="button" class="btn-outline" id="ac-sync-all-btn">Sincronizar agora</button>
+                <button type="button" class="btn-add" id="ac-new-device-btn">+ Novo terminal</button>
+              </div>
+            </div>
+            <div class="panel-body" style="padding-top:0;overflow:auto;">
+              <table>
+                <thead><tr><th>Terminal</th><th>Endereço</th><th>Estado</th><th>Permissões</th><th></th></tr></thead>
+                <tbody id="access-devices-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-head">
+              <div>
+                <h3>Grupos de terminais</h3>
+                <div class="sub">Ex.: Entradas principais, Armazéns, Escritórios</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px;">
+                <div class="field" style="margin:0;min-width:220px;flex:1;"><label>Nome do grupo</label><input id="ac-group-name" placeholder="Ex.: Entradas principais"></div>
+                <button type="button" class="btn-add" id="ac-group-save-btn">Criar grupo</button>
+              </div>
+              <div id="access-device-groups"></div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-head">
+              <div>
+                <h3 id="ac-device-editor-title">Novo equipamento de controlo de acessos</h3>
                 <div class="sub">Ex.: HIKVISION DS-K1T341 · DNS/IP e porta configurável</div>
               </div>
             </div>
@@ -2332,7 +3133,8 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
                 </div>
               </div>
               <div style="display:flex;justify-content:flex-end;gap:10px;">
-                <button class="btn-add" id="ac-hik-save-btn">Guardar terminal de acessos</button>
+                <button type="button" class="btn-outline" id="ac-hik-cancel-edit-btn" hidden>Cancelar edição</button>
+                <button class="btn-add" id="ac-hik-save-btn">Guardar terminal</button>
               </div>
             </div>
           </div>
@@ -2350,7 +3152,20 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
                   <div class="field"><label>Colaborador</label><select class="select-input" id="ac-person-employee"></select></div>
                   <div class="field"><label>Nome no terminal</label><input id="ac-person-name" placeholder="Nome da pessoa"></div>
                   <div class="field"><label>Código / PIN</label><input id="ac-person-pin" inputmode="numeric" maxlength="12" placeholder="4 a 12 dígitos"></div>
-                  <div class="field"><label>Terminal</label><select class="select-input" id="ac-person-device"></select></div>
+                  <div class="field">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px;">
+                      <label style="margin:0;">Portas / terminais autorizados</label>
+                      <div style="display:flex;gap:6px;">
+                        <button type="button" class="btn-toggle" id="ac-select-all-devices">Todas</button>
+                        <button type="button" class="btn-toggle" id="ac-clear-all-devices">Nenhuma</button>
+                      </div>
+                    </div>
+                    <div id="ac-person-devices" style="display:grid;gap:7px;"></div>
+                  </div>
+                  <div class="field">
+                    <label>Selecionar por grupo</label>
+                    <select class="select-input" id="ac-person-device-group"><option value="">— Escolher grupo —</option></select>
+                  </div>
                 </div>
                 <div>
                   <div class="grid-2">
@@ -2375,17 +3190,19 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
                   </div>
                 </div>
               </div>
-              <div style="display:flex;justify-content:flex-end;">
+              <div id="ac-person-edit-state" class="hint-chip" hidden style="margin-bottom:12px;"></div>
+              <div style="display:flex;justify-content:flex-end;gap:8px;">
+                <button type="button" class="btn-outline" id="ac-person-edit-cancel-btn" hidden>Cancelar edição</button>
                 <button class="btn-add" id="ac-permission-save-btn">Criar permissão</button>
               </div>
             </div>
           </div>
 
           <div class="panel">
-            <div class="panel-head"><div><h3>Pessoas autorizadas</h3><div class="sub">Permissões configuradas e estado de sincronização</div></div></div>
+            <div class="panel-head"><div><h3>Pessoas autorizadas</h3><div class="sub">Uma pessoa pode estar associada a vários terminais sem ocupar lugares adicionais</div></div><button type="button" class="btn-outline" id="ac-sync-all-permissions-btn">Sincronizar agora</button></div>
             <div class="panel-body" style="padding-top:0;overflow:auto;">
               <table>
-                <thead><tr><th>Pessoa</th><th>Terminal</th><th>Validade</th><th>Horário</th><th>Estado</th><th></th></tr></thead>
+                <thead><tr><th>Pessoa</th><th>Portas autorizadas</th><th>Validade</th><th>Horário</th><th>Estado</th><th></th></tr></thead>
                 <tbody id="access-permissions-body"></tbody>
               </table>
             </div>
@@ -4271,145 +5088,308 @@ function formatLicenseAmount(inst){
 }
 
 async function renderLicencas(){
-  // Carrega o custo atual do add-on de acessos por instituição.
+  let pendingRequests=[];
+
   try{
     const ids=institutions.map(i=>i.id).filter(Boolean);
-    if(ids.length && supabaseClient){
-      const [addonsRes,permsRes]=await Promise.all([
-        supabaseClient.from('institution_addons')
-          .select('institution_id,enabled,unit_price_cents')
-          .eq('addon_code','hikvision_access_control')
-          .in('institution_id',ids),
-        supabaseClient.from('hikvision_access_permissions')
-          .select('institution_id,employee_id,external_person_no,person_name,valid_from,valid_until,enabled')
-          .in('institution_id',ids)
-          .eq('enabled',true)
-      ]);
-      if(addonsRes.error) throw addonsRes.error;
-      if(permsRes.error) throw permsRes.error;
-      const nowIso=new Date().toISOString();
-      const addonByInst=Object.fromEntries((addonsRes.data||[]).map(a=>[String(a.institution_id),a]));
-      institutions.forEach(inst=>{
-        const addon=addonByInst[String(inst.id)];
-        const keys=new Set();
-        if(addon?.enabled){
-          (permsRes.data||[]).filter(x=>String(x.institution_id)===String(inst.id) && x.valid_from<=nowIso && x.valid_until>=nowIso).forEach(x=>{
-            keys.add(x.employee_id ? `e:${x.employee_id}` : `x:${String(x.external_person_no||x.person_name||'').trim().toLowerCase()}`);
-          });
-        }
-        const people=keys.size;
-        const unit=Number(addon?.unit_price_cents||100);
-        const months=inst.billingCycle==='annual'?12:1;
-        inst.accessAddonPeople=people;
-        inst.accessAddonCents=addon?.enabled ? people*unit*months : 0;
-        inst.accessAddonEnabled=!!addon?.enabled;
-      });
-    }
+
+    const [addonsRes,requestsRes]=await Promise.all([
+      ids.length
+        ? supabaseClient.from('institution_addons')
+            .select('institution_id,enabled,unit_price_cents,licensed_units,pending_licensed_units,pending_effective_date,billing_cycle')
+            .eq('addon_code','hikvision_access_control').in('institution_id',ids)
+        : Promise.resolve({data:[],error:null}),
+      supabaseClient.from('addon_license_requests')
+        .select('id,institution_id,requested_units,status,request_type,created_at,admin_note,previous_units,units_delta,effective_date')
+        .eq('addon_code','hikvision_access_control')
+        .order('created_at',{ascending:false}).limit(100)
+    ]);
+
+    if(addonsRes.error) throw addonsRes.error;
+    if(requestsRes.error) throw requestsRes.error;
+
+    pendingRequests=(requestsRes.data||[]).filter(r=>r.status==='pending');
+
+    pendingRequests=await Promise.all(
+      pendingRequests.map(async r=>{
+        const {data,error}=await supabaseClient.rpc('preview_access_addon_request',{
+          p_request_id:r.id,
+          p_billing_scope:'addon_only'
+        });
+        return {...r,preview:error?null:data,previewError:error?.message||null};
+      })
+    );
+
+    const addonByInst=Object.fromEntries((addonsRes.data||[]).map(a=>[String(a.institution_id),a]));
+
+    institutions.forEach(inst=>{
+      const addon=addonByInst[String(inst.id)];
+      const units=Number(addon?.licensed_units||0);
+      const unit=Number(addon?.unit_price_cents||100);
+      const months=inst.billingCycle==='annual'?12:1;
+
+      inst.accessAddonCents=addon?.enabled ? units*unit*months : 0;
+      inst.accessAddonEnabled=!!addon?.enabled;
+      inst.accessAddonLicensedUnits=units;
+      inst.accessAddonPendingUnits=addon?.pending_licensed_units==null?null:Number(addon.pending_licensed_units);
+      inst.accessAddonPendingDate=addon?.pending_effective_date||null;
+    });
+
   }catch(err){
-    console.warn('Não foi possível calcular add-ons nas licenças:',err);
+    console.warn('Não foi possível carregar add-ons/pedidos:',err);
   }
 
-  const activeCount = institutions.filter(i=>i.licenseStatus==='active').length;
-  const expiringSoon = institutions.filter(i=> i.expiresAt && i.expiresAt - now > 0 && i.expiresAt - now < 30*day).length;
-  const expiredCount = institutions.filter(i=>i.licenseStatus==='expired' || (i.expiresAt && i.expiresAt < now)).length;
-  const demoCount = institutions.filter(i=>i.licenseStatus==='demo').length;
+  const reqBody=document.getElementById('access-addon-requests-body');
+  const reqCount=document.getElementById('access-addon-request-count');
 
-  document.getElementById('lic-kpi-grid').innerHTML = `
+  if(reqCount){
+    reqCount.textContent=`${pendingRequests.length} pendente${pendingRequests.length===1?'':'s'}`;
+  }
+
+  if(reqBody){
+    reqBody.innerHTML=pendingRequests.length ? pendingRequests.map(r=>{
+      const inst=institutions.find(i=>String(i.id)===String(r.institution_id));
+      const pv=r.preview||{};
+      const typeLabel=r.request_type==='upgrade'?'Aumento':r.request_type==='downgrade'?'Redução':'Novo';
+      const delta=Number(pv.units_delta??r.units_delta??0);
+      const amount=Number(pv.addon_amount_cents||0);
+      const currency=pv.currency||inst?.currency||'EUR';
+      const effective=pv.effective_date?new Date(pv.effective_date+'T12:00:00').toLocaleDateString('pt-PT'):'—';
+      const details=delta>0
+        ? `${Number(pv.previous_units||0)} → ${Number(pv.requested_units||r.requested_units)} · +${delta} lugar(es)`
+        : `${Number(pv.previous_units||0)} → ${Number(pv.requested_units||r.requested_units)} · efetivo ${effective}`;
+      const priceText=delta>0
+        ? `${fmtLicenseMoney(amount,currency)}${pv.proration_days!=null?` <span style="font-size:11px;color:var(--ink-faint);">prorrata ${pv.proration_days}/${pv.period_days} dias</span>`:''}`
+        : `<span style="color:var(--ink-soft);">0,00 € agora</span>`;
+
+      return `<tr>
+        <td><strong>${analyticsEsc(inst?.name||'Instituição')}</strong></td>
+        <td>${typeLabel}<div style="font-size:11px;color:var(--ink-faint);">${details}</div>${r.admin_note?`<div style="font-size:11px;color:var(--ink-faint);">${analyticsEsc(r.admin_note)}</div>`:''}</td>
+        <td><strong>${r.requested_units}</strong></td>
+        <td>${priceText}</td>
+        <td>${new Date(r.created_at).toLocaleDateString('pt-PT')}</td>
+        <td>
+          <div class="row-actions" style="flex-wrap:wrap;">
+            <button class="btn-toggle" onclick="issueAccessAddonRequest('${r.id}','addon_only',this)">Emitir só add-on</button>
+            <button class="btn-toggle" onclick="issueAccessAddonRequest('${r.id}','license_plus_addon',this)">Licença + add-on</button>
+            <button class="btn-toggle" onclick="rejectAccessAddonRequest('${r.id}',this)">Rejeitar</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;color:var(--ink-faint);padding:22px;">Sem pedidos pendentes.</td></tr>';
+  }
+
+  const activeCount=institutions.filter(i=>i.licenseStatus==='active').length;
+  const expiredCount=institutions.filter(i=>i.licenseStatus==='expired'||(i.expiresAt&&i.expiresAt<now)).length;
+  const demoCount=institutions.filter(i=>i.licenseStatus==='demo').length;
+
+  document.getElementById('lic-kpi-grid').innerHTML=`
     <div class="kpi-card"><div class="label">Licenças Ativas</div><div class="value">${activeCount}</div><div class="delta up">em vigor</div></div>
-    <div class="kpi-card"><div class="label">A Expirar em 30 dias</div><div class="value">${expiringSoon}</div><div class="delta ${expiringSoon?'down':'flat'}">requer renovação</div></div>
+    <div class="kpi-card"><div class="label">Pedidos Add-on</div><div class="value">${pendingRequests.length}</div><div class="delta ${pendingRequests.length?'down':'flat'}">por emitir</div></div>
     <div class="kpi-card"><div class="label">Expiradas</div><div class="value">${expiredCount}</div><div class="delta ${expiredCount?'down':'flat'}">ação necessária</div></div>
-    <div class="kpi-card"><div class="label">Em Demo</div><div class="value">${demoCount}</div><div class="delta flat">potencial conversão</div></div>
-  `;
+    <div class="kpi-card"><div class="label">Em Demo</div><div class="value">${demoCount}</div><div class="delta flat">potencial conversão</div></div>`;
 
-  const body = document.getElementById('lic-table-body');
+  const body=document.getElementById('lic-table-body');
+
   if(!institutions.length){
-    body.innerHTML = `<tr><td colspan="10" style="text-align:center; color:var(--ink-faint); padding:28px;">Ainda não existem licenças.</td></tr>`;
+    body.innerHTML='<tr><td colspan="10" style="text-align:center;color:var(--ink-faint);padding:28px;">Ainda não existem licenças.</td></tr>';
     return;
   }
 
-  body.innerHTML = institutions.map(inst=>{
-    const daysLeft = inst.expiresAt ? Math.round((inst.expiresAt - now)/day) : null;
-    const cycleLabel = inst.billingCycle === 'annual' ? 'Anual' : inst.billingCycle === 'monthly' ? 'Mensal' : '—';
-    const status = inst.licenseStatus || 'demo';
-    return `
-    <tr>
+  body.innerHTML=institutions.map(inst=>{
+    const daysLeft=inst.expiresAt?Math.round((inst.expiresAt-now)/day):null;
+    const cycleLabel=inst.billingCycle==='annual'?'Anual':inst.billingCycle==='monthly'?'Mensal':'—';
+    const status=inst.licenseStatus||'demo';
+    const pending=inst.accessAddonPendingUnits!=null
+      ? `<div style="font-size:11px;color:#946218;">→ ${inst.accessAddonPendingUnits} em ${new Date(inst.accessAddonPendingDate+'T12:00:00').toLocaleDateString('pt-PT')}</div>`
+      : '';
+
+    return `<tr>
       <td class="inst-name">${inst.name}</td>
-      <td>${inst.plan} <span style="font-size:11px; color:var(--ink-faint);">· ${cycleLabel}</span></td>
-      <td><span class="badge ${status}">${statusLabel[status] || status}</span></td>
-      <td>
-        <div style="font-family:var(--font-mono); font-weight:600;">${formatLicenseAmount(inst)}</div>
-        <div style="font-size:11px; color:var(--ink-faint);">${cycleLabel}</div>
-      </td>
-      <td>
-        <div style="font-family:var(--font-mono);font-weight:600;">${inst.accessAddonCents ? new Intl.NumberFormat('pt-PT',{style:'currency',currency:inst.currency||'EUR'}).format(inst.accessAddonCents/100) : '—'}</div>
-        <div style="font-size:11px;color:var(--ink-faint);">${inst.accessAddonEnabled ? `${inst.accessAddonPeople||0} pessoa(s) em acessos` : 'sem add-ons ativos'}</div>
-      </td>
-      <td>
-        <div style="font-family:var(--font-mono);font-weight:800;">${inst.priceCents!=null ? new Intl.NumberFormat('pt-PT',{style:'currency',currency:inst.currency||'EUR'}).format((Number(inst.priceCents||0)+Number(inst.accessAddonCents||0))/100) : '—'}</div>
-        <div style="font-size:11px;color:var(--ink-faint);">base + add-ons</div>
-      </td>
-      <td>${inst.employees}/${inst.limit || 0}</td>
-      <td style="font-family:var(--font-mono); font-size:12.5px;">${inst.expiresAt ? fmtDate(inst.expiresAt) : '—'}</td>
-      <td style="font-family:var(--font-mono); font-size:12.5px; color:${daysLeft!==null && daysLeft<0?'var(--red)':daysLeft!==null && daysLeft<30?'#946218':'var(--ink-soft)'};">
-        ${daysLeft===null ? '—' : daysLeft<0 ? 'expirada há '+Math.abs(daysLeft)+'d' : daysLeft+' dias'}
-      </td>
-      <td>
-        <div class="row-actions" style="flex-wrap:wrap;">
-          <button class="btn-toggle" onclick="openInstDrawer('${inst.id}')">Editar</button>
-          <button class="btn-toggle" onclick="sendLicensePaymentEmail('${inst.id}', this)">Enviar cobrança</button>
-        </div>
-      </td>
+      <td>${inst.plan} <span style="font-size:11px;color:var(--ink-faint);">· ${cycleLabel}</span></td>
+      <td><span class="badge ${status}">${statusLabel[status]||status}</span></td>
+      <td><div style="font-family:var(--font-mono);font-weight:600;">${formatLicenseAmount(inst)}</div><div style="font-size:11px;color:var(--ink-faint);">${cycleLabel}</div></td>
+      <td><div style="font-family:var(--font-mono);font-weight:600;">${inst.accessAddonCents?fmtLicenseMoney(inst.accessAddonCents,inst.currency):'—'}</div><div style="font-size:11px;color:var(--ink-faint);">${inst.accessAddonEnabled?`${inst.accessAddonLicensedUnits||0} lugares contratados`:'sem add-on ativo'}</div>${pending}</td>
+      <td><div style="font-family:var(--font-mono);font-weight:800;">${inst.priceCents!=null?fmtLicenseMoney(Number(inst.priceCents||0)+Number(inst.accessAddonCents||0),inst.currency):'—'}</div><div style="font-size:11px;color:var(--ink-faint);">base + add-ons</div></td>
+      <td>${inst.employees}/${inst.limit||0}</td>
+      <td style="font-family:var(--font-mono);font-size:12.5px;">${inst.expiresAt?fmtDate(inst.expiresAt):'—'}</td>
+      <td style="font-family:var(--font-mono);font-size:12.5px;">${daysLeft===null?'—':daysLeft<0?'expirada há '+Math.abs(daysLeft)+'d':daysLeft+' dias'}</td>
+      <td><div class="row-actions" style="flex-wrap:wrap;"><button class="btn-toggle" onclick="openInstDrawer('${inst.id}')">Editar</button>${inst.accessAddonEnabled?`<button class="btn-toggle" onclick="toggleSuperAdminAccessAddon('${inst.id}',false,this)">Desativar add-on</button>`:''}<button class="btn-toggle" onclick="sendLicensePaymentEmail('${inst.id}',this,'license_plus_addon')">Enviar cobrança</button></div></td>
     </tr>`;
   }).join('');
 }
 
-async function sendLicensePaymentEmail(institutionId, button){
-  const inst = institutions.find(i=>String(i.id)===String(institutionId));
-  if(!inst){
-    showToast('Instituição não encontrada.', true);
-    return;
-  }
-  if(!inst.priceCents || inst.priceCents <= 0){
-    showToast('Define primeiro o valor da licença.', true);
-    return;
-  }
-  if(!inst.billingCycle){
-    showToast('Define primeiro a periodicidade mensal/anual.', true);
-    return;
-  }
+async function issueAccessAddonRequest(requestId,billingScope,button){
+  const old=button?.textContent||'Emitir';
 
-  const original = button?.textContent || 'Enviar cobrança';
   if(button){
-    button.disabled = true;
-    button.textContent = 'A enviar…';
+    button.disabled=true;
+    button.textContent='A emitir…';
   }
 
-  try {
-    const { data, error } = await supabaseClient.functions.invoke(
-      'send-license-payment-email',
-      { body: { institution_id: institutionId } }
-    );
-    if(error){
-      let message = error.message || 'Não foi possível enviar a cobrança.';
-      try {
-        if(error.context && typeof error.context.json === 'function'){
-          const body = await error.context.json();
-          if(body?.error) message = body.error;
-        }
-      } catch(_){}
-      throw new Error(message);
-    }
-    if(!data?.ok) throw new Error(data?.error || 'Não foi possível enviar a cobrança.');
+  try{
+    const {data,error}=await supabaseClient.rpc('issue_access_addon_request',{
+      p_request_id:requestId,
+      p_billing_scope:billingScope,
+      p_review_note:null
+    });
 
-    const recipients = Array.isArray(data.recipients) ? data.recipients.join(', ') : '';
-    showToast(`Cobrança enviada para ${data.sent_count || 0} administrador(es)${recipients ? ': ' + recipients : '.'}`);
-  } catch(err){
-    console.error('Erro ao enviar cobrança:', err);
-    showToast('Erro ao enviar cobrança: ' + (err.message || 'tente novamente.'), true);
-  } finally {
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Falha ao emitir licença.');
+
+    const emailRes=await supabaseClient.functions.invoke('send-license-payment-email',{
+      body:{
+        institution_id:data.institution_id,
+        billing_scope:billingScope,
+        request_id:requestId
+      }
+    });
+
+    if(emailRes.error) throw emailRes.error;
+    if(!emailRes.data?.ok) throw new Error(emailRes.data?.error||'A alteração foi emitida, mas não foi possível enviar o email.');
+
+    if(Number(data.units_delta)<0){
+      showToast(`Redução aprovada: ${data.previous_units} → ${data.requested_units} lugares a partir de ${new Date(data.effective_date+'T12:00:00').toLocaleDateString('pt-PT')}.`);
+    }else{
+      showToast(`Add-on atualizado para ${data.requested_units} lugares. Cobrança prorrateada: ${fmtLicenseMoney(data.addon_amount_cents,data.currency)}.`);
+    }
+
+    await renderLicencas();
+
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao emitir add-on: '+(err.message||''),true);
+  }finally{
     if(button){
-      button.disabled = false;
-      button.textContent = original;
+      button.disabled=false;
+      button.textContent=old;
+    }
+  }
+}
+
+async function rejectAccessAddonRequest(requestId,button){
+  const reason=prompt('Motivo da rejeição (opcional):')||null;
+  const old=button?.textContent||'Rejeitar';
+
+  if(button){
+    button.disabled=true;
+    button.textContent='A rejeitar…';
+  }
+
+  try{
+    const {data,error}=await supabaseClient.rpc('reject_access_addon_request',{
+      p_request_id:requestId,
+      p_review_note:reason
+    });
+
+    if(error) throw error;
+    if(!data?.ok) throw new Error('Não foi possível rejeitar o pedido.');
+
+    let emailOk=true;
+    try{
+      const emailRes=await supabaseClient.functions.invoke('send-addon-license-status-email',{
+        body:{action:'rejected',request_id:requestId}
+      });
+      if(emailRes.error || !emailRes.data?.ok) emailOk=false;
+    }catch(mailErr){
+      console.warn('Pedido rejeitado, mas falhou o email:',mailErr);
+      emailOk=false;
+    }
+
+    showToast(emailOk
+      ? 'Pedido rejeitado e Admin notificado por email.'
+      : 'Pedido rejeitado. Não foi possível enviar o email ao Admin.'
+    );
+
+    await renderLicencas();
+
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao rejeitar pedido: '+(err.message||''),true);
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=old;
+    }
+  }
+}
+
+
+async function toggleSuperAdminAccessAddon(institutionId, enable, button){
+  if(enable){
+    showToast('A emissão do add-on deve ser feita a partir de um pedido do Admin.',true);
+    return;
+  }
+
+  const inst=institutions.find(i=>String(i.id)===String(institutionId));
+  if(!inst){
+    showToast('Instituição não encontrada.',true);
+    return;
+  }
+
+  if(!confirm(`Desativar o Controlo de Acessos de ${inst.name}?`)) return;
+
+  const old=button?.textContent||'Desativar add-on';
+  if(button){
+    button.disabled=true;
+    button.textContent='A desativar…';
+  }
+
+  try{
+    const {data,error}=await supabaseClient.functions.invoke('toggle-hikvision-access-addon',{
+      body:{institution_id:institutionId,enabled:false}
+    });
+
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível desativar o add-on.');
+
+    await renderLicencas();
+    showToast('Add-on Controlo de Acessos desativado.');
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao desativar add-on: '+(err.message||''),true);
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=old;
+    }
+  }
+}
+
+async function sendLicensePaymentEmail(institutionId, button, billingScope='license_plus_addon'){
+  const inst=institutions.find(i=>String(i.id)===String(institutionId));
+
+  if(!inst){
+    showToast('Instituição não encontrada.',true);
+    return;
+  }
+
+  const original=button?.textContent||'Enviar cobrança';
+
+  if(button){
+    button.disabled=true;
+    button.textContent='A enviar…';
+  }
+
+  try{
+    const {data,error}=await supabaseClient.functions.invoke('send-license-payment-email',{
+      body:{
+        institution_id:institutionId,
+        billing_scope:billingScope
+      }
+    });
+
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível enviar a cobrança.');
+
+    showToast(`Cobrança enviada para ${data.sent_count||0} administrador(es). Total: ${fmtLicenseMoney(data.total_cents,data.currency||inst.currency||'EUR')}.`);
+  }catch(err){
+    console.error('Erro ao enviar cobrança:',err);
+    showToast('Erro ao enviar cobrança: '+(err.message||'tente novamente.'),true);
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent=original;
     }
   }
 }
@@ -5049,6 +6029,10 @@ async function renderAdminDashboard(){
         <div class="delta flat">${c.delta}</div>
       </div>
     `).join('');
+
+    renderMobileDashboardCards();
+    refreshAccessHistoryLicenseVisibility();
+    loadNotificationCenter();
 
     if(!teams.length){
       document.getElementById('admin-team-chart').innerHTML =
@@ -8212,7 +9196,43 @@ function exportReportPDF(){
     <table><thead><tr><th>Colaborador</th><th>Equipa</th><th>Escalados</th><th>Pontual</th><th>Atraso</th><th>Falta</th><th>Assiduidade</th><th>Horas extra</th><th>Compensação</th></tr></thead>
     <tbody>${rows || '<tr><td colspan="9">Sem dados para este filtro.</td></tr>'}</tbody></table>
     ${detailHTML}
-    </body></html>
+    
+
+
+<div id="pwa-update-banner" hidden>
+  <div class="pwa-update-content">
+    <div>
+      <strong>Nova versão disponível</strong>
+      <span>Atualiza para usar a versão mais recente do Pica-Aqui.</span>
+    </div>
+    <button type="button" class="btn-add" id="pwa-update-btn">Atualizar</button>
+  </div>
+</div>
+
+<div class="notification-overlay" id="notification-overlay"></div>
+<aside id="notification-center" class="notification-center" aria-label="Centro de notificações">
+  <div class="notification-head">
+    <div>
+      <h3>Notificações</h3>
+      <div class="sub" id="notification-center-sub">A carregar…</div>
+    </div>
+    <button type="button" class="drawer-close" id="notification-close-btn">✕</button>
+  </div>
+  <div class="notification-actions">
+    <button type="button" class="btn-outline" id="notification-read-all-btn">Marcar todas como lidas</button>
+    <button type="button" class="btn-outline" id="notification-refresh-btn">Atualizar</button>
+  </div>
+  <div id="notification-list" class="notification-list"></div>
+</aside>
+
+<div id="global-action-loading" hidden aria-live="polite" aria-busy="true">
+  <div class="global-loading-card">
+    <div class="global-spinner" aria-hidden="true"></div>
+    <div class="global-loading-text" id="global-loading-text">A processar…</div>
+  </div>
+</div>
+
+</body></html>
   `);
   win.document.close();
   win.focus();
@@ -8649,22 +9669,39 @@ function clearKioskPairing(){
   try { localStorage.removeItem(KIOSK_PAIR_KEY); } catch(e){}
 }
 
-document.getElementById('admin-kiosk-btn').addEventListener('click', ()=>{
+document.getElementById('admin-kiosk-btn').addEventListener('click', async()=>{
   kioskLaunchOrigin = 'admin';
+  try{
+    if(navigator.onLine) await ensureAdminKioskDevice();
+  }catch(err){console.warn('Não foi possível preparar o modo offline do Quiosque:',err);}
   document.getElementById('admin-dashboard-screen').hidden = true;
   document.getElementById('kiosk-screen').hidden = false;
   document.getElementById('kiosk-unpair-btn').hidden = true;
   startKioskClock();
+  updateKioskConnectionStatus();
+  if(navigator.onLine) syncOfflineKioskPunches();
   kioskGoTeamSelect();
 });
 
-document.getElementById('public-kiosk-btn').addEventListener('click', ()=>{
+document.getElementById('public-kiosk-btn').addEventListener('click', async()=>{
   kioskLaunchOrigin = 'public';
   document.getElementById('login-screen').hidden = true;
   document.getElementById('kiosk-screen').hidden = false;
   startKioskClock();
-  if(getKioskPairing()){
+  updateKioskConnectionStatus();
+
+  const dev=kioskDevice();
+  if(dev?.pairing_id){
     document.getElementById('kiosk-unpair-btn').hidden = false;
+    loadCachedKioskSnapshot();
+    if(navigator.onLine){
+      try{
+        await refreshKioskSnapshot();
+        await syncOfflineKioskPunches();
+      }catch(err){
+        console.warn('Quiosque: a usar dados locais.',err);
+      }
+    }
     kioskGoTeamSelect();
   } else {
     document.getElementById('kiosk-unpair-btn').hidden = true;
@@ -8678,16 +9715,25 @@ document.getElementById('kiosk-exit-btn').addEventListener('click', ()=>{
 
 document.getElementById('kiosk-unpair-btn').addEventListener('click', ()=>{
   clearKioskPairing();
+  clearKioskDevice();
   showToast('Dispositivo desemparelhado.');
   kioskGoPairing();
   document.getElementById('kiosk-unpair-btn').hidden = true;
 });
 
 /* Painel do Admin: ver/gerar o código de emparelhamento */
-document.getElementById('pairing-code-btn').addEventListener('click', ()=>{
-  document.getElementById('pairing-code-display').textContent = kioskPairingCode;
-  document.getElementById('pairing-modal').classList.add('open');
-  document.getElementById('pairing-modal-overlay').classList.add('open');
+document.getElementById('pairing-code-btn').addEventListener('click', async()=>{
+  try{
+    const {data,error}=await supabaseClient.rpc('admin_create_kiosk_pairing',{p_device_label:null});
+    if(error) throw error;
+    kioskPairingCode=data.pairing_code;
+    document.getElementById('pairing-code-display').textContent=kioskPairingCode;
+    document.getElementById('pairing-modal').classList.add('open');
+    document.getElementById('pairing-modal-overlay').classList.add('open');
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao gerar código de emparelhamento: '+(err.message||''),true);
+  }
 });
 function closePairingModal(){
   document.getElementById('pairing-modal').classList.remove('open');
@@ -8696,11 +9742,189 @@ function closePairingModal(){
 document.getElementById('pairing-modal-close-btn').addEventListener('click', closePairingModal);
 document.getElementById('pairing-modal-ok-btn').addEventListener('click', closePairingModal);
 document.getElementById('pairing-modal-overlay').addEventListener('click', closePairingModal);
-document.getElementById('pairing-regenerate-btn').addEventListener('click', ()=>{
-  kioskPairingCode = String(Math.floor(100000+Math.random()*900000));
-  document.getElementById('pairing-code-display').textContent = kioskPairingCode;
-  showToast('Novo código gerado. Códigos antigos deixam de funcionar.');
+document.getElementById('pairing-regenerate-btn').addEventListener('click', async()=>{
+  try{
+    const {data,error}=await supabaseClient.rpc('admin_create_kiosk_pairing',{p_device_label:null});
+    if(error) throw error;
+    kioskPairingCode=data.pairing_code;
+    document.getElementById('pairing-code-display').textContent=kioskPairingCode;
+    showToast('Novo código gerado. Códigos anteriores foram desativados.');
+  }catch(err){
+    showToast('Erro ao gerar novo código: '+(err.message||''),true);
+  }
 });
+
+
+/* ---------------- QUIOSQUE OFFLINE / SINCRONIZAÇÃO ---------------- */
+const KIOSK_DEVICE_KEY='picaro_kiosk_device_v2';
+const KIOSK_SNAPSHOT_KEY='picaro_kiosk_snapshot_v2';
+const KIOSK_OFFLINE_QUEUE_KEY='picaro_kiosk_offline_queue_v2';
+const KIOSK_PIN_VERIFIERS_KEY='picaro_kiosk_pin_verifiers_v2';
+
+function kioskDevice(){
+  try{return JSON.parse(localStorage.getItem(KIOSK_DEVICE_KEY)||'null');}catch(_){return null;}
+}
+function setKioskDevice(v){
+  try{localStorage.setItem(KIOSK_DEVICE_KEY,JSON.stringify(v));}catch(_){}
+}
+function clearKioskDevice(){
+  try{
+    localStorage.removeItem(KIOSK_DEVICE_KEY);
+    localStorage.removeItem(KIOSK_SNAPSHOT_KEY);
+    localStorage.removeItem(KIOSK_OFFLINE_QUEUE_KEY);
+    localStorage.removeItem(KIOSK_PIN_VERIFIERS_KEY);
+  }catch(_){}
+}
+function kioskOfflineQueue(){
+  try{return JSON.parse(localStorage.getItem(KIOSK_OFFLINE_QUEUE_KEY)||'[]');}catch(_){return [];}
+}
+function saveKioskOfflineQueue(q){
+  try{localStorage.setItem(KIOSK_OFFLINE_QUEUE_KEY,JSON.stringify(q));}catch(_){}
+  updateKioskConnectionStatus();
+}
+function kioskPinVerifiers(){
+  try{return JSON.parse(localStorage.getItem(KIOSK_PIN_VERIFIERS_KEY)||'{}');}catch(_){return {};}
+}
+function saveKioskPinVerifiers(v){
+  try{localStorage.setItem(KIOSK_PIN_VERIFIERS_KEY,JSON.stringify(v));}catch(_){}
+}
+async function kioskSha256(text){
+  const bytes=new TextEncoder().encode(text);
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function cacheKioskPinVerifier(employeeId,pin){
+  const d=kioskDevice();
+  if(!d?.device_secret) return;
+  const all=kioskPinVerifiers();
+  all[String(employeeId)]=await kioskSha256(`${d.device_secret}:${employeeId}:${pin}`);
+  saveKioskPinVerifiers(all);
+}
+async function verifyKioskPinOffline(employeeId,pin){
+  const d=kioskDevice();
+  const expected=kioskPinVerifiers()[String(employeeId)];
+  if(!d?.device_secret||!expected) return false;
+  const actual=await kioskSha256(`${d.device_secret}:${employeeId}:${pin}`);
+  return actual===expected;
+}
+function updateKioskConnectionStatus(){
+  const c=document.getElementById('kiosk-connection-status');
+  const p=document.getElementById('kiosk-pending-status');
+  const count=kioskOfflineQueue().length;
+  if(c){
+    c.textContent=navigator.onLine?'Online':'Offline';
+    c.className=`badge ${navigator.onLine?'active':'expired'}`;
+  }
+  if(p){
+    p.hidden=count===0;
+    p.textContent=`${count} por sincronizar`;
+  }
+}
+function applyKioskSnapshot(snapshot){
+  if(!snapshot) return;
+  currentInstitutionId=snapshot.institution_id||currentInstitutionId;
+  teams=(snapshot.teams||[]).map(t=>({id:t.id,name:t.name,scheduled:0,present:0}));
+  employees=(snapshot.employees||[]).map(e=>({
+    id:e.id,
+    name:e.name,
+    team:e.team||'Sem equipa',
+    teamId:e.team_id||null,
+    status:e.status==='active'?'ativo':e.status,
+    photo:null,
+    _supa:true
+  }));
+  employees.forEach(e=>{if(!kioskPunchState[e.id]) kioskPunchState[e.id]='fora';});
+}
+function loadCachedKioskSnapshot(){
+  try{
+    const s=JSON.parse(localStorage.getItem(KIOSK_SNAPSHOT_KEY)||'null');
+    if(s) applyKioskSnapshot(s);
+    return s;
+  }catch(_){return null;}
+}
+async function refreshKioskSnapshot(){
+  const d=kioskDevice();
+  if(!d?.pairing_id||!d?.device_secret) return false;
+  const {data,error}=await supabaseClient.rpc('kiosk_get_snapshot',{
+    p_pairing_id:d.pairing_id,
+    p_device_secret:d.device_secret
+  });
+  if(error) throw error;
+  localStorage.setItem(KIOSK_SNAPSHOT_KEY,JSON.stringify(data));
+  applyKioskSnapshot(data);
+  return true;
+}
+async function pairKioskWithServer(code){
+  const label=`Quiosque ${navigator.platform||'dispositivo'}`;
+  const {data,error}=await supabaseClient.rpc('kiosk_validate_pairing_v2',{
+    p_code:code,
+    p_device_label:label
+  });
+  if(error) throw error;
+  if(!data?.ok) throw new Error('Não foi possível emparelhar o dispositivo.');
+  setKioskDevice(data);
+  setKioskPairing(data.institution_id);
+  await refreshKioskSnapshot();
+  return data;
+}
+async function ensureAdminKioskDevice(){
+  const d=kioskDevice();
+  if(d?.pairing_id&&d?.device_secret) return d;
+  const {data,error}=await supabaseClient.rpc('admin_create_kiosk_pairing',{
+    p_device_label:'Quiosque do Admin'
+  });
+  if(error) throw error;
+  return await pairKioskWithServer(data.pairing_code);
+}
+async function queueOfflineKioskPunch(emp,type,action){
+  const event={
+    event_id:crypto.randomUUID(),
+    employee_id:emp.id,
+    type,
+    action,
+    recorded_at:new Date().toISOString()
+  };
+  const q=kioskOfflineQueue();
+  q.push(event);
+  saveKioskOfflineQueue(q);
+  return event;
+}
+async function syncOfflineKioskPunches(){
+  if(!navigator.onLine) return;
+  const d=kioskDevice();
+  if(!d?.pairing_id||!d?.device_secret) return;
+  let q=kioskOfflineQueue();
+  if(!q.length){updateKioskConnectionStatus();return;}
+  const remaining=[];
+  for(const ev of q){
+    try{
+      const {error}=await supabaseClient.rpc('kiosk_sync_offline_punch',{
+        p_pairing_id:d.pairing_id,
+        p_device_secret:d.device_secret,
+        p_employee_id:ev.employee_id,
+        p_type:ev.type,
+        p_recorded_at:ev.recorded_at,
+        p_external_event_id:ev.event_id
+      });
+      if(error) throw error;
+    }catch(err){
+      console.warn('Picagem offline ainda não sincronizada:',err);
+      remaining.push(ev);
+    }
+  }
+  saveKioskOfflineQueue(remaining);
+  if(remaining.length===0 && q.length){
+    showToast(`${q.length} picagem(ns) offline sincronizada(s).`);
+  }
+  try{await refreshKioskSnapshot();}catch(_){}
+}
+window.addEventListener('online',async()=>{
+  updateKioskConnectionStatus();
+  await syncOfflineKioskPunches();
+});
+window.addEventListener('offline',updateKioskConnectionStatus);
+setInterval(()=>{if(navigator.onLine) syncOfflineKioskPunches();},30000);
+
 
 /* ---------------- QUIOSQUE FLOW ---------------- */
 const teamIcons = {"Enfermagem":"🩺","Ação Social":"🤝","Cozinha":"🍲","Limpeza":"🧹","Administrativo":"🗂","Manutenção":"🔧"};
@@ -8744,24 +9968,31 @@ function updateKioskPairingDots(){
   el.innerHTML = [0,1,2,3,4,5].map(i=>`<div class="kiosk-pin-dot ${i<kioskCtx.pairingInput.length?'filled':''}"></div>`).join('');
 }
 
-function kioskPressPairingKey(key){
-  const errEl = document.getElementById('kiosk-error');
-  if(key==='clear'){ kioskCtx.pairingInput=''; }
-  else if(key==='back'){ kioskCtx.pairingInput = kioskCtx.pairingInput.slice(0,-1); }
-  else if(kioskCtx.pairingInput.length<6){ kioskCtx.pairingInput += key; }
-  if(errEl) errEl.textContent = '';
+async function kioskPressPairingKey(key){
+  const errEl=document.getElementById('kiosk-error');
+  if(key==='clear'){kioskCtx.pairingInput='';}
+  else if(key==='back'){kioskCtx.pairingInput=kioskCtx.pairingInput.slice(0,-1);}
+  else if(kioskCtx.pairingInput.length<6){kioskCtx.pairingInput+=key;}
+  if(errEl) errEl.textContent='';
   updateKioskPairingDots();
 
   if(kioskCtx.pairingInput.length===6){
-    if(kioskCtx.pairingInput === kioskPairingCode){
-      setKioskPairing(1);
-      document.getElementById('kiosk-unpair-btn').hidden = false;
+    if(!navigator.onLine){
+      errEl.textContent='É necessária internet apenas para o primeiro emparelhamento.';
+      kioskCtx.pairingInput='';
+      setTimeout(updateKioskPairingDots,150);
+      return;
+    }
+    try{
+      await pairKioskWithServer(kioskCtx.pairingInput);
+      document.getElementById('kiosk-unpair-btn').hidden=false;
       showToast('Dispositivo emparelhado com a instituição.');
       kioskGoTeamSelect();
-    } else {
-      errEl.textContent = 'Código inválido. Tente novamente.';
+    }catch(err){
+      console.warn(err);
+      errEl.textContent='Código de emparelhamento inválido.';
       kioskCtx.pairingInput='';
-      setTimeout(updateKioskPairingDots, 150);
+      setTimeout(updateKioskPairingDots,150);
     }
   }
 }
@@ -8912,60 +10143,97 @@ function updateKioskPinDots(){
 }
 
 async function kioskPressKey(key){
-  const errEl = document.getElementById('kiosk-error');
-  if(key==='clear'){ kioskCtx.pin=''; }
-  else if(key==='back'){ kioskCtx.pin = kioskCtx.pin.slice(0,-1); }
-  else if(kioskCtx.pin.length<4){ kioskCtx.pin += key; }
-  if(errEl) errEl.textContent = '';
+  const errEl=document.getElementById('kiosk-error');
+
+  if(key==='clear'){kioskCtx.pin='';}
+  else if(key==='back'){kioskCtx.pin=kioskCtx.pin.slice(0,-1);}
+  else if(kioskCtx.pin.length<4){kioskCtx.pin+=key;}
+
+  if(errEl) errEl.textContent='';
   updateKioskPinDots();
 
-  if(kioskCtx.pin.length===4){
-    if(currentInstitutionId){
-      const pinToCheck = kioskCtx.pin;
-      try {
-        const { error } = await supabaseClient.rpc('kiosk_register_punch', {
-          p_employee_id: kioskCtx.employee.id,
-          p_pin: pinToCheck,
-          p_type: kioskActionToType[kioskCtx.action],
+  if(kioskCtx.pin.length!==4) return;
+
+  const pinToCheck=kioskCtx.pin;
+  const type=kioskActionToType[kioskCtx.action];
+  const eventId=crypto.randomUUID();
+  const recordedAt=new Date().toISOString();
+
+  if(currentInstitutionId){
+    if(navigator.onLine){
+      try{
+        const {error}=await supabaseClient.rpc('kiosk_register_punch_v2',{
+          p_employee_id:kioskCtx.employee.id,
+          p_pin:pinToCheck,
+          p_type:type,
+          p_device_id:kioskDevice()?.pairing_id||null,
+          p_recorded_at:recordedAt,
+          p_external_event_id:eventId
         });
         if(error) throw error;
-        kioskConfirmPunch();
-      } catch(err){
-        console.warn('Falha no registo de ponto sistema:', err);
-        document.getElementById('kiosk-error').textContent = 'PIN incorreto ou erro no registo.';
-        kioskCtx.pin='';
-        setTimeout(updateKioskPinDots, 150);
+
+        await cacheKioskPinVerifier(kioskCtx.employee.id,pinToCheck);
+        kioskConfirmPunch(false,recordedAt);
+        syncOfflineKioskPunches();
+        return;
+
+      }catch(err){
+        console.warn('Falha no registo online:',err);
+
+        // Se ainda existe internet, tratamos como PIN/rejeição do servidor.
+        if(navigator.onLine){
+          errEl.textContent='PIN incorreto ou registo recusado.';
+          kioskCtx.pin='';
+          setTimeout(updateKioskPinDots,150);
+          return;
+        }
       }
+    }
+
+    // OFFLINE: nunca guardamos o PIN; apenas comparamos com verificador local.
+    const validOffline=await verifyKioskPinOffline(kioskCtx.employee.id,pinToCheck);
+    if(!validOffline){
+      errEl.textContent='Sem internet. Este PIN ainda não foi validado neste terminal online.';
+      kioskCtx.pin='';
+      setTimeout(updateKioskPinDots,150);
       return;
     }
-    if(kioskCtx.pin === kioskCtx.employee.pin){
-      kioskConfirmPunch();
-    } else {
-      errEl.textContent = 'PIN incorreto. Tente novamente.';
-      kioskCtx.pin='';
-      setTimeout(updateKioskPinDots, 150);
-    }
+
+    await queueOfflineKioskPunch(kioskCtx.employee,type,kioskCtx.action);
+    kioskConfirmPunch(true,recordedAt);
+    return;
+  }
+
+  if(kioskCtx.pin===kioskCtx.employee.pin){
+    kioskConfirmPunch(false,recordedAt);
+  }else{
+    errEl.textContent='PIN incorreto. Tente novamente.';
+    kioskCtx.pin='';
+    setTimeout(updateKioskPinDots,150);
   }
 }
 
-function kioskConfirmPunch(){
-  const emp = kioskCtx.employee;
-  if(kioskCtx.action==='entrada') kioskPunchState[emp.id] = 'dentro';
-  else if(kioskCtx.action==='saida') kioskPunchState[emp.id] = 'fora';
-  else if(kioskCtx.action==='pausa-start') kioskPunchState[emp.id] = 'pausa';
-  else if(kioskCtx.action==='pausa-end') kioskPunchState[emp.id] = 'dentro';
+function kioskConfirmPunch(isOffline=false,recordedAt=null){
+  const emp=kioskCtx.employee;
 
-  const now2 = new Date();
-  document.getElementById('kiosk-body').innerHTML = `
+  if(kioskCtx.action==='entrada') kioskPunchState[emp.id]='dentro';
+  else if(kioskCtx.action==='saida') kioskPunchState[emp.id]='fora';
+  else if(kioskCtx.action==='pausa-start') kioskPunchState[emp.id]='pausa';
+  else if(kioskCtx.action==='pausa-end') kioskPunchState[emp.id]='dentro';
+
+  const when=recordedAt?new Date(recordedAt):new Date();
+  document.getElementById('kiosk-body').innerHTML=`
     <div class="kiosk-confirm">
       <div class="kc-check">✓</div>
       <div class="kc-name">${emp.name}</div>
-      <div class="kc-detail">${kioskActionLabel[kioskCtx.action]} registada com sucesso</div>
-      <div class="kc-time">${pad2(now2.getHours())}:${pad2(now2.getMinutes())}</div>
+      <div class="kc-detail">${kioskActionLabel[kioskCtx.action]} ${isOffline?'guardada no dispositivo':'registada com sucesso'}</div>
+      <div class="kc-time">${pad2(when.getHours())}:${pad2(when.getMinutes())}</div>
+      ${isOffline?'<div class="hint-chip" style="margin-top:14px;">Sem internet · será sincronizada automaticamente quando a ligação voltar.</div>':''}
     </div>
   `;
-  document.getElementById('kiosk-exit-btn').style.visibility = 'hidden';
-  setTimeout(kioskGoTeamSelect, 3000);
+  document.getElementById('kiosk-exit-btn').style.visibility='hidden';
+  updateKioskConnectionStatus();
+  setTimeout(kioskGoTeamSelect,3000);
 }
 
 /* ---------------- DASHBOARD NAV / LOGOUT ---------------- */
@@ -9056,6 +10324,219 @@ document.getElementById('tour-skip-btn').addEventListener('click', ()=>endTour(t
 document.getElementById('admin-tour-btn').addEventListener('click', startAdminTour);
 window.addEventListener('resize', ()=>{ if(tourActive) showTourStep(tourIndex); });
 
+
+/* ================= NOTIFICAÇÕES / HISTÓRICO DE ACESSOS / MOBILE DASH ================= */
+let appNotifications=[];
+let accessHistoryEvents=[];
+
+function notificationIcon(n){
+  if(n.severity==='error') return '⚠';
+  if(n.severity==='warning') return '!';
+  if(n.severity==='success') return '✓';
+  return 'ℹ';
+}
+function relativeNotificationTime(iso){
+  const ms=Date.now()-new Date(iso).getTime();
+  const min=Math.max(0,Math.floor(ms/60000));
+  if(min<1) return 'agora';
+  if(min<60) return `${min} min`;
+  const h=Math.floor(min/60);
+  if(h<24) return `${h} h`;
+  const d=Math.floor(h/24);
+  return `${d} d`;
+}
+function updateNotificationBadges(){
+  const unread=appNotifications.filter(n=>!n.read_at).length;
+  ['admin-notification-count','sa-notification-count'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    el.hidden=unread===0;
+    el.textContent=unread>99?'99+':String(unread);
+  });
+  const mobile=document.getElementById('mobile-notification-text');
+  if(mobile) mobile.textContent=unread?`${unread} notificação(ões) por ler`:'Sem notificações novas';
+  const sub=document.getElementById('notification-center-sub');
+  if(sub) sub.textContent=unread?`${unread} por ler`:'Tudo em dia';
+}
+async function loadNotificationCenter(){
+  if(!supabaseClient) return;
+  try{
+    await supabaseClient.rpc('refresh_my_notifications');
+    const {data,error}=await supabaseClient.from('app_notifications')
+      .select('id,type,severity,title,message,target_page,entity_type,entity_id,read_at,created_at')
+      .order('created_at',{ascending:false}).limit(80);
+    if(error) throw error;
+    appNotifications=data||[];
+    renderNotificationCenter();
+    updateNotificationBadges();
+  }catch(err){
+    console.warn('Erro ao carregar notificações:',err);
+  }
+}
+function renderNotificationCenter(){
+  const list=document.getElementById('notification-list');
+  if(!list) return;
+  if(!appNotifications.length){
+    list.innerHTML='<div class="notification-empty"><div style="font-size:28px;margin-bottom:8px;">🔔</div>Não existem notificações.</div>';
+    return;
+  }
+  list.innerHTML=appNotifications.map(n=>`
+    <button class="notification-item ${n.read_at?'':'unread'}" onclick="openAppNotification('${n.id}')">
+      <span class="notification-icon">${notificationIcon(n)}</span>
+      <span>
+        <div class="notification-title">${analyticsEsc(n.title)}</div>
+        <div class="notification-message">${analyticsEsc(n.message)}</div>
+      </span>
+      <span class="notification-time">${relativeNotificationTime(n.created_at)}</span>
+    </button>`).join('');
+}
+function openNotificationCenter(){
+  document.getElementById('notification-center')?.classList.add('open');
+  document.getElementById('notification-overlay')?.classList.add('open');
+  loadNotificationCenter();
+}
+function closeNotificationCenter(){
+  document.getElementById('notification-center')?.classList.remove('open');
+  document.getElementById('notification-overlay')?.classList.remove('open');
+}
+async function openAppNotification(id){
+  const n=appNotifications.find(x=>String(x.id)===String(id));
+  if(!n) return;
+  if(!n.read_at){
+    try{await supabaseClient.rpc('mark_notification_read',{p_notification_id:n.id});}catch(_){}
+    n.read_at=new Date().toISOString();
+    renderNotificationCenter();updateNotificationBadges();
+  }
+  closeNotificationCenter();
+  if(n.target_page){
+    if(document.getElementById('admin-dashboard-screen') && !document.getElementById('admin-dashboard-screen').hidden){
+      if(n.target_page==='historico-acessos') openAdminNavPage('historico-acessos');
+      else if(n.target_page==='licencas') openAdminNavPage('definicoes','licencas');
+      else openAdminNavPage(n.target_page);
+    }else if(document.getElementById('dashboard-screen') && !document.getElementById('dashboard-screen').hidden){
+      const item=document.querySelector(`#dashboard-screen .nav-item[data-nav="${n.target_page}"]`);
+      item?.click();
+    }
+  }
+}
+async function markAllNotificationsRead(){
+  try{
+    await supabaseClient.rpc('mark_all_notifications_read');
+    appNotifications.forEach(n=>n.read_at=n.read_at||new Date().toISOString());
+    renderNotificationCenter();updateNotificationBadges();
+  }catch(err){showToast('Erro ao atualizar notificações: '+(err.message||''),true);}
+}
+function openAdminNavPage(nav,settingsTab=null){
+  const item=document.querySelector(`#admin-dashboard-screen .nav-item[data-nav="${nav}"]`);
+  if(item){item.click();if(nav==='definicoes'&&settingsTab)setTimeout(()=>setAdminSettingsTab(settingsTab),40);}
+}
+function renderMobileDashboardCards(){
+  const src=document.querySelectorAll('#admin-kpi-grid .kpi-card');
+  const dest=document.getElementById('mobile-dashboard-kpis');
+  if(!dest) return;
+  const cards=[...src].slice(0,4);
+  dest.innerHTML=cards.length?cards.map(c=>`
+    <div class="mobile-dashboard-kpi">
+      <div class="m-label">${c.querySelector('.label')?.textContent||''}</div>
+      <div class="m-value">${c.querySelector('.value')?.textContent||'—'}</div>
+      <div class="m-delta">${c.querySelector('.delta')?.textContent||''}</div>
+    </div>`).join(''):'<div class="mobile-dashboard-kpi"><div class="m-label">Dashboard</div><div class="m-value">—</div><div class="m-delta">A carregar</div></div>';
+}
+async function refreshAccessHistoryLicenseVisibility(){
+  const nav=document.getElementById('nav-access-history');
+  if(!nav||!currentInstitutionId) return false;
+  try{
+    const {data,error}=await supabaseClient.rpc('get_hikvision_access_addon_summary',{p_institution_id:currentInstitutionId});
+    if(error) throw error;
+    const s=Array.isArray(data)?(data[0]||{}):(data||{});
+    nav.hidden=!s.enabled;
+    return !!s.enabled;
+  }catch(_){nav.hidden=true;return false;}
+}
+async function renderAccessHistory(){
+  if(!currentInstitutionId) return;
+  const licensed=await refreshAccessHistoryLicenseVisibility();
+  if(!licensed){
+    showToast('O Histórico de Acessos requer a licença do add-on Controlo de Acessos.',true);
+    openAdminNavPage('dashboard');
+    return;
+  }
+
+  const device=document.getElementById('access-history-device')?.value||'';
+  const result=document.getElementById('access-history-result')?.value||'';
+  const date=document.getElementById('access-history-date')?.value||'';
+
+  let q=supabaseClient.from('hikvision_access_events')
+    .select('id,device_id,employee_id,person_name,external_person_no,occurred_at,result,event_type,reason,door_no')
+    .eq('institution_id',currentInstitutionId)
+    .order('occurred_at',{ascending:false}).limit(500);
+
+  if(device) q=q.eq('device_id',device);
+  if(result) q=q.eq('result',result);
+  if(date){
+    const from=new Date(date+'T00:00:00').toISOString();
+    const to=new Date(date+'T23:59:59').toISOString();
+    q=q.gte('occurred_at',from).lte('occurred_at',to);
+  }
+
+  const [eventsRes,devicesRes]=await Promise.all([
+    q,
+    supabaseClient.from('hikvision_devices').select('id,name,device_key').eq('institution_id',currentInstitutionId).eq('purpose','access_control').order('name')
+  ]);
+  if(eventsRes.error) throw eventsRes.error;
+  if(devicesRes.error) throw devicesRes.error;
+
+  accessHistoryEvents=eventsRes.data||[];
+  const devices=devicesRes.data||[];
+  const dmap=Object.fromEntries(devices.map(d=>[String(d.id),d]));
+
+  const sel=document.getElementById('access-history-device');
+  const current=sel.value;
+  sel.innerHTML='<option value="">Todos os terminais</option>'+devices.map(d=>`<option value="${d.id}">${analyticsEsc(d.name)}</option>`).join('');
+  sel.value=current;
+
+  const authorized=accessHistoryEvents.filter(e=>e.result==='authorized').length;
+  const denied=accessHistoryEvents.filter(e=>e.result==='denied').length;
+  const people=new Set(accessHistoryEvents.map(e=>e.employee_id||e.external_person_no||e.person_name).filter(Boolean)).size;
+  document.getElementById('access-history-kpis').innerHTML=`
+    <div class="kpi-card"><div class="label">Eventos</div><div class="value">${accessHistoryEvents.length}</div><div class="delta flat">no filtro atual</div></div>
+    <div class="kpi-card"><div class="label">Autorizados</div><div class="value">${authorized}</div><div class="delta up">entradas válidas</div></div>
+    <div class="kpi-card"><div class="label">Recusados</div><div class="value">${denied}</div><div class="delta ${denied?'down':'flat'}">acessos negados</div></div>
+    <div class="kpi-card"><div class="label">Pessoas</div><div class="value">${people}</div><div class="delta flat">identificadas</div></div>`;
+
+  const body=document.getElementById('access-history-body');
+  body.innerHTML=accessHistoryEvents.length?accessHistoryEvents.map(e=>{
+    const dev=dmap[String(e.device_id)];
+    const resultLabel=e.result==='authorized'?'Autorizado':e.result==='denied'?'Recusado':'Evento';
+    const cls=e.result==='authorized'?'active':e.result==='denied'?'expired':'demo';
+    return `<tr>
+      <td>${new Date(e.occurred_at).toLocaleString('pt-PT',{dateStyle:'short',timeStyle:'short'})}</td>
+      <td><strong>${analyticsEsc(e.person_name||e.external_person_no||'Não identificado')}</strong></td>
+      <td>${analyticsEsc(dev?.name||'—')}</td>
+      <td>${e.door_no??'—'}</td>
+      <td><span class="badge ${cls}">${resultLabel}</span></td>
+      <td>${analyticsEsc(e.reason||e.event_type||'—')}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="6" style="padding:30px;text-align:center;color:var(--ink-faint);">Ainda não existem eventos importados dos terminais.</td></tr>';
+}
+async function syncAccessHistoryFromDevices(){
+  const btn=document.getElementById('access-history-sync-btn');
+  const old=btn?.textContent||'Atualizar dos terminais';
+  if(btn){btn.disabled=true;btn.textContent='A importar…';}
+  try{
+    const {data,error}=await supabaseClient.functions.invoke('sync-hikvision-access-events',{body:{institution_id:currentInstitutionId}});
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível importar os eventos.');
+    showToast(`${data.imported||0} evento(s) processado(s) dos terminais.`);
+    await renderAccessHistory();
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao atualizar histórico: '+(err.message||''),true);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=old;}
+  }
+}
+
 function wireSidebarNav(scopeSelector, pages){
   document.querySelectorAll(`${scopeSelector} .nav-item`).forEach(item=>{
     item.addEventListener('click', ()=>{
@@ -9110,6 +10591,7 @@ wireSidebarNav('#admin-dashboard-screen', {
   relatorios:{id:'page-relatorios', render:renderRelatorios},
   trocas:{id:'page-trocas', render:renderAdminShiftSwaps},
   'banco-horas':{id:'page-banco-horas', render:renderTimeBank},
+  'historico-acessos':{id:'page-historico-acessos', render:renderAccessHistory},
   definicoes:{id:'page-definicoes', render:renderAdminDefinicoes},
 });
 
@@ -9119,90 +10601,169 @@ wireSidebarNav('#admin-dashboard-screen', {
 let hikAccessAddon = {enabled:false,unit_price_cents:100,active_people:0,monthly_total_cents:0};
 let hikAccessDevices = [];
 let hikAccessPermissions = [];
+let hikAccessDeviceGroups = [];
+let hikAccessGroupMembers = [];
+let hikAccessEditingDeviceId = null;
+let hikAccessEditingPersonTemplateId = null;
+let hikAccessSyncQueue = [];
 
 function euroCents(c){ return new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(c||0)/100); }
 
 async function loadAccessControlData(){
   if(!currentInstitutionId || !supabaseClient) return;
 
-  const [sumRes, devRes, permRes] = await Promise.all([
+  const [sumRes,devRes,permRes,groupRes,memberRes,queueRes]=await Promise.all([
     supabaseClient.rpc('get_hikvision_access_addon_summary',{p_institution_id:currentInstitutionId}),
     supabaseClient.from('hikvision_devices').select('*').eq('institution_id',currentInstitutionId).eq('purpose','access_control').order('created_at'),
     supabaseClient.from('hikvision_access_permissions')
-      .select('id,device_id,employee_id,person_name,valid_from,valid_until,access_start_time,access_end_time,enabled,sync_status,last_sync_at,last_sync_error')
-      .eq('institution_id',currentInstitutionId).order('created_at',{ascending:false})
+      .select('id,device_id,employee_id,person_name,external_person_no,valid_from,valid_until,access_start_time,access_end_time,monday,tuesday,wednesday,thursday,friday,saturday,sunday,enabled,sync_status,last_sync_at,last_sync_error')
+      .eq('institution_id',currentInstitutionId).order('created_at',{ascending:false}),
+    supabaseClient.from('hikvision_access_device_groups').select('*').eq('institution_id',currentInstitutionId).order('name'),
+    supabaseClient.from('hikvision_access_device_group_members').select('group_id,device_id'),
+    supabaseClient.from('hikvision_access_sync_queue')
+      .select('id,permission_id,device_id,action,status,attempts,next_attempt_at,last_error,updated_at')
+      .eq('institution_id',currentInstitutionId)
+      .order('updated_at',{ascending:false})
   ]);
 
-  if(sumRes.error) throw sumRes.error;
-  if(devRes.error) throw devRes.error;
-  if(permRes.error) throw permRes.error;
+  for(const r of [sumRes,devRes,permRes,groupRes,memberRes,queueRes]) if(r.error) throw r.error;
 
-  const s = Array.isArray(sumRes.data) ? (sumRes.data[0]||{}) : (sumRes.data||{});
-  hikAccessAddon = {
+  const s=Array.isArray(sumRes.data)?(sumRes.data[0]||{}):(sumRes.data||{});
+  hikAccessAddon={
     enabled:!!s.enabled,
     unit_price_cents:Number(s.unit_price_cents||100),
+    licensed_units:Number(s.licensed_units||0),
     active_people:Number(s.active_people||0),
+    available_units:Number(s.available_units||0),
     monthly_total_cents:Number(s.monthly_total_cents||0)
   };
-  hikAccessDevices = devRes.data || [];
-  hikAccessPermissions = permRes.data || [];
+  hikAccessDevices=devRes.data||[];
+  hikAccessPermissions=permRes.data||[];
+  hikAccessDeviceGroups=groupRes.data||[];
+  hikAccessSyncQueue=queueRes.data||[];
+  const validGroupIds=new Set(hikAccessDeviceGroups.map(g=>String(g.id)));
+  hikAccessGroupMembers=(memberRes.data||[]).filter(m=>validGroupIds.has(String(m.group_id)));
 }
 
 function fillAccessControlUI(){
   const badge=document.getElementById('access-addon-badge');
-  const btn=document.getElementById('access-addon-toggle-btn');
+  const managed=document.getElementById('access-addon-managed-badge');
   const content=document.getElementById('access-addon-content');
 
-  badge.textContent = hikAccessAddon.enabled ? 'Add-on ativo' : 'Add-on inativo';
-  badge.className = `badge ${hikAccessAddon.enabled?'active':'suspended'}`;
-  btn.textContent = hikAccessAddon.enabled ? 'Desativar add-on' : 'Ativar add-on';
-  content.style.opacity = hikAccessAddon.enabled ? '1' : '.5';
-  content.style.pointerEvents = hikAccessAddon.enabled ? 'auto' : 'none';
+  badge.textContent=hikAccessAddon.enabled?'Add-on ativo':'Add-on inativo';
+  badge.className=`badge ${hikAccessAddon.enabled?'active':'suspended'}`;
+  if(managed){
+    managed.textContent=hikAccessAddon.enabled?`${hikAccessAddon.licensed_units} lugares contratados`:'Add-on não contratado';
+    managed.className=`badge ${hikAccessAddon.enabled?'active':'demo'}`;
+  }
+  content.style.opacity=hikAccessAddon.enabled?'1':'.5';
+  content.style.pointerEvents=hikAccessAddon.enabled?'auto':'none';
 
-  document.getElementById('access-addon-kpis').innerHTML = `
-    <div class="kpi-card"><div class="label">Preço unitário</div><div class="value">${euroCents(hikAccessAddon.unit_price_cents)}</div><div class="delta flat">por pessoa / mês</div></div>
-    <div class="kpi-card"><div class="label">Pessoas ativas</div><div class="value">${hikAccessAddon.active_people}</div><div class="delta flat">com acesso válido</div></div>
-    <div class="kpi-card"><div class="label">Total mensal</div><div class="value">${euroCents(hikAccessAddon.monthly_total_cents)}</div><div class="delta flat">add-on acessos</div></div>
-  `;
+  const autoSyncEl=document.getElementById('access-auto-sync-status');
+  if(autoSyncEl){
+    const pending=hikAccessSyncQueue.filter(q=>q.status==='pending'||q.status==='processing').length;
+    const errors=hikAccessSyncQueue.filter(q=>q.status==='error').length;
+    const nextError=hikAccessSyncQueue.find(q=>q.status==='error');
+    autoSyncEl.innerHTML=`<strong>Sincronização automática ativa</strong> · o sistema verifica alterações a cada minuto. ${pending?`${pending} pendente(s)`: 'sem alterações pendentes'}${errors?` · <span style="color:var(--red);">${errors} em retry automático</span>`:''}${nextError?.last_error?`<div style="margin-top:5px;font-size:11px;">Último erro: ${hikEsc(nextError.last_error)}</div>`:''}`;
+  }
 
-  const dsel=document.getElementById('ac-person-device');
-  dsel.innerHTML = hikAccessDevices.length ? hikAccessDevices.map(d=>`<option value="${d.id}">${hikEsc(d.name)} · ${hikEsc(d.host)}:${d.port}</option>`).join('') : '<option value="">Guarde primeiro um terminal</option>';
-
-  const esel=document.getElementById('ac-person-employee');
-  esel.innerHTML = '<option value="">— Visitante / externo —</option>' + employees.map(e=>`<option value="${e.id}">${hikEsc(e.name)}</option>`).join('');
+  document.getElementById('access-addon-kpis').innerHTML=`
+    <div class="kpi-card"><div class="label">Lugares contratados</div><div class="value">${hikAccessAddon.licensed_units}</div><div class="delta flat">${hikAccessAddon.active_people} utilizados · ${hikAccessAddon.available_units} livres</div></div>
+    <div class="kpi-card"><div class="label">Terminais</div><div class="value">${hikAccessDevices.length}</div><div class="delta flat">${hikAccessDevices.filter(d=>d.enabled).length} ativos</div></div>
+    <div class="kpi-card"><div class="label">Total mensal</div><div class="value">${euroCents(hikAccessAddon.monthly_total_cents)}</div><div class="delta flat">por lugares contratados</div></div>`;
 
   const deviceById=Object.fromEntries(hikAccessDevices.map(d=>[String(d.id),d]));
-  const body=document.getElementById('access-permissions-body');
-  body.innerHTML = hikAccessPermissions.length ? hikAccessPermissions.map(p=>`
-    <tr>
-      <td><strong>${hikEsc(p.person_name)}</strong></td>
-      <td>${hikEsc(deviceById[String(p.device_id)]?.name || '—')}</td>
-      <td>${new Date(p.valid_from).toLocaleDateString('pt-PT')} → ${new Date(p.valid_until).toLocaleDateString('pt-PT')}</td>
-      <td>${String(p.access_start_time||'').slice(0,5)}–${String(p.access_end_time||'').slice(0,5)}</td>
-      <td>
-        <span class="badge ${
-          p.sync_status==='synced' ? 'active' :
-          p.sync_status==='synced_partial' ? 'demo' :
-          p.sync_status==='error' ? 'expired' : 'demo'
-        }">${
-          p.sync_status==='synced' ? 'Sincronizado' :
-          p.sync_status==='synced_partial' ? 'Parcial' :
-          p.sync_status==='error' ? 'Erro' : 'Pendente'
-        }</span>
-        ${p.last_sync_error ? `<div style="font-size:10.5px;color:var(--ink-faint);margin-top:4px;max-width:220px;">${hikEsc(p.last_sync_error)}</div>` : ''}
-      </td>
-      <td><button class="btn-toggle" onclick="syncAccessPermission('${p.id}', this)">Sincronizar</button></td>
-    </tr>`).join('') : '<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--ink-faint);">Ainda não existem permissões de acesso.</td></tr>';
+  const permissionCounts={};
+  hikAccessPermissions.filter(p=>p.enabled).forEach(p=>permissionCounts[String(p.device_id)]=(permissionCounts[String(p.device_id)]||0)+1);
 
-  const first=hikAccessDevices[0];
-  document.getElementById('ac-hik-name').value=first?.name||'';
-  document.getElementById('ac-hik-device-key').value=first?.device_key||'access-1';
-  document.getElementById('ac-hik-protocol').value=first?.protocol||'http';
-  document.getElementById('ac-hik-host').value=first?.host||'';
-  document.getElementById('ac-hik-port').value=first?.port||80;
-  document.getElementById('ac-hik-username').value=first?.username||'';
-  document.getElementById('ac-hik-password').value='';
-  document.getElementById('ac-hik-enabled').checked=first?.enabled!==false;
+  const devicesBody=document.getElementById('access-devices-body');
+  devicesBody.innerHTML=hikAccessDevices.length?hikAccessDevices.map(d=>`
+    <tr>
+      <td><strong>${hikEsc(d.name)}</strong><div style="font-size:11px;color:var(--ink-faint);">${hikEsc(d.device_key)}</div></td>
+      <td>${hikEsc(d.protocol)}://${hikEsc(d.host)}:${d.port}</td>
+      <td><span class="badge ${d.status==='online'?'active':d.status==='error'?'expired':'demo'}">${d.status==='online'?'Online':d.status==='offline'?'Offline':d.status==='error'?'Erro':'A aguardar'}</span></td>
+      <td>${permissionCounts[String(d.id)]||0}</td>
+      <td><button class="btn-toggle" onclick="editAccessDevice('${d.id}')">Editar</button></td>
+    </tr>`).join(''):'<tr><td colspan="5" style="padding:22px;text-align:center;color:var(--ink-faint);">Ainda não existem terminais de acessos.</td></tr>';
+
+  const devWrap=document.getElementById('ac-person-devices');
+  devWrap.innerHTML=hikAccessDevices.length?hikAccessDevices.filter(d=>d.enabled).map((d,i)=>`
+    <label style="display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid var(--border);border-radius:9px;">
+      <input type="checkbox" class="ac-person-device-check" value="${d.id}" style="width:auto;">
+      <span style="min-width:0;"><strong>${hikEsc(d.name)}</strong><span style="display:block;font-size:11px;color:var(--ink-faint);">${hikEsc(d.device_key)} · ${hikEsc(d.host)}:${d.port}</span></span>
+    </label>`).join(''):'<div class="hint-chip">Guarda primeiro pelo menos um terminal ativo.</div>';
+
+  const groupSel=document.getElementById('ac-person-device-group');
+  groupSel.innerHTML='<option value="">— Escolher grupo —</option>'+hikAccessDeviceGroups.map(g=>`<option value="${g.id}">${hikEsc(g.name)}</option>`).join('');
+
+  const groupsWrap=document.getElementById('access-device-groups');
+  groupsWrap.innerHTML=hikAccessDeviceGroups.length?hikAccessDeviceGroups.map(g=>{
+    const memberIds=hikAccessGroupMembers.filter(m=>String(m.group_id)===String(g.id)).map(m=>String(m.device_id));
+    return `<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px;">
+        <strong>${hikEsc(g.name)}</strong>
+        <button type="button" class="btn-toggle" onclick="deleteAccessDeviceGroup('${g.id}')">Eliminar</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">${hikAccessDevices.map(d=>`
+        <label style="font-size:12px;"><input type="checkbox" style="width:auto;" ${memberIds.includes(String(d.id))?'checked':''} onchange="toggleAccessDeviceGroupMember('${g.id}','${d.id}',this.checked)"> ${hikEsc(d.name)}</label>`).join('')||'<span class="sub">Sem terminais.</span>'}</div>
+    </div>`;
+  }).join(''):'<div class="sub">Ainda não existem grupos de terminais.</div>';
+
+  const esel=document.getElementById('ac-person-employee');
+  esel.innerHTML='<option value="">— Visitante / externo —</option>'+employees.map(e=>`<option value="${e.id}">${hikEsc(e.name)}</option>`).join('');
+
+  // Uma linha por pessoa, mesmo com várias portas.
+  const personMap=new Map();
+  for(const p of hikAccessPermissions){
+    const key=p.employee_id?`e:${p.employee_id}`:`x:${String(p.external_person_no||p.person_name||'').toLowerCase()}`;
+    if(!personMap.has(key)) personMap.set(key,{key,permissions:[],name:p.person_name,employee_id:p.employee_id,external_person_no:p.external_person_no});
+    personMap.get(key).permissions.push(p);
+  }
+
+  const people=[...personMap.values()];
+  const body=document.getElementById('access-permissions-body');
+  body.innerHTML=people.length?people.map(person=>{
+    const active=person.permissions.filter(p=>p.enabled);
+    const template=active[0]||person.permissions[0];
+    const devices=active.map(p=>deviceById[String(p.device_id)]).filter(Boolean);
+    const statuses=active.map(p=>p.sync_status);
+    const hasError=statuses.includes('error');
+    const allSynced=active.length>0&&statuses.every(s=>s==='synced'||s==='synced_partial');
+    const statusLabel=hasError?'Erro':allSynced?'Sincronizado':'Pendente';
+    const statusClass=hasError?'expired':allSynced?'active':'demo';
+    const uniqueNames=[...new Set(devices.map(d=>d.name))];
+
+    return `<tr>
+      <td><strong>${hikEsc(person.name)}</strong><div style="font-size:11px;color:var(--ink-faint);">${active.length} porta(s)</div></td>
+      <td>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+          ${uniqueNames.length?uniqueNames.map(n=>`<span class="badge demo">${hikEsc(n)}</span>`).join(''):'<span style="color:var(--ink-faint);">Sem portas ativas</span>'}
+        </div>
+      </td>
+      <td>${template?`${new Date(template.valid_from).toLocaleDateString('pt-PT')} → ${new Date(template.valid_until).toLocaleDateString('pt-PT')}`:'—'}</td>
+      <td>${template?`${String(template.access_start_time||'').slice(0,5)}–${String(template.access_end_time||'').slice(0,5)}`:'—'}</td>
+      <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+      <td><div class="row-actions" style="flex-wrap:wrap;">
+        <button class="btn-toggle" onclick="editAccessPersonDoors('${template?.id||''}')">Editar portas</button>
+        ${active.length?`<button class="btn-toggle" onclick="syncAccessPerson('${template?.id||''}',this)">Sincronizar</button>`:''}
+      </div></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--ink-faint);">Ainda não existem pessoas autorizadas.</td></tr>';
+
+  if(hikAccessEditingDeviceId){
+    const dev=hikAccessDevices.find(d=>String(d.id)===String(hikAccessEditingDeviceId));
+    if(dev) fillAccessDeviceEditor(dev);
+    else newAccessDevice();
+  }else{
+    newAccessDevice(false);
+  }
+
+  // Se estamos a editar uma pessoa, restaurar a seleção após rerender.
+  if(hikAccessEditingPersonTemplateId){
+    const template=hikAccessPermissions.find(p=>String(p.id)===String(hikAccessEditingPersonTemplateId));
+    if(template) loadAccessPersonEditor(template);
+    else cancelAccessPersonEdit();
+  }
 }
 
 async function renderTerminalAcessos(){
@@ -9235,16 +10796,104 @@ async function toggleAccessAddon(){
   }catch(err){showToast('Erro no add-on: '+(err.message||''),true);}
 }
 
+
+function fillAccessDeviceEditor(dev){
+  hikAccessEditingDeviceId=dev?.id||null;
+  document.getElementById('ac-device-editor-title').textContent=dev?'Editar terminal':'Novo equipamento de controlo de acessos';
+  document.getElementById('ac-hik-name').value=dev?.name||'';
+  document.getElementById('ac-hik-device-key').value=dev?.device_key||`access-${hikAccessDevices.length+1}`;
+  document.getElementById('ac-hik-protocol').value=dev?.protocol||'http';
+  document.getElementById('ac-hik-host').value=dev?.host||'';
+  document.getElementById('ac-hik-port').value=dev?.port||80;
+  document.getElementById('ac-hik-username').value=dev?.username||'';
+  document.getElementById('ac-hik-password').value='';
+  document.getElementById('ac-hik-enabled').checked=dev?dev.enabled!==false:true;
+  document.getElementById('ac-hik-cancel-edit-btn').hidden=!dev;
+}
+function newAccessDevice(scroll=true){
+  hikAccessEditingDeviceId=null;
+  fillAccessDeviceEditor(null);
+  if(scroll) document.getElementById('ac-device-editor-title')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function editAccessDevice(id){
+  const dev=hikAccessDevices.find(d=>String(d.id)===String(id));
+  if(!dev) return;
+  fillAccessDeviceEditor(dev);
+  document.getElementById('ac-device-editor-title')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+async function createAccessDeviceGroup(){
+  const name=document.getElementById('ac-group-name').value.trim();
+  if(!name){showToast('Indica o nome do grupo.',true);return;}
+  try{
+    const {error}=await supabaseClient.from('hikvision_access_device_groups').insert({institution_id:currentInstitutionId,name});
+    if(error) throw error;
+    document.getElementById('ac-group-name').value='';
+    await renderTerminalAcessos();
+    showToast('Grupo criado.');
+  }catch(err){showToast('Erro ao criar grupo: '+(err.message||''),true);}
+}
+async function toggleAccessDeviceGroupMember(groupId,deviceId,checked){
+  try{
+    if(checked){
+      const {error}=await supabaseClient.from('hikvision_access_device_group_members').upsert({group_id:groupId,device_id:deviceId});
+      if(error) throw error;
+    }else{
+      const {error}=await supabaseClient.from('hikvision_access_device_group_members').delete().eq('group_id',groupId).eq('device_id',deviceId);
+      if(error) throw error;
+    }
+    await loadAccessControlData();
+  }catch(err){showToast('Erro ao atualizar grupo: '+(err.message||''),true);}
+}
+async function deleteAccessDeviceGroup(groupId){
+  if(!confirm('Eliminar este grupo de terminais?')) return;
+  try{
+    const {error}=await supabaseClient.from('hikvision_access_device_groups').delete().eq('id',groupId);
+    if(error) throw error;
+    await renderTerminalAcessos();
+    showToast('Grupo eliminado.');
+  }catch(err){showToast('Erro ao eliminar grupo: '+(err.message||''),true);}
+}
+function selectAccessDeviceGroup(groupId){
+  if(!groupId) return;
+  const ids=new Set(hikAccessGroupMembers.filter(m=>String(m.group_id)===String(groupId)).map(m=>String(m.device_id)));
+  document.querySelectorAll('.ac-person-device-check').forEach(c=>c.checked=ids.has(String(c.value)));
+}
+async function syncAllAccessPermissions(button){
+  const list=hikAccessPermissions.filter(p=>p.enabled);
+  if(!list.length){showToast('Não existem permissões para sincronizar.');return;}
+  const old=button?.textContent||'Sincronizar tudo';
+  if(button){button.disabled=true;button.textContent='A sincronizar…';}
+  let ok=0,fail=0;
+  for(const p of list){
+    try{
+      const {data,error}=await supabaseClient.functions.invoke('sync-hikvision-access',{body:{permission_id:p.id}});
+      if(error||!data?.ok) throw error||new Error(data?.error||'Falhou');
+      ok++;
+    }catch(_){fail++;}
+  }
+  await renderTerminalAcessos();
+  if(fail) showToast(`${ok} sincronizada(s); ${fail} com erro.`,true);
+  else showToast(`${ok} permissão(ões) sincronizada(s).`);
+  if(button){button.disabled=false;button.textContent=old;}
+}
+
 async function saveAccessDevice(){
-  if(!hikAccessAddon.enabled){showToast('Ativa primeiro o add-on.',true);return;}
-  const existing=hikAccessDevices[0]||null;
+  if(!hikAccessAddon.enabled){showToast('O add-on de Controlo de Acessos não está ativo.',true);return;}
+
+  const existing=hikAccessEditingDeviceId
+    ? hikAccessDevices.find(d=>String(d.id)===String(hikAccessEditingDeviceId))
+    : null;
   const password=document.getElementById('ac-hik-password').value;
-  if(!existing && !password){showToast('Indica a password do terminal.',true);return;}
+
+  if(!existing && !password){
+    showToast('Indica a password do novo terminal.',true);
+    return;
+  }
 
   const body={
     device_id:existing?.id||null,
     institution_id:currentInstitutionId,
-    device_key:document.getElementById('ac-hik-device-key').value.trim()||'access-1',
+    device_key:document.getElementById('ac-hik-device-key').value.trim()||`access-${hikAccessDevices.length+1}`,
     name:document.getElementById('ac-hik-name').value.trim()||'Terminal de Acessos',
     protocol:document.getElementById('ac-hik-protocol').value,
     host:document.getElementById('ac-hik-host').value.trim(),
@@ -9253,15 +10902,26 @@ async function saveAccessDevice(){
     password:password||null,
     enabled:document.getElementById('ac-hik-enabled').checked
   };
+
   if(!body.host){showToast('Indica o Host/DNS do terminal.',true);return;}
+
   try{
     const {data,error}=await supabaseClient.functions.invoke('save-hikvision-device',{body});
     if(error) throw error;
     if(!data?.ok) throw new Error(data?.error||'Não foi possível guardar o terminal.');
-    await supabaseClient.from('hikvision_devices').update({purpose:'access_control'}).eq('id',data.device.id);
+
+    const {error:purposeError}=await supabaseClient.from('hikvision_devices')
+      .update({purpose:'access_control'})
+      .eq('id',data.device.id)
+      .eq('institution_id',currentInstitutionId);
+    if(purposeError) throw purposeError;
+
+    hikAccessEditingDeviceId=null;
     await renderTerminalAcessos();
-    showToast('Terminal de acessos guardado.');
-  }catch(err){showToast('Erro ao guardar terminal: '+(err.message||''),true);}
+    showToast(existing?'Terminal atualizado.':'Novo terminal adicionado.');
+  }catch(err){
+    showToast('Erro ao guardar terminal: '+(err.message||''),true);
+  }
 }
 
 async function syncAccessPermission(permissionId, button){
@@ -9304,46 +10964,183 @@ async function syncAccessPermission(permissionId, button){
   }
 }
 
+
+function accessPersonKeyFromPermission(p){
+  return p?.employee_id?`e:${p.employee_id}`:`x:${String(p?.external_person_no||p?.person_name||'').toLowerCase()}`;
+}
+function personPermissionsFromTemplate(templateId){
+  const t=hikAccessPermissions.find(p=>String(p.id)===String(templateId));
+  if(!t) return [];
+  const key=accessPersonKeyFromPermission(t);
+  return hikAccessPermissions.filter(p=>accessPersonKeyFromPermission(p)===key);
+}
+function loadAccessPersonEditor(template){
+  const perms=personPermissionsFromTemplate(template.id);
+  const activeDeviceIds=new Set(perms.filter(p=>p.enabled).map(p=>String(p.device_id)));
+
+  hikAccessEditingPersonTemplateId=template.id;
+  document.getElementById('ac-person-employee').value=template.employee_id||'';
+  document.getElementById('ac-person-employee').disabled=true;
+  document.getElementById('ac-person-name').value=template.person_name||'';
+  document.getElementById('ac-person-name').disabled=true;
+  document.getElementById('ac-person-pin').value='';
+  document.getElementById('ac-person-pin').placeholder='Não é necessário para alterar portas';
+  document.getElementById('ac-person-pin').disabled=true;
+
+  document.querySelectorAll('.ac-person-device-check').forEach(c=>{
+    c.checked=activeDeviceIds.has(String(c.value));
+  });
+
+  const state=document.getElementById('ac-person-edit-state');
+  state.hidden=false;
+  state.innerHTML=`A editar portas de <strong>${hikEsc(template.person_name)}</strong>. Marca apenas as portas onde esta pessoa deve poder entrar.`;
+
+  document.getElementById('ac-person-edit-cancel-btn').hidden=false;
+  document.getElementById('ac-permission-save-btn').textContent='Guardar portas';
+
+  document.getElementById('ac-person-devices')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function editAccessPersonDoors(templateId){
+  const template=hikAccessPermissions.find(p=>String(p.id)===String(templateId));
+  if(!template) return;
+  loadAccessPersonEditor(template);
+}
+function cancelAccessPersonEdit(){
+  hikAccessEditingPersonTemplateId=null;
+  const emp=document.getElementById('ac-person-employee');
+  const name=document.getElementById('ac-person-name');
+  const pin=document.getElementById('ac-person-pin');
+  if(emp){emp.disabled=false;emp.value='';}
+  if(name){name.disabled=false;name.value='';}
+  if(pin){pin.disabled=false;pin.value='';pin.placeholder='4 a 12 dígitos';}
+  document.querySelectorAll('.ac-person-device-check').forEach(c=>c.checked=false);
+  const state=document.getElementById('ac-person-edit-state');
+  if(state){state.hidden=true;state.innerHTML='';}
+  document.getElementById('ac-person-edit-cancel-btn').hidden=true;
+  document.getElementById('ac-permission-save-btn').textContent='Criar permissão';
+}
+function selectAllAccessDevices(value){
+  document.querySelectorAll('.ac-person-device-check').forEach(c=>c.checked=!!value);
+}
+async function syncAccessPerson(templateId,button){
+  const perms=personPermissionsFromTemplate(templateId).filter(p=>p.enabled);
+  const old=button?.textContent||'Sincronizar';
+  if(button){button.disabled=true;button.textContent='A sincronizar…';}
+  let ok=0,fail=0;
+  for(const p of perms){
+    try{
+      const {data,error}=await supabaseClient.functions.invoke('sync-hikvision-access',{body:{permission_id:p.id}});
+      if(error||!data?.ok) throw error||new Error(data?.error||'Falhou');
+      ok++;
+    }catch(_){fail++;}
+  }
+  await renderTerminalAcessos();
+  if(fail) showToast(`${ok} porta(s) sincronizada(s), ${fail} com erro.`,true);
+  else showToast(`${ok} porta(s) sincronizada(s).`);
+  if(button){button.disabled=false;button.textContent=old;}
+}
+async function saveEditedAccessPersonDoors(){
+  const selected=[...document.querySelectorAll('.ac-person-device-check:checked')].map(c=>c.value);
+  if(!selected.length){
+    showToast('Seleciona pelo menos uma porta. Para retirar totalmente o acesso, desativa a pessoa através da gestão de acessos.',true);
+    return;
+  }
+
+  const btn=document.getElementById('ac-permission-save-btn');
+  const old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='A guardar…';
+
+  try{
+    const {data,error}=await supabaseClient.rpc('set_access_person_devices',{
+      p_template_permission_id:hikAccessEditingPersonTemplateId,
+      p_device_ids:selected
+    });
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível atualizar as portas.');
+
+    cancelAccessPersonEdit();
+    await renderTerminalAcessos();
+    showToast('Portas atualizadas. A sincronização com os terminais será feita automaticamente.');
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao atualizar portas: '+(err.message||''),true);
+  }finally{
+    btn.disabled=false;
+    btn.textContent=hikAccessEditingPersonTemplateId?'Guardar portas':'Criar permissão';
+  }
+}
+
 async function saveAccessPermission(){
-  if(!hikAccessAddon.enabled){showToast('Ativa primeiro o add-on.',true);return;}
+  if(hikAccessEditingPersonTemplateId){
+    await saveEditedAccessPersonDoors();
+    return;
+  }
+
+  if(!hikAccessAddon.enabled){
+    showToast('O add-on de Controlo de Acessos não está ativo.',true);
+    return;
+  }
+
   const employeeId=document.getElementById('ac-person-employee').value||null;
   const emp=employees.find(e=>String(e.id)===String(employeeId));
-  const personName=(document.getElementById('ac-person-name').value.trim() || emp?.name || '');
-  const deviceId=document.getElementById('ac-person-device').value;
+  const personName=(document.getElementById('ac-person-name').value.trim()||emp?.name||'');
+  const deviceIds=[...document.querySelectorAll('.ac-person-device-check:checked')].map(c=>c.value);
   const pin=document.getElementById('ac-person-pin').value.trim();
   const validFrom=document.getElementById('ac-valid-from').value;
   const validUntil=document.getElementById('ac-valid-until').value;
-  if(!personName||!deviceId||!pin||!validFrom||!validUntil){showToast('Preenche pessoa, terminal, PIN e validade.',true);return;}
 
-  const days={}; document.querySelectorAll('.ac-day').forEach(c=>days[c.dataset.day]=c.checked);
+  if(!personName||!deviceIds.length||!pin||!validFrom||!validUntil){
+    showToast('Preenche pessoa, seleciona pelo menos uma porta, PIN e validade.',true);
+    return;
+  }
+
+  const days={};
+  document.querySelectorAll('.ac-day').forEach(c=>days[c.dataset.day]=c.checked);
+
+  const created=[];
   try{
-    const {data,error}=await supabaseClient.functions.invoke('save-hikvision-access-permission',{body:{
-      institution_id:currentInstitutionId,device_id:deviceId,employee_id:employeeId,person_name:personName,pin,
-      valid_from:new Date(validFrom).toISOString(),valid_until:new Date(validUntil).toISOString(),
-      access_start_time:document.getElementById('ac-time-from').value,
-      access_end_time:document.getElementById('ac-time-until').value,
-      ...days
-    }});
-    if(error) throw error;
-    if(!data?.ok) throw new Error(data?.error||'Não foi possível criar a permissão.');
-    document.getElementById('ac-person-pin').value='';
-    showToast('Permissão criada. A sincronizar com o terminal…');
-    try{
-      const syncRes = await supabaseClient.functions.invoke(
-        'sync-hikvision-access',
-        {body:{permission_id:data.permission.id}}
-      );
-      if(syncRes.error) throw syncRes.error;
-      if(!syncRes.data?.ok) throw new Error(syncRes.data?.message||syncRes.data?.error||'Sincronização recusada.');
-      showToast(syncRes.data.message || 'Permissão sincronizada.');
-    }catch(syncErr){
-      console.error(syncErr);
-      showToast('Permissão criada, mas a sincronização falhou: '+(syncErr.message||''),true);
+    for(const deviceId of deviceIds){
+      const {data,error}=await supabaseClient.functions.invoke('save-hikvision-access-permission',{body:{
+        institution_id:currentInstitutionId,
+        device_id:deviceId,
+        employee_id:employeeId,
+        person_name:personName,
+        pin,
+        valid_from:new Date(validFrom).toISOString(),
+        valid_until:new Date(validUntil).toISOString(),
+        access_start_time:document.getElementById('ac-time-from').value,
+        access_end_time:document.getElementById('ac-time-until').value,
+        ...days
+      }});
+      if(error) throw error;
+      if(!data?.ok) throw new Error(data?.error||'Não foi possível criar a permissão.');
+      created.push(data.permission);
     }
+
+    document.getElementById('ac-person-pin').value='';
     await renderTerminalAcessos();
-  }catch(err){showToast('Erro ao criar permissão: '+(err.message||''),true);}
+    showToast(`Acesso guardado em ${created.length} porta(s). A sincronização HIKVISION é automática.`);
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao criar permissões: '+(err.message||''),true);
+    await renderTerminalAcessos();
+  }
 }
 
+
+
+
+document.getElementById('ac-select-all-devices')?.addEventListener('click',()=>selectAllAccessDevices(true));
+document.getElementById('ac-clear-all-devices')?.addEventListener('click',()=>selectAllAccessDevices(false));
+document.getElementById('ac-person-edit-cancel-btn')?.addEventListener('click',cancelAccessPersonEdit);
+
+document.getElementById('ac-new-device-btn')?.addEventListener('click',()=>newAccessDevice(true));
+document.getElementById('ac-hik-cancel-edit-btn')?.addEventListener('click',()=>newAccessDevice(false));
+document.getElementById('ac-group-save-btn')?.addEventListener('click',createAccessDeviceGroup);
+document.getElementById('ac-person-device-group')?.addEventListener('change',e=>selectAccessDeviceGroup(e.target.value));
+document.getElementById('ac-sync-all-btn')?.addEventListener('click',e=>syncAllAccessPermissions(e.currentTarget));
+document.getElementById('ac-sync-all-permissions-btn')?.addEventListener('click',e=>syncAllAccessPermissions(e.currentTarget));
 
 /* ================= HIKVISION: CONFIGURAÇÃO ================= */
 let hikvisionDevices = [];
@@ -9714,20 +11511,203 @@ async function saveHikvisionMappings(){
   }
 })();
 
+
+let adminLicenseData = null;
+
+function setAdminSettingsTab(tab){
+  const presencas = tab==='presencas';
+  const acessos = tab==='acessos';
+  const licencas = tab==='licencas';
+
+  const general=document.getElementById('settings-presencas-general');
+  const point=document.getElementById('settings-terminal-ponto');
+  const save=document.getElementById('settings-presencas-save');
+  const access=document.getElementById('settings-terminal-acessos');
+  const licenses=document.getElementById('settings-licencas');
+
+  if(general) general.hidden=!presencas;
+  if(point) point.hidden=!presencas;
+  if(save) save.hidden=!presencas;
+  if(access) access.hidden=!acessos;
+  if(licenses) licenses.hidden=!licencas;
+
+  document.querySelectorAll('[data-settings-tab]').forEach(btn=>{
+    btn.classList.toggle('active',btn.dataset.settingsTab===tab);
+  });
+
+  if(licencas) renderAdminLicense();
+  if(acessos) renderTerminalAcessos();
+  if(presencas) loadHikvisionConfig();
+}
+
+document.querySelectorAll('[data-settings-tab]').forEach(btn=>{
+  btn.addEventListener('click',()=>setAdminSettingsTab(btn.dataset.settingsTab));
+});
+
+function fmtLicenseMoney(cents,currency='EUR'){
+  if(cents==null) return '—';
+  try{
+    return new Intl.NumberFormat('pt-PT',{style:'currency',currency:currency||'EUR'}).format(Number(cents||0)/100);
+  }catch(_){
+    return `${(Number(cents||0)/100).toFixed(2)} €`;
+  }
+}
+function adminLicenseDaysLeft(expirationDate){
+  if(!expirationDate) return null;
+  const end=new Date(expirationDate+'T23:59:59');
+  return Math.ceil((end-new Date())/86400000);
+}
+
+async function renderAdminLicense(){
+  if(!currentInstitutionId || !supabaseClient) return;
+  const statusEl=document.getElementById('admin-license-status');
+  const kpis=document.getElementById('admin-license-kpis');
+  const body=document.getElementById('admin-license-components');
+  const reqState=document.getElementById('admin-access-request-state');
+  if(!statusEl||!kpis||!body) return;
+  statusEl.textContent='A carregar…';
+
+  try{
+    const [licenseRes,addonRes,requestRes]=await Promise.all([
+      supabaseClient.from('licenses')
+        .select('id,plan,status,max_employees,extra_packs,manual_override_limit,start_date,renewal_date,expiration_date,price_cents,currency,billing_cycle')
+        .eq('institution_id',currentInstitutionId).order('created_at',{ascending:false}).limit(1).maybeSingle(),
+      supabaseClient.rpc('get_hikvision_access_addon_summary',{p_institution_id:currentInstitutionId}),
+      supabaseClient.from('addon_license_requests')
+        .select('id,requested_units,status,request_type,admin_note,review_note,created_at,reviewed_at,amount_cents,billing_scope,previous_units,units_delta,effective_date,addon_amount_cents,base_amount_cents,proration_days,period_days,period_end_date')
+        .eq('institution_id',currentInstitutionId).eq('addon_code','hikvision_access_control')
+        .order('created_at',{ascending:false}).limit(5)
+    ]);
+
+    if(licenseRes.error) throw licenseRes.error;
+    if(addonRes.error) throw addonRes.error;
+    if(requestRes.error) throw requestRes.error;
+
+    const lic=licenseRes.data||null;
+    const addon=Array.isArray(addonRes.data)?(addonRes.data[0]||{}):(addonRes.data||{});
+    const requests=requestRes.data||[];
+    const pending=requests.find(r=>r.status==='pending');
+    adminLicenseData={license:lic,addon,requests};
+
+    if(!lic){
+      statusEl.textContent='Sem licença';
+      statusEl.className='badge expired';
+      kpis.innerHTML='<div class="kpi-card"><div class="label">Licença</div><div class="value">—</div><div class="delta down">não emitida</div></div>';
+      body.innerHTML='<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--ink-faint);">Não existe uma licença emitida para esta instituição.</td></tr>';
+      return;
+    }
+
+    const days=adminLicenseDaysLeft(lic.expiration_date);
+    const cycle=lic.billing_cycle==='annual'?'Anual':lic.billing_cycle==='monthly'?'Mensal':'—';
+    const licensed=Number(addon.licensed_units||0);
+    const used=Number(addon.active_people||0);
+    const available=Number(addon.available_units||0);
+    const addonMonthly=Number(addon.monthly_total_cents||0);
+    const addonForCycle=lic.billing_cycle==='annual'?addonMonthly*12:addonMonthly;
+    const total=Number(lic.price_cents||0)+addonForCycle;
+    const addonEnabled=!!addon.enabled;
+    const pendingLicensed=addon.pending_licensed_units==null?null:Number(addon.pending_licensed_units);
+    const pendingEffective=addon.pending_effective_date||null;
+
+    statusEl.textContent=licenseStatusLabel(lic.status);
+    statusEl.className=`badge ${lic.status==='active'?'active':lic.status==='expired'?'expired':'demo'}`;
+
+    kpis.innerHTML=`
+      <div class="kpi-card"><div class="label">Plano</div><div class="value" style="font-size:22px;">${analyticsEsc(String(lic.plan||'—').toUpperCase())}</div><div class="delta flat">${cycle}</div></div>
+      <div class="kpi-card"><div class="label">Valor contratado</div><div class="value" style="font-size:22px;">${fmtLicenseMoney(total,lic.currency)}</div><div class="delta flat">base + add-ons</div></div>
+      <div class="kpi-card"><div class="label">Acessos</div><div class="value" style="font-size:22px;">${addonEnabled?`${used}/${licensed}`:'—'}</div><div class="delta flat">${addonEnabled?`${available} disponível(eis)`:'não contratado'}</div></div>
+      <div class="kpi-card"><div class="label">Dias restantes</div><div class="value" style="font-size:22px;">${days==null?'—':Math.max(0,days)}</div><div class="delta ${days!=null&&days<=5?'down':'flat'}">${days==null?'sem validade definida':days<0?`expirada há ${Math.abs(days)} dia(s)`:days===1?'falta 1 dia':`faltam ${days} dias`}</div></div>`;
+
+    body.innerHTML=`
+      <tr><td><strong>Licença ${analyticsEsc(String(lic.plan||'').toUpperCase())}</strong></td><td>${cycle}</td><td>${lic.max_employees||0} colaboradores</td><td>${fmtLicenseMoney(lic.price_cents,lic.currency)}</td><td><span class="badge ${lic.status==='active'?'active':lic.status==='expired'?'expired':'demo'}">${licenseStatusLabel(lic.status)}</span></td></tr>
+      <tr><td><strong>Controlo de Acessos</strong><div style="font-size:11px;color:var(--ink-faint);">1,00 € / lugar / mês</div></td><td>${cycle}</td><td>${addonEnabled?`${licensed} lugares · ${used} usados`:'—'}</td><td>${addonEnabled?fmtLicenseMoney(addonForCycle,lic.currency):'—'}</td><td><span class="badge ${addonEnabled?'active':'demo'}">${addonEnabled?'Ativo':'Não contratado'}</span>${pendingLicensed!=null?`<div style="font-size:11px;color:#946218;margin-top:4px;">Redução para ${pendingLicensed} em ${new Date(pendingEffective+'T12:00:00').toLocaleDateString('pt-PT')}</div>`:''}</td></tr>
+      <tr><td colspan="3"><strong>Total da licença</strong></td><td><strong>${fmtLicenseMoney(total,lic.currency)}</strong></td><td></td></tr>`;
+
+    const unitsInput=document.getElementById('admin-access-request-units');
+    const reqBtn=document.getElementById('admin-access-request-btn');
+
+    if(unitsInput && !unitsInput.dataset.userEdited){
+      unitsInput.value=String(addonEnabled?Math.max(1,licensed):Math.min(Math.max(1,lic.max_employees||1),10));
+      unitsInput.oninput=()=>{unitsInput.dataset.userEdited='1';};
+    }
+    if(reqBtn) reqBtn.disabled=!!pending;
+
+    if(reqState){
+      if(pending){
+        const label=pending.request_type==='upgrade'?'Aumento':pending.request_type==='downgrade'?'Redução':'Novo add-on';
+        reqState.innerHTML=`<div class="hint-chip">${label} pendente: <strong>${pending.requested_units} lugares</strong>. Aguarda emissão pelo Super Admin.</div>`;
+      }else if(pendingLicensed!=null && pendingEffective){
+        reqState.innerHTML=`<div class="hint-chip">Redução já aprovada: o limite passa para <strong>${pendingLicensed} lugares</strong> em <strong>${new Date(pendingEffective+'T12:00:00').toLocaleDateString('pt-PT')}</strong>.</div>`;
+      }else if(requests[0]?.status==='issued'){
+        const d=Number(requests[0].units_delta||0);
+        const label=d>0?'Upgrade emitido':d<0?'Downgrade programado':'Pedido emitido';
+        reqState.innerHTML=`<div class="hint-chip">${label}: <strong>${requests[0].requested_units} lugares</strong>${requests[0].effective_date?` · efetivo em ${new Date(requests[0].effective_date+'T12:00:00').toLocaleDateString('pt-PT')}`:''}.</div>`;
+      }else if(requests[0]?.status==='rejected'){
+        reqState.innerHTML=`<div class="hint-chip">Último pedido rejeitado${requests[0].review_note?`: ${analyticsEsc(requests[0].review_note)}`:'.'}</div>`;
+      }else reqState.innerHTML='';
+    }
+  }catch(err){
+    console.error('Erro ao carregar licença da instituição:',err);
+    statusEl.textContent='Erro';
+    statusEl.className='badge expired';
+    body.innerHTML='<tr><td colspan="5" style="padding:24px;text-align:center;color:var(--red);">Não foi possível carregar a licença.</td></tr>';
+  }
+}
+
+async function requestAccessAddonLicense(){
+  const units=Number(document.getElementById('admin-access-request-units')?.value||0);
+  const note=document.getElementById('admin-access-request-note')?.value?.trim()||null;
+  const btn=document.getElementById('admin-access-request-btn');
+
+  if(!Number.isInteger(units)||units<1){
+    showToast('Indica um número válido de lugares.',true);
+    return;
+  }
+
+  const old=btn?.textContent||'Enviar pedido';
+  if(btn){btn.disabled=true;btn.textContent='A enviar…';}
+
+  try{
+    const {data,error}=await supabaseClient.rpc('request_access_addon',{
+      p_requested_units:units,
+      p_admin_note:note
+    });
+
+    if(error) throw error;
+    if(!data?.ok) throw new Error(data?.error||'Não foi possível enviar o pedido.');
+
+    let emailOk=true;
+    try{
+      const emailRes=await supabaseClient.functions.invoke('send-addon-license-status-email',{
+        body:{action:'request_created',request_id:data.request_id}
+      });
+      if(emailRes.error || !emailRes.data?.ok) emailOk=false;
+    }catch(mailErr){
+      console.warn('Pedido criado, mas falhou o email de confirmação:',mailErr);
+      emailOk=false;
+    }
+
+    showToast(emailOk
+      ? `Pedido de ${units} lugares enviado. Receberás confirmação por email.`
+      : `Pedido de ${units} lugares enviado ao Super Admin. O email de confirmação não foi enviado.`
+    );
+
+    await renderAdminLicense();
+
+  }catch(err){
+    console.error(err);
+    showToast('Erro ao enviar pedido: '+(err.message||''),true);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=old;}
+  }
+}
+
+
 async function renderAdminDefinicoes(){
   document.getElementById('ad-timezone').value = adminSettings.timezone;
   document.getElementById('ad-late-tolerance').value = adminSettings.lateToleranceMin;
   document.getElementById('ad-overtime-threshold').value = adminSettings.overtimeThresholdMin;
-
-  try{
-    await Promise.all([
-      loadHikvisionConfig(),
-      renderTerminalAcessos()
-    ]);
-  }catch(err){
-    console.error('Erro ao carregar definições dos terminais:', err);
-    showToast('Algumas configurações dos terminais não puderam ser carregadas.', true);
-  }
+  setAdminSettingsTab('presencas');
 }
 function saveAdminDefinicoes(){
   adminSettings.timezone = document.getElementById('ad-timezone').value;
@@ -9737,7 +11717,7 @@ function saveAdminDefinicoes(){
   if(!Number.isFinite(adminSettings.overtimeThresholdMin) || adminSettings.overtimeThresholdMin < 0) adminSettings.overtimeThresholdMin = 15;
   showToast('Definições guardadas com sucesso.');
 }
-document.getElementById('access-addon-toggle-btn').addEventListener('click', toggleAccessAddon);
+document.getElementById('access-addon-toggle-btn')?.addEventListener('click', toggleAccessAddon);
 document.getElementById('ac-hik-save-btn').addEventListener('click', saveAccessDevice);
 document.getElementById('ac-permission-save-btn').addEventListener('click', saveAccessPermission);
 document.getElementById('ac-person-employee').addEventListener('change', ()=>{
@@ -10484,12 +12464,214 @@ document.getElementById('ep-erase-request-btn').addEventListener('click', ()=>{
   });
 });
 
-/* ---------------- PWA: registo do service worker ---------------- */
-if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
-  });
+/* ---------------- PWA: Service Worker + atualização controlada ---------------- */
+let picaWaitingServiceWorker=null;
+let picaSwRefreshing=false;
+
+function showPwaUpdateBanner(worker){
+  if(!worker) return;
+  picaWaitingServiceWorker=worker;
+  const banner=document.getElementById('pwa-update-banner');
+  if(banner) banner.hidden=false;
 }
+function hidePwaUpdateBanner(){
+  const banner=document.getElementById('pwa-update-banner');
+  if(banner) banner.hidden=true;
+}
+async function registerPicaServiceWorker(){
+  if(!('serviceWorker' in navigator) || location.protocol==='file:') return;
+  try{
+    const reg=await navigator.serviceWorker.register('service-worker.js',{updateViaCache:'none'});
+
+    if(reg.waiting && navigator.serviceWorker.controller){
+      showPwaUpdateBanner(reg.waiting);
+    }
+
+    reg.addEventListener('updatefound',()=>{
+      const worker=reg.installing;
+      if(!worker) return;
+      worker.addEventListener('statechange',()=>{
+        if(worker.state==='installed' && navigator.serviceWorker.controller){
+          showPwaUpdateBanner(worker);
+        }
+      });
+    });
+
+    // Verifica novas versões quando a app abre e quando volta ao primeiro plano.
+    reg.update().catch(()=>{});
+    document.addEventListener('visibilitychange',()=>{
+      if(!document.hidden) reg.update().catch(()=>{});
+    });
+    setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
+
+  }catch(err){
+    console.warn('Service Worker indisponível:',err);
+  }
+}
+
+navigator.serviceWorker?.addEventListener('controllerchange',()=>{
+  if(picaSwRefreshing) return;
+  picaSwRefreshing=true;
+  location.reload();
+});
+
+window.addEventListener('load',registerPicaServiceWorker);
+
+document.getElementById('pwa-update-btn')?.addEventListener('click',()=>{
+  if(!picaWaitingServiceWorker) return;
+  const btn=document.getElementById('pwa-update-btn');
+  if(btn){btn.disabled=true;btn.textContent='A atualizar…';}
+  picaWaitingServiceWorker.postMessage({type:'SKIP_WAITING'});
+});
+
+/* ================= GLOBAL ACTION LOADING / DOUBLE-TAP GUARD ================= */
+const PICA_LOADING_ACTION_RE = /(guardar|gravar|salvar|criar|gerar|aplicar|emitir|enviar|sincronizar|atualizar|registar|aprovar|rejeitar|eliminar|apagar|renovar|copiar|importar|exportar|testar|emparelhar)/i;
+let picaNetworkPending = 0;
+let picaInteractionPending = 0;
+let picaLoadingSourceButton = null;
+let picaLoadingMinTimer = null;
+let picaInteractionStartedAt = 0;
+
+function picaLoadingMessageFromButton(btn){
+  const text=(btn?.textContent||'').trim().toLowerCase();
+  if(text.includes('gerar')) return 'A gerar…';
+  if(text.includes('sincron')) return 'A sincronizar…';
+  if(text.includes('enviar')) return 'A enviar…';
+  if(text.includes('emitir')) return 'A emitir…';
+  if(text.includes('eliminar')||text.includes('apagar')) return 'A eliminar…';
+  if(text.includes('export')) return 'A exportar…';
+  if(text.includes('import')) return 'A importar…';
+  if(text.includes('aplicar')) return 'A aplicar…';
+  if(text.includes('guardar')||text.includes('gravar')||text.includes('criar')||text.includes('registar')) return 'A guardar…';
+  return 'A processar…';
+}
+
+function picaUpdateGlobalLoading(){
+  const overlay=document.getElementById('global-action-loading');
+  if(!overlay) return;
+  const busy=(picaNetworkPending>0 || picaInteractionPending>0);
+  overlay.hidden=!busy;
+  document.documentElement.style.cursor=busy?'progress':'';
+  if(!busy && picaLoadingSourceButton){
+    picaLoadingSourceButton.classList.remove('is-loading');
+    picaLoadingSourceButton.disabled=false;
+    picaLoadingSourceButton=null;
+  }
+}
+
+function picaStartInteractionLoading(btn){
+  picaInteractionPending=1;
+  picaInteractionStartedAt=Date.now();
+  picaLoadingSourceButton=btn||null;
+
+  if(btn){
+    btn.classList.add('is-loading');
+    btn.disabled=true;
+  }
+
+  const label=document.getElementById('global-loading-text');
+  if(label) label.textContent=picaLoadingMessageFromButton(btn);
+
+  clearTimeout(picaLoadingMinTimer);
+  picaLoadingMinTimer=setTimeout(()=>{
+    /*
+      Se não arrancou qualquer pedido de rede, libertamos a ação local.
+      Se arrancou, o fetch tracker mantém o overlay até terminar.
+    */
+    picaInteractionPending=0;
+    picaUpdateGlobalLoading();
+  },320);
+
+  picaUpdateGlobalLoading();
+}
+
+function picaFinishInteractionLoading(){
+  const elapsed=Date.now()-picaInteractionStartedAt;
+  const wait=Math.max(0,260-elapsed);
+  setTimeout(()=>{
+    picaInteractionPending=0;
+    picaUpdateGlobalLoading();
+  },wait);
+}
+
+/* Captura ações antes dos handlers normais: o overlay impede segundo toque. */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('button');
+  if(!btn || btn.disabled) return;
+
+  const raw=`${btn.id||''} ${btn.textContent||''} ${btn.getAttribute('title')||''}`;
+  const excluded=/^(ponto-prev-btn|ponto-next-btn|escala-prev-btn|escala-next-btn|time-bank-prev-btn|time-bank-next-btn)$/;
+  if(excluded.test(btn.id||'')) return;
+
+  if(PICA_LOADING_ACTION_RE.test(raw)){
+    picaStartInteractionLoading(btn);
+  }
+},true);
+
+/* Track de todos os pedidos fetch (Supabase, Edge Functions, etc.). */
+(function installPicaFetchTracker(){
+  if(window.__picaFetchTrackerInstalled) return;
+  window.__picaFetchTrackerInstalled=true;
+  const originalFetch=window.fetch.bind(window);
+
+  window.fetch=async function(...args){
+    picaNetworkPending++;
+    picaUpdateGlobalLoading();
+
+    try{
+      return await originalFetch(...args);
+    }finally{
+      picaNetworkPending=Math.max(0,picaNetworkPending-1);
+      if(picaNetworkPending===0){
+        picaFinishInteractionLoading();
+      }else{
+        picaUpdateGlobalLoading();
+      }
+    }
+  };
+})();
+
+/* Segurança extra: nunca deixar overlay preso por navegação/erro não tratado. */
+window.addEventListener('pageshow',()=>{
+  picaNetworkPending=0;
+  picaInteractionPending=0;
+  picaUpdateGlobalLoading();
+});
+window.addEventListener('unhandledrejection',()=>{
+  setTimeout(()=>{
+    if(picaNetworkPending===0){
+      picaInteractionPending=0;
+      picaUpdateGlobalLoading();
+    }
+  },500);
+});
+
+
+document.getElementById('admin-notification-btn')?.addEventListener('click',openNotificationCenter);
+document.getElementById('sa-notification-btn')?.addEventListener('click',openNotificationCenter);
+document.getElementById('notification-close-btn')?.addEventListener('click',closeNotificationCenter);
+document.getElementById('notification-overlay')?.addEventListener('click',closeNotificationCenter);
+document.getElementById('notification-read-all-btn')?.addEventListener('click',markAllNotificationsRead);
+document.getElementById('notification-refresh-btn')?.addEventListener('click',loadNotificationCenter);
+document.getElementById('access-history-sync-btn')?.addEventListener('click',syncAccessHistoryFromDevices);
+document.getElementById('access-history-device')?.addEventListener('change',renderAccessHistory);
+document.getElementById('access-history-result')?.addEventListener('change',renderAccessHistory);
+document.getElementById('access-history-date')?.addEventListener('change',renderAccessHistory);
+
+const adminKpiObserverTarget=document.getElementById('admin-kpi-grid');
+if(adminKpiObserverTarget){
+  new MutationObserver(()=>renderMobileDashboardCards()).observe(adminKpiObserverTarget,{childList:true,subtree:true});
+}
+setInterval(()=>{ if(!document.hidden) loadNotificationCenter(); },60000);
+
+
+setInterval(()=>{
+  const accessSection=document.getElementById('settings-terminal-acessos');
+  if(accessSection && !accessSection.hidden && currentInstitutionId){
+    loadAccessControlData().then(fillAccessControlUI).catch(()=>{});
+  }
+},30000);
+
 </script>
 </body>
 </html>
