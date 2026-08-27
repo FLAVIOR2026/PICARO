@@ -1146,9 +1146,6 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
     <button class="nav-item" data-nav="instituicoes"><span class="ic">▢</span>Empresas/Instituições</button>
     <button class="nav-item" data-nav="licencas"><span class="ic">◈</span>Licenças</button>
     <button class="nav-item" data-nav="admins"><span class="ic">◍</span>Administradores</button>
-    <div class="nav-section-label">Terminais</div>
-    <button class="nav-item" data-nav="terminal-ponto"><span class="ic">⏱</span>Terminal de Ponto</button>
-    <button class="nav-item" data-nav="terminal-acessos"><span class="ic">▣</span>Terminal de Acessos</button>
     <div class="nav-section-label">Sistema</div>
     <button class="nav-item" data-nav="definicoes"><span class="ic">⚙</span>Definições</button>
     <div class="sidebar-footer">
@@ -2075,10 +2072,73 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
       </div>
 
       
-      <div class="page" id="page-terminal-ponto" hidden>
+      
+
+      
+
+<div class="page" id="page-definicoes" hidden>
         <div class="page-head">
           <div>
-            <h1>Terminal de Ponto</h1>
+            <h1>Definições</h1>
+            <div class="sub">Regras aplicadas a esta empresa/instituição</div>
+          </div>
+        </div>
+        <div class="toolbar" style="margin-bottom:16px;">
+          <div class="filter-group" style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="btn-outline" onclick="document.getElementById('settings-terminal-ponto')?.scrollIntoView({behavior:'smooth',block:'start'})">Terminal de Ponto</button>
+            <button type="button" class="btn-outline" onclick="document.getElementById('settings-terminal-acessos')?.scrollIntoView({behavior:'smooth',block:'start'})">Terminal de Acessos</button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head">
+              <div><h3>Fuso horário</h3><div class="sub">Usado nos horários, escalas e no relógio do Quiosque</div></div>
+            </div>
+            <div class="panel-body" style="padding-top:16px;">
+              <div class="field">
+                <label>Fuso horário desta empresa/instituição</label>
+                <select class="select-input" id="ad-timezone" style="width:100%;">
+                  <option value="Europe/Lisbon">Europa/Lisboa (WET/WEST)</option>
+                  <option value="Atlantic/Azores">Atlântico/Açores</option>
+                  <option value="Atlantic/Madeira">Atlântico/Madeira</option>
+                  <option value="America/Sao_Paulo">América/São Paulo</option>
+                  <option value="Africa/Luanda">África/Luanda</option>
+                  <option value="Africa/Maputo">África/Maputo</option>
+                </select>
+              </div>
+              <div class="hint" style="font-size:11.5px; color:var(--ink-faint);">Todas as horas mostradas na app (escalas, ponto, relatórios) passam a ser calculadas neste fuso horário.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <div><h3>Assiduidade</h3><div class="sub">Regras usadas para classificar entradas e horas extra</div></div>
+            </div>
+            <div class="panel-body" style="padding-top:16px;">
+              <div class="field">
+                <label>Tolerância de atraso (minutos)</label>
+                <input type="number" id="ad-late-tolerance" min="0" max="120" value="10">
+                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Uma entrada até este número de minutos depois da hora do turno ainda conta como "Pontual". A partir daqui conta como "Atraso".</div>
+              </div>
+              <div class="field">
+                <label>Hora extra a partir de (minutos)</label>
+                <input type="number" id="ad-overtime-threshold" min="0" max="120" value="15">
+                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Só passa a contar como hora extra (e a ser incluída na compensação dos Relatórios) quem sair depois da hora do turno mais este número de minutos.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <section id="settings-terminal-ponto" style="margin-top:24px;">
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-body" style="padding-top:18px;">
+
+        <div class="panel-head">
+          <div>
+            <h2 style="font-family:var(--font-display);font-size:22px;">Terminal de Ponto</h2>
             <div class="sub">Configuração do equipamento HIKVISION usado para registos de ponto</div>
           </div>
         </div>
@@ -2213,12 +2273,19 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
 
 
 
-      </div>
+      
+            </div>
+          </div>
+        </section>
 
-      <div class="page" id="page-terminal-acessos" hidden>
-        <div class="page-head">
+
+        <section id="settings-terminal-acessos" style="margin-top:24px;">
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-body" style="padding-top:18px;">
+
+        <div class="panel-head">
           <div>
-            <h1>Terminal de Acessos</h1>
+            <h2 style="font-family:var(--font-display);font-size:22px;">Terminal de Acessos</h2>
             <div class="sub">Controlo de acessos HIKVISION · add-on faturado por pessoa ativa</div>
           </div>
           <span class="badge" id="access-addon-badge">A carregar…</span>
@@ -2324,56 +2391,10 @@ input.invalid{ border-color:var(--red) !important; box-shadow:0 0 0 3px var(--re
             </div>
           </div>
         </div>
-      </div>
-
-<div class="page" id="page-definicoes" hidden>
-        <div class="page-head">
-          <div>
-            <h1>Definições</h1>
-            <div class="sub">Regras aplicadas a esta empresa/instituição</div>
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="panel">
-            <div class="panel-head">
-              <div><h3>Fuso horário</h3><div class="sub">Usado nos horários, escalas e no relógio do Quiosque</div></div>
-            </div>
-            <div class="panel-body" style="padding-top:16px;">
-              <div class="field">
-                <label>Fuso horário desta empresa/instituição</label>
-                <select class="select-input" id="ad-timezone" style="width:100%;">
-                  <option value="Europe/Lisbon">Europa/Lisboa (WET/WEST)</option>
-                  <option value="Atlantic/Azores">Atlântico/Açores</option>
-                  <option value="Atlantic/Madeira">Atlântico/Madeira</option>
-                  <option value="America/Sao_Paulo">América/São Paulo</option>
-                  <option value="Africa/Luanda">África/Luanda</option>
-                  <option value="Africa/Maputo">África/Maputo</option>
-                </select>
-              </div>
-              <div class="hint" style="font-size:11.5px; color:var(--ink-faint);">Todas as horas mostradas na app (escalas, ponto, relatórios) passam a ser calculadas neste fuso horário.</div>
+      
             </div>
           </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <div><h3>Assiduidade</h3><div class="sub">Regras usadas para classificar entradas e horas extra</div></div>
-            </div>
-            <div class="panel-body" style="padding-top:16px;">
-              <div class="field">
-                <label>Tolerância de atraso (minutos)</label>
-                <input type="number" id="ad-late-tolerance" min="0" max="120" value="10">
-                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Uma entrada até este número de minutos depois da hora do turno ainda conta como "Pontual". A partir daqui conta como "Atraso".</div>
-              </div>
-              <div class="field">
-                <label>Hora extra a partir de (minutos)</label>
-                <input type="number" id="ad-overtime-threshold" min="0" max="120" value="15">
-                <div class="hint" style="font-size:11.5px; color:var(--ink-faint); margin-top:6px;">Só passa a contar como hora extra (e a ser incluída na compensação dos Relatórios) quem sair depois da hora do turno mais este número de minutos.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        </section>
 
         <div class="panel">
           <div class="panel-body" style="padding-top:16px; display:flex; justify-content:flex-end; gap:10px;">
@@ -5984,25 +6005,44 @@ function hasMinimumRest(empId, ds, shift, proposalEntries, minRestHours){
   return true;
 }
 
-function openRosterGenerator(){
-  const teamSel=document.getElementById('rg-team');
-  teamSel.innerHTML='<option value="">Todas as equipas</option>' +
-    teams.map(t=>`<option value="${analyticsEsc(t.name)}">${analyticsEsc(t.name)}</option>`).join('');
+async function openRosterGenerator(){
+  try{
+    if(currentInstitutionId){
+      await Promise.all([
+        loadRosterForWeek(currentInstitutionId,currentWeekStart),
+        loadSupaTeamMap(currentInstitutionId),
+        loadShiftsFromSupabase(currentInstitutionId),
+        loadApprovedVacationsForWeek(currentInstitutionId,currentWeekStart)
+      ]);
+    }
 
-  document.getElementById('rg-shifts').innerHTML = shifts.length
-    ? shifts.map(s=>`
-      <label class="rg-shift-option">
-        <input type="checkbox" class="rg-shift-check" value="${s.id}" checked>
-        <span class="rg-shift-dot" style="background:${s.color}"></span>
-        <span><strong>${analyticsEsc(s.name)}</strong><br><span style="color:var(--ink-faint)">${s.start}–${s.end}${isOvernightShift(s)?' (+1 dia)':''} · ${formatDurationMinutes(shiftNetMinutes(s))}</span></span>
-      </label>`).join('')
-    : '<div class="analytics-empty">Cria primeiro pelo menos um turno.</div>';
+    const teamSel=document.getElementById('rg-team');
+    if(!teamSel) throw new Error('Painel do gerador não encontrado.');
 
-  document.getElementById('rg-preview').innerHTML='';
-  document.getElementById('roster-generator-apply-btn').disabled=true;
-  generatedRosterProposal=null;
-  document.getElementById('roster-generator-drawer').classList.add('open');
-  document.getElementById('roster-generator-overlay').classList.add('open');
+    teamSel.innerHTML='<option value="">Todas as equipas</option>' +
+      teams.map(t=>`<option value="${analyticsEsc(t.name)}">${analyticsEsc(t.name)}</option>`).join('');
+
+    const shiftsWrap=document.getElementById('rg-shifts');
+    shiftsWrap.innerHTML = shifts.length
+      ? shifts.map(s=>`
+        <label class="rg-shift-option">
+          <input type="checkbox" class="rg-shift-check" value="${s.id}" checked>
+          <span class="rg-shift-dot" style="background:${s.color}"></span>
+          <span><strong>${analyticsEsc(s.name)}</strong><br><span style="color:var(--ink-faint)">${s.start}–${s.end}${isOvernightShift(s)?' (+1 dia)':''} · ${formatDurationMinutes(shiftNetMinutes(s))}</span></span>
+        </label>`).join('')
+      : '<div class="analytics-empty">Cria primeiro pelo menos um turno.</div>';
+
+    document.getElementById('rg-preview').innerHTML='';
+    document.getElementById('roster-generator-apply-btn').disabled=true;
+    generatedRosterProposal=null;
+
+    document.getElementById('roster-generator-drawer').classList.add('open');
+    document.getElementById('roster-generator-overlay').classList.add('open');
+
+  }catch(err){
+    console.error('Gerador de escalas:',err);
+    showToast('Erro ao abrir o gerador: '+(err.message||''),true);
+  }
 }
 function closeRosterGenerator(){
   document.getElementById('roster-generator-drawer').classList.remove('open');
@@ -6152,72 +6192,98 @@ function buildRosterProposal(){
 }
 
 function previewRosterGenerator(){
-  try{
-    const result=buildRosterProposal();
-    generatedRosterProposal=result;
+  const preview=document.getElementById('rg-preview');
+  const applyBtn=document.getElementById('roster-generator-apply-btn');
 
+  try{
+    preview.innerHTML='<div class="rg-preview-card"><div class="rg-preview-line">A gerar proposta…</div></div>';
+    applyBtn.disabled=true;
+
+    const result=buildRosterProposal();
     const workEntries=result.proposal.filter(x=>!x.isDayOff);
     const offEntries=result.proposal.filter(x=>x.isDayOff);
-    const totalHours=workEntries.reduce((sum,r)=>{
+
+    if(!workEntries.length){
+      generatedRosterProposal=null;
+      preview.innerHTML=`<div class="rg-preview-card rg-warning"><div class="rg-preview-title">Não foi possível gerar turnos</div><div class="rg-preview-line">Verifica se existem colaboradores ativos, equipas, turnos selecionados e se férias/ausências ou limites semanais não estão a bloquear a proposta.</div></div>`;
+      return;
+    }
+
+    generatedRosterProposal=result;
+
+    const totalMinutes=workEntries.reduce((sum,r)=>{
       const s=shifts.find(x=>String(x.id)===String(r.shiftId));
       return sum+(s?shiftNetMinutes(s):0);
     },0);
 
     const perShift=result.usableShifts.map(s=>{
-      const c=workEntries.filter(r=>String(r.shiftId)===String(s.id)).length;
-      return `${s.name}: ${c}`;
+      const count=workEntries.filter(r=>String(r.shiftId)===String(s.id)).length;
+      return `${analyticsEsc(s.name)}: ${count}`;
     }).join(' · ');
 
-    document.getElementById('rg-preview').innerHTML=`
+    preview.innerHTML=`
       <div class="rg-preview-card rg-good">
         <div class="rg-preview-title">Proposta pronta</div>
-        <div class="rg-preview-line">${result.targetEmployees.length} colaborador(es) · ${workEntries.length} turnos · ${offEntries.length} folgas explícitas</div>
-        <div class="rg-preview-line">Carga total proposta: ${formatDurationMinutes(totalHours)}</div>
-        <div class="rg-preview-line">${analyticsEsc(perShift||'Sem turnos')}</div>
+        <div class="rg-preview-line">${result.targetEmployees.length} colaborador(es) · ${workEntries.length} turno(s) · ${offEntries.length} folga(s)</div>
+        <div class="rg-preview-line">Carga total: ${formatDurationMinutes(totalMinutes)}</div>
+        <div class="rg-preview-line">${perShift||'Sem distribuição por turno'}</div>
       </div>
-      ${result.warnings.length ? `
+      ${result.warnings.length?`
         <div class="rg-preview-card rg-warning">
           <div class="rg-preview-title">Avisos (${result.warnings.length})</div>
-          ${result.warnings.slice(0,10).map(w=>`<div class="rg-preview-line">⚠ ${analyticsEsc(w)}</div>`).join('')}
-          ${result.warnings.length>10?`<div class="rg-preview-line">+ ${result.warnings.length-10} outros avisos</div>`:''}
-        </div>` : `
-        <div class="rg-preview-card rg-good"><div class="rg-preview-line">✓ Sem conflitos detetados nesta proposta.</div></div>`}
-    `;
-    document.getElementById('roster-generator-apply-btn').disabled=false;
+          ${result.warnings.slice(0,12).map(w=>`<div class="rg-preview-line">⚠ ${analyticsEsc(w)}</div>`).join('')}
+        </div>`:
+        `<div class="rg-preview-card rg-good"><div class="rg-preview-line">✓ Sem conflitos detetados.</div></div>`
+      }`;
+
+    applyBtn.disabled=false;
+
   }catch(err){
+    console.error('Erro ao gerar proposta:',err);
     generatedRosterProposal=null;
-    document.getElementById('roster-generator-apply-btn').disabled=true;
-    document.getElementById('rg-preview').innerHTML=`<div class="rg-preview-card rg-warning"><div class="rg-preview-line">⚠ ${analyticsEsc(err.message||'Não foi possível gerar a escala.')}</div></div>`;
+    applyBtn.disabled=true;
+    preview.innerHTML=`<div class="rg-preview-card rg-warning"><div class="rg-preview-title">Erro</div><div class="rg-preview-line">⚠ ${analyticsEsc(err.message||'Não foi possível gerar a escala.')}</div></div>`;
+    showToast('Erro ao gerar proposta: '+(err.message||''),true);
   }
 }
 
 async function applyGeneratedRoster(){
-  if(!generatedRosterProposal) return;
+  if(!generatedRosterProposal){
+    showToast('Gera primeiro uma proposta de escala.',true);
+    return;
+  }
+
   const btn=document.getElementById('roster-generator-apply-btn');
-  const old=btn.textContent; btn.disabled=true; btn.textContent='A guardar…';
+  const old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='A aplicar…';
 
   try{
     const {proposal,targetEmployees,replaceExisting}=generatedRosterProposal;
     const dates=getWeekDates(currentWeekStart).map(dateStr);
 
     if(currentInstitutionId){
-      if(replaceExisting){
-        const ids=targetEmployees.map(e=>e.id);
-        const {error:delErr}=await supabaseClient.from('roster_entries')
-          .delete()
-          .eq('institution_id',currentInstitutionId)
-          .in('employee_id',ids)
-          .gte('work_date',dates[0])
-          .lte('work_date',dates[6]);
-        if(delErr) throw delErr;
-      }
+      const payload=proposal.map(r=>({
+        employee_id:r.employeeId,
+        work_date:r.date,
+        shift_type_id:r.shiftId||null,
+        is_day_off:!!r.isDayOff,
+        notes:r.notes||null
+      }));
 
-      for(const r of proposal){
-        await supaUpsertRoster(r.employeeId,r.date,r.shiftId,{
-          isDayOff:!!r.isDayOff,
-          notes:r.notes||''
-        });
-      }
+      const {data,error}=await supabaseClient.rpc('apply_generated_roster',{
+        p_institution_id:currentInstitutionId,
+        p_entries:payload,
+        p_replace_existing:!!replaceExisting,
+        p_employee_ids:replaceExisting ? targetEmployees.map(e=>e.id) : null,
+        p_from_date:replaceExisting ? dates[0] : null,
+        p_to_date:replaceExisting ? dates[6] : null
+      });
+
+      if(error) throw error;
+      if(!data?.ok) throw new Error('O servidor não confirmou a aplicação da escala.');
+
+      await loadRosterForWeek(currentInstitutionId,currentWeekStart);
       await renderEscalas();
     }else{
       for(const r of proposal){
@@ -6227,13 +6293,17 @@ async function applyGeneratedRoster(){
       renderEscalas();
     }
 
+    const total=proposal.filter(x=>!x.isDayOff).length;
     closeRosterGenerator();
-    showToast(`Escala gerada com sucesso — ${proposal.filter(x=>!x.isDayOff).length} turnos aplicados.`);
+    generatedRosterProposal=null;
+    showToast(`Escala aplicada com sucesso — ${total} turno(s) gravado(s).`);
+
   }catch(err){
-    console.error(err);
-    showToast('Erro ao aplicar escala gerada: '+(err.message||''),true);
+    console.error('Erro ao aplicar escala gerada:',err);
+    showToast('Erro ao aplicar escala: '+(err.message||''),true);
   }finally{
-    btn.disabled=false; btn.textContent=old;
+    btn.disabled=false;
+    btn.textContent=old;
   }
 }
 
@@ -9040,8 +9110,6 @@ wireSidebarNav('#admin-dashboard-screen', {
   relatorios:{id:'page-relatorios', render:renderRelatorios},
   trocas:{id:'page-trocas', render:renderAdminShiftSwaps},
   'banco-horas':{id:'page-banco-horas', render:renderTimeBank},
-  'terminal-ponto':{id:'page-terminal-ponto', render:loadHikvisionConfig},
-  'terminal-acessos':{id:'page-terminal-acessos', render:renderTerminalAcessos},
   definicoes:{id:'page-definicoes', render:renderAdminDefinicoes},
 });
 
@@ -9610,10 +9678,56 @@ async function saveHikvisionMappings(){
 }
 
 
-function renderAdminDefinicoes(){
+
+/* ---------------- EVENTOS DO GERADOR DE ESCALAS ---------------- */
+(function wireRosterGenerator(){
+  const openBtn=document.getElementById('escala-generator-btn');
+  const closeBtn=document.getElementById('roster-generator-close');
+  const cancelBtn=document.getElementById('roster-generator-cancel');
+  const overlay=document.getElementById('roster-generator-overlay');
+  const previewBtn=document.getElementById('roster-generator-preview-btn');
+  const applyBtn=document.getElementById('roster-generator-apply-btn');
+
+  if(openBtn && !openBtn.dataset.wired){
+    openBtn.dataset.wired='1';
+    openBtn.addEventListener('click',()=>openRosterGenerator());
+  }
+  if(closeBtn && !closeBtn.dataset.wired){
+    closeBtn.dataset.wired='1';
+    closeBtn.addEventListener('click',closeRosterGenerator);
+  }
+  if(cancelBtn && !cancelBtn.dataset.wired){
+    cancelBtn.dataset.wired='1';
+    cancelBtn.addEventListener('click',closeRosterGenerator);
+  }
+  if(overlay && !overlay.dataset.wired){
+    overlay.dataset.wired='1';
+    overlay.addEventListener('click',closeRosterGenerator);
+  }
+  if(previewBtn && !previewBtn.dataset.wired){
+    previewBtn.dataset.wired='1';
+    previewBtn.addEventListener('click',previewRosterGenerator);
+  }
+  if(applyBtn && !applyBtn.dataset.wired){
+    applyBtn.dataset.wired='1';
+    applyBtn.addEventListener('click',applyGeneratedRoster);
+  }
+})();
+
+async function renderAdminDefinicoes(){
   document.getElementById('ad-timezone').value = adminSettings.timezone;
   document.getElementById('ad-late-tolerance').value = adminSettings.lateToleranceMin;
   document.getElementById('ad-overtime-threshold').value = adminSettings.overtimeThresholdMin;
+
+  try{
+    await Promise.all([
+      loadHikvisionConfig(),
+      renderTerminalAcessos()
+    ]);
+  }catch(err){
+    console.error('Erro ao carregar definições dos terminais:', err);
+    showToast('Algumas configurações dos terminais não puderam ser carregadas.', true);
+  }
 }
 function saveAdminDefinicoes(){
   adminSettings.timezone = document.getElementById('ad-timezone').value;
